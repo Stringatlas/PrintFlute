@@ -1,15 +1,18 @@
 <script lang="ts">
-	import MainGeometry from './generation/MainGeometry.svelte';
-	import ProcessForPrinting from './generation/ProcessForPrinting.svelte';
-	import { viewMode } from '$lib/stores/fluteStore';
+	import MainGeometry from '$lib/components/generation/generation-steps/MainGeometry.svelte';
+	import ProcessForPrinting from '$lib/components/generation/generation-steps/ProcessForPrinting.svelte';
+	import PlacetoneHoles from '$lib/components/generation/generation-steps/PlacetoneHoles.svelte';
+    import { viewMode } from '$lib/stores/fluteStore';
 
 	let currentStep = 1;
-	const totalSteps = 2;
 
 	const steps = [
 		{ number: 1, label: 'Main Geometry', icon: 'bi-1-circle-fill' },
-		{ number: 2, label: 'Process for Printing', icon: 'bi-2-circle-fill' }
+        { number: 2, label: 'Place Tone Holes', icon: 'bi-2-circle-fill' },
+		{ number: 3, label: 'Process for Printing', icon: 'bi-3-circle-fill' }
 	];
+
+    const totalSteps = steps.length;
 
 	function toggleViewMode() {
 		viewMode.update(mode => (mode === 'basic' ? 'advanced' : 'basic'));
@@ -48,23 +51,29 @@
 
 	<!-- Step Progress Bar -->
 	<div class="relative py-6">
-		<!-- Progress Line -->
-		<div class="absolute top-1/2 left-0 right-0 h-0.5 bg-gray-700 -translate-y-1/2" style="margin: 0 60px;"></div>
-		<div 
-			class="absolute top-1/2 left-0 h-0.5 bg-primary-500 -translate-y-1/2 transition-all duration-300" 
-			style="margin-left: 60px; width: calc((100% - 120px) * {progressPercent} / 100);"
-		></div>
-
 		<!-- Step Indicators -->
 		<div class="relative flex justify-between">
+			<!-- Progress Lines (behind icons) -->
+			<div class="absolute left-0 right-0 top-4 -translate-y-1/2 px-12 pointer-events-none">
+				<div class="relative h-0.5 bg-gray-700">
+					<div 
+						class="absolute h-full bg-primary-500 transition-all duration-300"
+						style="width: {progressPercent}%;"
+					></div>
+				</div>
+			</div>
+
 			{#each steps as step}
 				<button
 					on:click={() => goToStep(step.number)}
 					class="flex flex-col items-center gap-2 group"
 				>
-					<div class="relative flex items-center justify-center">
+					<div class="relative flex items-center justify-center h-8">
+						<!-- Background to block line through icon center -->
+						<div class="absolute w-10 h-10 bg-gray-900 rounded-full z-[5]"></div>
+						
 						<i 
-							class="{step.icon} text-3xl transition-colors duration-200 {
+							class="relative z-10 {step.icon} text-3xl transition-colors duration-200 {
 								currentStep >= step.number 
 									? 'text-primary-500' 
 									: 'text-gray-600'
@@ -88,7 +97,9 @@
 		{#if currentStep === 1}
 			<MainGeometry onNext={() => goToStep(2)} />
 		{:else if currentStep === 2}
-			<ProcessForPrinting onBack={() => goToStep(1)} />
+			<PlacetoneHoles onBack={() => goToStep(1)} onNext={() => goToStep(3)} />
+        {:else if currentStep === 3}
+			<ProcessForPrinting onBack={() => goToStep(2)} />
 		{/if}
 	</div>
 </div>

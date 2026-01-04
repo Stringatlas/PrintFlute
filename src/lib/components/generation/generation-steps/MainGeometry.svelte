@@ -1,13 +1,13 @@
 <script lang="ts">
-	import ParameterControl from './ParameterControl.svelte';
-	import FrequencySelector from './FrequencySelector.svelte';
+	import ParameterControl from '$lib/components/generation/ParameterControl.svelte';
+	import FrequencySelector from '$lib/components/generation/FrequencySelector.svelte';
 	import { fluteParams, viewMode, DEFAULT_PARAMETERS } from '$lib/stores/fluteStore';
 	import {
 		validateBoreDiameter,
 		validateWallThickness
-	} from './designParametersValidation';
-	import { PARAMETER_INFO } from './designParametersInfo';
-	import { getDefaultCorkDistance, getDefaultCorkThickness } from './designParamtersDefault';
+	} from '$lib/components/generation/designParametersValidation';
+	import { PARAMETER_INFO } from '$lib/components/generation/designParametersInfo';
+	import { getDefaultCorkDistance, getDefaultCorkThickness } from '$lib/components/generation/designParamtersDefault';
 
 	function handleParameterChange<K extends keyof typeof $fluteParams>(
 		key: K,
@@ -176,7 +176,7 @@
 			on:click={onNext}
 			class="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
 		>
-			Next: Process for Printing
+			Next Step
 			<i class="bi bi-arrow-right"></i>
 		</button>
 		<button

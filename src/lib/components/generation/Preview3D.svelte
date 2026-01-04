@@ -27,15 +27,16 @@
 		// Scene
 		scene = new THREE.Scene();
 		scene.background = new THREE.Color(0x0a0a0a);
-
-		// Camera
+        
+		// Camera - top-down view
 		camera = new THREE.PerspectiveCamera(
 			75,
 			canvas.clientWidth / canvas.clientHeight,
 			0.1,
 			1000
 		);
-		camera.position.set(0, 0, 5);
+		camera.position.set(0, 8, 0);
+		camera.lookAt(0, 0, 0);
 
 		// Renderer
 		renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -57,18 +58,15 @@
 
 		// Placeholder: Simple flute-like cylinder
 		const geometry = new THREE.CylinderGeometry(0.3, 0.3, 4, 32);
+        geometry.rotateX(Math.PI / 2);
 		const material = new THREE.MeshStandardMaterial({
-			color: 0x10b981,
-			metalness: 0.3,
-			roughness: 0.4
+			color: 0xc19a6b,
+			metalness: 0.1,
+			roughness: 0.7
 		});
 		const flute = new THREE.Mesh(geometry, material);
 		flute.rotation.z = Math.PI / 2;
 		scene.add(flute);
-
-		// Grid helper
-		const gridHelper = new THREE.GridHelper(10, 10, 0x10b981, 0x1f2937);
-		scene.add(gridHelper);
 
 		// Handle resize
 		window.addEventListener('resize', handleResize);
