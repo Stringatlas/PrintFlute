@@ -17,6 +17,12 @@ export interface FluteParameters {
 	// Tuning Parameters
 	numberOfToneHoles: number;
 	fundamentalFrequency: number;
+	
+	// Printing Parameters
+	toneHoleFilletRadius: number;
+	connectorLength: number;
+	numberOfCuts: number;
+	cutDistances: number[];
 }
 
 export const DEFAULT_PARAMETERS: FluteParameters = {
@@ -31,6 +37,10 @@ export const DEFAULT_PARAMETERS: FluteParameters = {
 	lipCoveragePercent: 5,
 	numberOfToneHoles: 6,
 	fundamentalFrequency: 587.33,
+	toneHoleFilletRadius: 1.5,
+	connectorLength: 15,
+	numberOfCuts: 1,
+	cutDistances: [0],
 };
 
 function createFluteStore() {
