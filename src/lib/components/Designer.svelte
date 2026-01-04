@@ -25,7 +25,7 @@
 <div class="space-y-6 p-4 sm:p-6 md:p-8">
 	<!-- Header with View Mode Toggle -->
 	<div class="flex items-center justify-between">
-		<h2 class="text-xl font-semibold text-primary-400">Flute Parameters</h2>
+		<h2 class="text-xl font-semibold text-primary-400">Flute Designer</h2>
 		<div class="flex rounded-lg bg-gray-800 p-1 border border-gray-700">
 			<button
 				on:click={toggleViewMode}

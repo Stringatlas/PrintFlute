@@ -1,7 +1,7 @@
 export const FFT_SIZE = 8192;
 export const MIN_DECIBELS = -90;
 export const MAX_DECIBELS = -10;
-export const SMOOTHING_TIME_CONSTANT = 0.8;
+export const SMOOTHING_TIME_CONSTANT = 0.0;
 
 export interface AudioBuffers {
 	frequencyData: Float32Array;
@@ -31,8 +31,15 @@ export class AudioCapture {
 		this.frequencyData = new Float32Array(this.analyser.frequencyBinCount);
 		this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
 
-		this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-		this.microphone = this.audioContext.createMediaStreamSource(this.stream);
+		// this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+		this.stream = await navigator.mediaDevices.getUserMedia({ 
+			audio: {
+				autoGainControl: false,
+				noiseSuppression: false,
+				echoCancellation: false
+			}
+		});
+        this.microphone = this.audioContext.createMediaStreamSource(this.stream);
 		this.microphone.connect(this.analyser);
 	}
 

@@ -1,9 +1,20 @@
 <script lang="ts">
-	export let centsOff: number;
-	export let noteName: string;
-	export let octave: number;
+	export let centsOff: number | undefined = undefined;
+	export let noteName: string | undefined = undefined;
+	export let octave: number | undefined = undefined;
+	export let frequency: number | undefined = undefined;
 
 	const MAX_CENTS = 50;
+
+	let lastCentsOff: number = 0;
+	let lastNoteName: string = '--';
+	let lastOctave: number = 0;
+	let lastFrequency: number = 0;
+
+	$: if (centsOff) lastCentsOff = centsOff;
+	$: if (noteName) lastNoteName = noteName;
+	$: if (octave) lastOctave = octave;
+	$: if (frequency) lastFrequency = frequency;
 
 	function getTuningColor(cents: number): string {
 		const absCents = Math.abs(cents);
@@ -13,8 +24,8 @@
 		return '#ef4444';
 	}
 
-	$: needleOffset = (Math.max(-MAX_CENTS, Math.min(MAX_CENTS, centsOff)) / MAX_CENTS) * 50;
-	$: color = getTuningColor(centsOff);
+	$: needleOffset = (Math.max(-MAX_CENTS, Math.min(MAX_CENTS, lastCentsOff)) / MAX_CENTS) * 50;
+	$: color = getTuningColor(lastCentsOff);
 </script>
 
 <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
@@ -22,7 +33,7 @@
 	
 	<div class="flex flex-col items-center space-y-4">
 		<div class="text-4xl font-bold" style="color: {color}">
-			{noteName}{octave}
+			{lastFrequency > 0 ? `${lastNoteName}${lastOctave}` : '--'}
 		</div>
 
 		<div class="w-full max-w-sm">
@@ -55,9 +66,12 @@
 			</div>
 		</div>
 
-		<div class="flex items-baseline space-x-2">
+		<div class="flex flex-col items-center space-y-1">
 			<span class="text-3xl font-bold" style="color: {color}">
-				{centsOff > 0 ? '+' : ''}{centsOff}¢
+				{lastFrequency > 0 ? `${lastCentsOff > 0 ? '+' : ''}${lastCentsOff}¢` : '--'}
+			</span>
+			<span class="text-sm text-gray-400">
+				{lastFrequency > 0 ? `${lastFrequency.toFixed(2)} Hz` : '--'}
 			</span>
 		</div>
 	</div>

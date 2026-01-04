@@ -16,6 +16,7 @@
 			centsOff={analysis.centsOff} 
 			noteName={analysis.noteName} 
 			octave={analysis.octave} 
+            frequency={analysis.fundamentalFrequency}
 		/>
 		
 		<div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">

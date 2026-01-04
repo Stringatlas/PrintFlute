@@ -7,6 +7,7 @@
 	import DetectionMetrics from '$lib/components/analysis/DetectionMetrics.svelte';
 	import HarmonicsList from '$lib/components/analysis/HarmonicsList.svelte';
 	import QualityMetrics from '$lib/components/analysis/QualityMetrics.svelte';
+    import ChromaticTuner from '$lib/components/analysis/ChromaticTuner.svelte';
 
 	export let predictedFrequency: number | null = null;
 
@@ -102,25 +103,25 @@
 		</div>
 	</div>
 
-	{#if $audioStore.currentAnalysis && $audioStore.currentAnalysis.fundamentalFrequency > 0}
-		<DetectionMetrics analysis={$audioStore.currentAnalysis} />
-		<HarmonicsList
-			harmonics={$audioStore.currentAnalysis.harmonics}
-			amplitudes={$audioStore.currentAnalysis.harmonicAmplitudes}
-		/>
-		<QualityMetrics
-			analysis={$audioStore.currentAnalysis}
-			{predictedFrequency}
-			tuningAccuracy={$tuningAccuracy}
-			pitchStability={$pitchStability}
-		/>
-	{:else if $audioStore.isRecording}
-		<div class="p-8 bg-gray-800/50 rounded-lg border border-gray-700 text-center">
-			<p class="text-gray-400">Listening... Play a note to analyze</p>
-		</div>
-	{:else}
-		<div class="p-8 bg-gray-800/50 rounded-lg border border-gray-700 text-center">
-			<p class="text-gray-400">Click "Start Recording" to begin audio analysis</p>
-		</div>
-	{/if}
+
+    <ChromaticTuner 
+        centsOff={$audioStore.currentAnalysis?.centsOff} 
+        noteName={$audioStore.currentAnalysis?.noteName} 
+        octave={$audioStore.currentAnalysis?.octave}
+        frequency={$audioStore.currentAnalysis?.fundamentalFrequency}
+    />
+
+    <!-- For debug -->
+	<!-- <div class="p-4 bg-gray-900/50 rounded-lg border border-gray-600 font-mono text-xs">
+		<h3 class="text-sm font-medium text-gray-300 mb-2">Debug: Current Analysis</h3>
+		<pre class="text-gray-400 whitespace-pre-wrap break-all">{JSON.stringify({
+			fundamentalFrequency: $audioStore.currentAnalysis?.fundamentalFrequency,
+			noteName: $audioStore.currentAnalysis?.noteName,
+			octave: $audioStore.currentAnalysis?.octave,
+			centsOff: $audioStore.currentAnalysis?.centsOff,
+			amplitude: $audioStore.currentAnalysis?.amplitude,
+			clarity: $audioStore.currentAnalysis?.clarity,
+			harmonicsCount: $audioStore.currentAnalysis?.harmonics?.length
+		}, null, 2)}</pre>
+	</div> -->
 </div>
