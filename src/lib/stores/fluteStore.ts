@@ -4,18 +4,32 @@ export interface FluteParameters {
 	// Physical Parameters
 	boreDiameter: number;
 	wallThickness: number;
+	hasThumbHole: boolean;
+	overhangLength: number;
+	corkDistance: number | undefined;
+	corkThickness: number | undefined;
 	
-	// Basic Parameters
-	length: number;
-	numberOfHoles: number;
+	// Embouchure Hole Parameters
+	embouchureHoleLength: number;
+	embouchureHoleWidth: number;
+	lipCoveragePercent: number;
+	
+	// Tuning Parameters
+	numberOfToneHoles: number;
 	fundamentalFrequency: number;
 }
 
 export const DEFAULT_PARAMETERS: FluteParameters = {
-	boreDiameter: 19,
-	wallThickness: 2,
-	length: 400,
-	numberOfHoles: 6,
+	boreDiameter: 14.3,
+	wallThickness: 2.5,
+	hasThumbHole: true,
+	overhangLength: 20,
+	corkDistance: undefined,
+	corkThickness: undefined,
+	embouchureHoleLength: 9.5,
+	embouchureHoleWidth: 9.5,
+	lipCoveragePercent: 5,
+	numberOfToneHoles: 6,
 	fundamentalFrequency: 587.33,
 };
 

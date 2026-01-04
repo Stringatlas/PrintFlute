@@ -2,26 +2,32 @@
 	import { viewMode } from '$lib/stores/fluteStore';
 
 	export let label: string;
-	export let value: number;
+	export let value: number | boolean;
 	export let min: number | undefined = undefined;
 	export let max: number | undefined = undefined;
 	export let step: number = 1;
 	export let unit: string = '';
-	export let inputType: 'slider' | 'number' = 'number';
+	export let inputType: 'slider' | 'number' | 'checkbox' = 'number';
 
 	const inputId = `param-${label.replace(/\s+/g, '-').toLowerCase()}`;
 	export let visibility: 'always' | 'basic' | 'advanced' = 'always';
 	export let validate: ((value: number) => { status: 'success' | 'warning' | 'error'; message?: string }) | undefined = undefined;
-	export let getDefault: () => number;
-	export let onChange: (value: number) => void;
+	export let getDefault: () => number | boolean;
+	export let onChange: (value: number | boolean) => void;
+	export let info: string | undefined = undefined;
 
 	let showTooltip = false;
+	let showInfoTooltip = false;
 
 	function handleInput(event: Event) {
 		const target = event.target as HTMLInputElement;
-		const newValue = parseFloat(target.value);
-		if (!isNaN(newValue)) {
-			onChange(newValue);
+		if (inputType === 'checkbox') {
+			onChange(target.checked as any);
+		} else {
+			const newValue = parseFloat(target.value);
+			if (!isNaN(newValue)) {
+				onChange(newValue);
+			}
 		}
 	}
 
@@ -31,7 +37,7 @@
 	}
 
 	$: isDefault = value === getDefault();
-	$: validationResult = validate ? validate(value) : { status: 'success' as const };
+	$: validationResult = validate && typeof value === 'number' ? validate(value) : { status: 'success' as const };
 	$: isVisible = visibility === 'always' || $viewMode === visibility;
 	$: borderColor = validationResult.status === 'error' 
 		? 'border-red-500' 
@@ -45,7 +51,25 @@
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-2">
 				<label for={inputId} class="block text-sm font-medium text-gray-300">{label}</label>
-				{#if validationResult.status !== 'success' && validationResult.message}
+				{#if info && validationResult.status === 'success'}
+					<div class="relative">
+						<button
+							type="button"
+							on:mouseenter={() => showInfoTooltip = true}
+							on:mouseleave={() => showInfoTooltip = false}
+							class="flex items-center justify-center w-4 h-4 rounded-full text-gray-400 hover:text-primary-400 transition-colors"
+							aria-label="Parameter information"
+						>
+							<i class="bi bi-info-circle text-sm"></i>
+						</button>
+						{#if showInfoTooltip}
+							<div class="absolute left-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-normal w-64 z-10 border border-gray-700 shadow-lg">
+								{info}
+								<div class="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+							</div>
+						{/if}
+					</div>
+				{:else if validationResult.status !== 'success' && validationResult.message}
 					<div class="relative">
 						<button
 							type="button"
@@ -54,20 +78,16 @@
 							class="flex items-center justify-center w-4 h-4 rounded-full {validationResult.status === 'error' 
 								? 'text-red-400' 
 								: 'text-yellow-400'}"
+							aria-label={validationResult.status === 'error' ? 'Validation error' : 'Validation warning'}
 						>
 							{#if validationResult.status === 'error'}
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-									<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-									<path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-								</svg>
+								<i class="bi bi-exclamation-circle-fill text-sm"></i>
 							{:else}
-								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-									<path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-								</svg>
+								<i class="bi bi-exclamation-triangle-fill text-sm"></i>
 							{/if}
 						</button>
 						{#if showTooltip}
-							<div class="absolute left-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-nowrap z-10 border border-gray-700 shadow-lg">
+							<div class="absolute left-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-normal w-64 z-10 border border-gray-700 shadow-lg">
 								{validationResult.message}
 								<div class="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
 							</div>
@@ -99,6 +119,14 @@
 					class="w-64 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
 				/>
 				<span class="text-sm text-gray-400 min-w-[60px] text-right">{value}{unit}</span>
+			{:else if inputType === 'checkbox'}
+				<input
+					id={inputId}
+					type="checkbox"
+					checked={typeof value === 'boolean' ? value : false}
+					on:change={handleInput}
+					class="w-4 h-4 bg-gray-800 border border-gray-700 rounded text-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-offset-gray-900"
+				/>
 			{:else}
 				<input
 					id={inputId}

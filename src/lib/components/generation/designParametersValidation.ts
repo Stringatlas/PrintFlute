@@ -14,7 +14,7 @@ export function validateLength(value: number): ValidationResult {
 }
 
 export function validateBoreDiameter(value: number): ValidationResult {
-	if (value < 15) {
+	if (value < 10) {
 		return { status: 'warning', message: 'Narrow bore may restrict airflow' };
 	}
 	if (value > 25) {
@@ -24,7 +24,7 @@ export function validateBoreDiameter(value: number): ValidationResult {
 }
 
 export function validateWallThickness(value: number): ValidationResult {
-	if (value < 1.5) {
+	if (value < 2) {
 		return { status: 'error', message: 'Too thin, structural integrity at risk' };
 	}
 	if (value > 4) {
