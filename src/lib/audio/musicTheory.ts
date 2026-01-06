@@ -2,6 +2,8 @@ const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 
 const A4_FREQUENCY = 440;
 const CENTS_PER_SEMITONE = 100;
 
+export const DIATONIC_SCALE_CENTS = [0, 200, 400, 500, 700, 900, 1100, 1200];
+
 export interface NoteInfo {
 	noteName: string;
 	octave: number;

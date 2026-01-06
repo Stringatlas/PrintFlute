@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { viewMode } from '$lib/stores/fluteStore';
+	import Tooltip from './Tooltip.svelte';
 
 	export let label: string;
 	export let value: number | boolean;
@@ -15,9 +16,6 @@
 	export let getDefault: () => number | boolean;
 	export let onChange: (value: number | boolean) => void;
 	export let info: string | undefined = undefined;
-
-	let showTooltip = false;
-	let showInfoTooltip = false;
 
 	function handleInput(event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -52,47 +50,9 @@
 			<div class="flex items-center gap-2">
 				<label for={inputId} class="block text-sm font-medium text-gray-300">{label}</label>
 				{#if info && validationResult.status === 'success'}
-					<div class="relative">
-						<button
-							type="button"
-							on:mouseenter={() => showInfoTooltip = true}
-							on:mouseleave={() => showInfoTooltip = false}
-							class="flex items-center justify-center w-4 h-4 rounded-full text-gray-400 hover:text-primary-400 transition-colors"
-							aria-label="Parameter information"
-						>
-							<i class="bi bi-info-circle text-sm"></i>
-						</button>
-						{#if showInfoTooltip}
-							<div class="absolute left-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-normal w-64 z-10 border border-gray-700 shadow-lg">
-								{info}
-								<div class="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-							</div>
-						{/if}
-					</div>
+					<Tooltip text={info} type="info" />
 				{:else if validationResult.status !== 'success' && validationResult.message}
-					<div class="relative">
-						<button
-							type="button"
-							on:mouseenter={() => showTooltip = true}
-							on:mouseleave={() => showTooltip = false}
-							class="flex items-center justify-center w-4 h-4 rounded-full {validationResult.status === 'error' 
-								? 'text-red-400' 
-								: 'text-yellow-400'}"
-							aria-label={validationResult.status === 'error' ? 'Validation error' : 'Validation warning'}
-						>
-							{#if validationResult.status === 'error'}
-								<i class="bi bi-exclamation-circle-fill text-sm"></i>
-							{:else}
-								<i class="bi bi-exclamation-triangle-fill text-sm"></i>
-							{/if}
-						</button>
-						{#if showTooltip}
-							<div class="absolute left-0 bottom-full mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-normal w-64 z-10 border border-gray-700 shadow-lg">
-								{validationResult.message}
-								<div class="absolute left-2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-							</div>
-						{/if}
-					</div>
+					<Tooltip text={validationResult.message} type={validationResult.status} />
 				{/if}
 			</div>
 			<button

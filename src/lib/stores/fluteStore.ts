@@ -88,3 +88,58 @@ export const DEFAULT_MESH_RESOLUTION: MeshResolution = {
 };
 
 export const meshResolution = writable<MeshResolution>({ ...DEFAULT_MESH_RESOLUTION });
+
+export interface ToneHoleParameters {
+	holeDiameters: number[];
+	holeCents: number[];
+	holeDistances: number[];
+	cutoffRatios: number[];
+}
+
+export const DEFAULT_TONEHOLE_PARAMETERS: ToneHoleParameters = {
+	holeDiameters: [8, 8, 8, 8, 8, 8, 8, 8],
+	holeCents: [200, 400, 500, 700, 900, 1100, 1200, 1400],
+	holeDistances: [0, 0, 0, 0, 0, 0, 0, 0],
+	cutoffRatios: [0, 0, 0, 0, 0, 0, 0, 0],
+};
+
+function createToneHoleStore() {
+	const { subscribe, set, update } = writable<ToneHoleParameters>({ ...DEFAULT_TONEHOLE_PARAMETERS });
+
+	return {
+		subscribe,
+		updateHoleDiameter: (index: number, value: number) => {
+			update(params => {
+				const newDiameters = [...params.holeDiameters];
+				newDiameters[index] = value;
+				return { ...params, holeDiameters: newDiameters };
+			});
+		},
+		updateHoleCents: (index: number, value: number) => {
+			update(params => {
+				const newCents = [...params.holeCents];
+				newCents[index] = value;
+				return { ...params, holeCents: newCents };
+			});
+		},
+		updateHoleDistance: (index: number, value: number) => {
+			update(params => {
+				const newDistances = [...params.holeDistances];
+				newDistances[index] = value;
+				return { ...params, holeDistances: newDistances };
+			});
+		},
+		updateCutoffRatio: (index: number, value: number) => {
+			update(params => {
+				const newRatios = [...params.cutoffRatios];
+				newRatios[index] = value;
+				return { ...params, cutoffRatios: newRatios };
+			});
+		},
+		resetAll: () => {
+			set({ ...DEFAULT_TONEHOLE_PARAMETERS });
+		},
+	};
+}
+
+export const toneHoleParams = createToneHoleStore();

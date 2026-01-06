@@ -32,3 +32,19 @@ export function validateWallThickness(value: number): ValidationResult {
 	}
 	return { status: 'success' };
 }
+
+export function validateDiameter(value: number): { status: 'success' | 'warning' | 'error'; message?: string } {
+    if (value < 3) {
+        return { status: 'error', message: 'Hole diameter too small. Minimum 3mm.' };
+    }
+    if (value > 15) {
+        return { status: 'error', message: 'Hole diameter too large. Maximum 15mm.' };
+    }
+    if (value < 5) {
+        return { status: 'warning', message: 'Very small hole. May be difficult to cover.' };
+    }
+    if (value > 12) {
+        return { status: 'warning', message: 'Very large hole. May affect tuning significantly.' };
+    }
+    return { status: 'success' };
+}

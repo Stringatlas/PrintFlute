@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ParameterControl from '$lib/components/generation/ParameterControl.svelte';
+	import ParameterControl from '$lib/components/generation/form-elements/ParameterControl.svelte';
 	import { fluteParams, DEFAULT_PARAMETERS } from '$lib/stores/fluteStore';
 	import { PARAMETER_INFO } from '$lib/components/generation/designParametersInfo';
 

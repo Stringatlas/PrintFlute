@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ParameterControl from '$lib/components/generation/ParameterControl.svelte';
-	import FrequencySelector from '$lib/components/generation/FrequencySelector.svelte';
+	import ParameterControl from '$lib/components/generation/form-elements/ParameterControl.svelte';
+	import FrequencySelector from '$lib/components/generation/form-elements/FrequencySelector.svelte';
 	import { fluteParams, viewMode, DEFAULT_PARAMETERS } from '$lib/stores/fluteStore';
 	import {
 		validateBoreDiameter,
