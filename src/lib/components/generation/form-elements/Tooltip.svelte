@@ -1,0 +1,61 @@
+<script lang="ts">
+	import { onMount } from 'svelte';
+
+	export let text: string;
+	export let type: 'info' | 'error' | 'warning' = 'info';
+	
+	let showTooltip = false;
+	let buttonElement: HTMLButtonElement;
+	let tooltipX = 0;
+	let tooltipY = 0;
+	
+	$: iconClass = type === 'error' 
+		? 'text-red-400' 
+		: type === 'warning' 
+		? 'text-yellow-400' 
+		: 'text-gray-400 hover:text-primary-400';
+	
+	$: icon = type === 'error' 
+		? 'bi-exclamation-circle-fill' 
+		: type === 'warning' 
+		? 'bi-exclamation-triangle-fill' 
+		: 'bi-info-circle';
+
+	function updateTooltipPosition() {
+		if (buttonElement) {
+			const rect = buttonElement.getBoundingClientRect();
+			tooltipX = rect.left;
+			tooltipY = rect.bottom + 8;
+		}
+	}
+
+	function handleMouseEnter() {
+		showTooltip = true;
+		updateTooltipPosition();
+	}
+
+	function handleMouseLeave() {
+		showTooltip = false;
+	}
+</script>
+
+<button
+	bind:this={buttonElement}
+	type="button"
+	on:mouseenter={handleMouseEnter}
+	on:mouseleave={handleMouseLeave}
+	class="flex items-center justify-center w-4 h-4 rounded-full {iconClass} transition-colors"
+	aria-label={type === 'error' ? 'Validation error' : type === 'warning' ? 'Validation warning' : 'Information'}
+>
+	<i class="bi {icon} text-sm"></i>
+</button>
+
+{#if showTooltip}
+	<div 
+		class="fixed px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-normal w-64 z-[9999] border border-gray-700 shadow-lg pointer-events-none"
+		style="left: {tooltipX}px; top: {tooltipY}px;"
+	>
+		{text}
+		<div class="absolute left-2 bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900"></div>
+	</div>
+{/if}
