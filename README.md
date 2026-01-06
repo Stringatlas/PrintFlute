@@ -1,38 +1,88 @@
-# sv
+# Flute Generator
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A web-based tool for designing, generating, and analyzing 3D-printed flutes. This application provides an end-to-end workflow for creating custom wind instruments, from parametric design through acoustic analysis and STL file generation for 3D printing.
 
-## Creating a project
+[Try it here](https://print-flute.vercel.app/)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Overview
 
-```sh
-# create a new project in the current directory
-npx sv create
+This project enables makers and musicians to design functional flutes with precise control over acoustic and physical parameters. The tool combines computational acoustics, 3D geometry generation, and real-time audio analysis to create instruments that can be fabricated on consumer 3D printers.
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Features
 
-## Developing
+### Parametric Design
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+The design interface provides control over key flute parameters organized into three categories:
 
-```sh
+**Physical Parameters**
+- Bore diameter: Controls the internal tube diameter, affecting volume and tone quality
+- Wall thickness: Determines structural strength and acoustic resonance
+- Thumb hole: Optional back-facing hole for extended range
+- Overhang length: Distance the tube extends beyond the embouchure hole
+- Cork distance and thickness: Parameters for the end cap that affect tuning
+
+**Embouchure Hole Parameters**
+- Hole length and width: Dimensions of the blow hole that determine airflow characteristics
+- Lip coverage: Percentage of hole coverage affecting tone color and pitch stability
+
+**Tuning Parameters**
+- Fundamental frequency: Sets the base pitch and key of the instrument
+- Number of tone holes: Configures the finger hole count for note range
+
+### 3D Model Generation
+
+The application generates complete 3D geometry based on design parameters:
+- Cylindrical bore with configurable dimensions
+- Precisely positioned embouchure hole and finger holes
+- Cork and mounting features
+- Export to STL format for direct 3D printing
+
+### Acoustic Analysis
+
+Real-time audio analysis tools for validating and refining designs:
+- Pitch detection using the Web Audio API
+- Harmonic analysis to assess tone quality
+- Frequency spectrum visualization
+- Comparison between predicted and actual pitches
+- Quality metrics for evaluating instrument performance
+
+### Design Workflow
+
+The application guides users through a two-step process:
+1. Main Geometry: Configure all acoustic and physical parameters
+2. Process for Printing: Prepare the design for fabrication
+
+## Technical Architecture
+
+Built with modern web technologies for performance and accessibility:
+- **Frontend Framework**: SvelteKit for reactive UI components
+- **3D Rendering**: Three.js for real-time geometry visualization
+- **Audio Processing**: Web Audio API for pitch detection and spectral analysis
+- **Acoustic Calculations**: Custom algorithms for frequency prediction and hole positioning
+- **File Export**: STL generation for 3D printing compatibility
+
+## Project Structure
+
+The codebase is organized by functional domain:
+- `acoustics/`: Pure acoustic calculations and frequency algorithms
+- `geometry/`: Three.js mesh generation and 3D modeling
+- `audio/`: Pitch detection, harmonic analysis, and audio capture
+- `components/`: Svelte UI components for design and analysis
+- `stores/`: Application state management
+
+## Use Cases
+
+- Educational tool for learning about acoustic physics and instrument design
+- Rapid prototyping of custom flute designs
+- Experimentation with non-traditional tunings and scales
+- Creating instruments optimized for specific acoustic requirements
+- Validating theoretical acoustic models with real-world measurements
+
+## Development
+
+```bash
+npm install
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+The application runs entirely in the browser with no server-side dependencies.

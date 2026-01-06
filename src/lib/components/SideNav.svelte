@@ -25,16 +25,16 @@
 </script>
 
 <nav class="{isCollapsed ? 'w-20' : 'w-64'} h-full bg-gray-900 border-r border-gray-800 flex flex-col transition-all duration-300">
-	<div class="p-6 border-b border-gray-800 flex justify-between items-start">
+	<div class="{isCollapsed ? 'p-3' : 'p-6'} border-b border-gray-800 flex justify-between items-start">
 		<div class="flex-1 {isCollapsed ? 'hidden' : ''}">
-			<div class="flex items-center gap-3">
-				<img src={favicon} alt="Print Flute Logo" class="h-12 w-auto" />
-				<h1 class="text-2xl font-bold text-primary-400">Print Flute</h1>
-			</div>
-			<p class="text-sm text-gray-400 mt-1">Design & Analysis for 3D Printed Flutes</p>
+            <div class="flex items-center gap-3 mb-4">
+                <img src={favicon} alt="Print Flute Logo" class="h-12 w-auto" />
+                <h1 class="text-2xl font-bold text-primary-400">Print Flute</h1>
+            </div>
+            <p class="text-sm text-gray-400 mt-1 text-center w-full">Design & Analysis for 3D Printed Flutes</p>
 		</div>
 		{#if isCollapsed}
-			<img src={favicon} alt="Print Flute Logo" class="h-8 w-auto mx-auto" />
+			<img src={favicon} alt="Print Flute Logo" class="size-14 flex-shrink-0 mx-auto" />
 		{/if}
 		<button
 			class="text-gray-400 hover:text-gray-200 transition-colors {isCollapsed ? 'hidden' : ''}"
@@ -64,13 +64,7 @@
 				onclick={() => (currentTab = tab.id)}
 				aria-label={tab.label}
 			>
-				{#if getTabIcon(tab.id) === 'tuning-fork'}
-					<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M9 3v7q0 3 3 3q3 0 3-3V3M12 13v8" />
-					</svg>
-				{:else}
-					<i class="bi {getTabIcon(tab.id)} {isCollapsed ? 'text-xl' : ''}"></i>
-				{/if}
+				<i class="bi {getTabIcon(tab.id)} {isCollapsed ? 'text-xl' : ''}"></i>
 				{#if !isCollapsed}
 					<span>{tab.label}</span>
 				{/if}
@@ -79,6 +73,6 @@
 	</div>
 
 	<div class="p-6 border-t border-gray-800 {isCollapsed ? 'text-center' : ''}">
-		<p class="text-xs text-gray-500">{isCollapsed ? 'v0.1' : 'v0.1.0'}</p>
+		<p class="text-xs text-gray-500">{'v0.1.0'}</p>
 	</div>
 </nav>
