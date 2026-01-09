@@ -97,7 +97,17 @@ export function calculateFlutePositions(params: FluteParams): FluteResult {
     const a = fhBorRatio * fhBorRatio;
     const b = -(endX + halfWl) * a;
     const c = endX * halfWl * a + effWalW(wallThickness, holes[0].diameter) * (halfWl - endX);
-    fhXs[0] = (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+    const discriminant = b * b - 4 * a * c;
+    
+    if (discriminant < 0) {
+        throw new Error('Impossible hole configuration: first hole cannot be placed (try adjusting hole size, frequency, or bore diameter)');
+    }
+    
+    fhXs[0] = (-b - Math.sqrt(discriminant)) / (2 * a);
+    
+    if (fhXs[0] < 0 || isNaN(fhXs[0])) {
+        throw new Error('Impossible hole configuration: first hole position is invalid');
+    }
     
     for (let holeNum = 1; holeNum < holeCount; holeNum++) {
         halfWl = 0.5 * SPEED_OF_SOUND_MM_S / holes[holeNum].frequency;
@@ -113,22 +123,52 @@ export function calculateFlutePositions(params: FluteParams): FluteResult {
         const holeCalc = effWalW(wallThickness, holes[holeNum].diameter) * borFhRatio * borFhRatio;
         const b = -fhXs[holeNum - 1] - 3 * halfWl + holeCalc;
         const c = fhXs[holeNum - 1] * (halfWl - holeCalc) + (halfWl * halfWl);
-        fhXs[holeNum] = (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
+        const discriminant = b * b - 4 * a * c;
+        
+        if (discriminant < 0) {
+            throw new Error(`Impossible hole configuration: hole ${holeNum + 1} cannot be placed (try adjusting frequencies, hole sizes, or spacing)`);
+        }
+        
+        fhXs[holeNum] = (-b - Math.sqrt(discriminant)) / (2 * a);
+        
+        if (isNaN(fhXs[holeNum])) {
+            throw new Error(`Impossible hole configuration: hole ${holeNum + 1} position is invalid`);
+        }
+        
+        // Check if holes are in correct order (acoustic position should decrease)
+        if (fhXs[holeNum] >= fhXs[holeNum - 1]) {
+            throw new Error(`Impossible hole configuration: hole ${holeNum + 1} would overlap or be in wrong order (try larger spacing or different frequencies)`);
+        }
+        
+        // Check minimum spacing (at least 5mm for practical manufacturing)
+        const spacing = fhXs[holeNum - 1] - fhXs[holeNum];
+        if (spacing < 5) {
+            throw new Error(`Impossible hole configuration: holes ${holeNum} and ${holeNum + 1} are too close together (${spacing.toFixed(1)}mm, minimum 5mm)`);
+        }
     }
     
     const embX = embCorr(boreDiameter, adjEmbDiameter, wallThickness);
     const embouchurePhysicalPosition = endX - embX;
     
+    if (embouchurePhysicalPosition < 0) {
+        throw new Error('Impossible configuration: embouchure position is negative (flute would be too short)');
+    }
+    
     const calculatedHoles: FluteHole[] = holes.map((hole, i) => {
         const fhXsDiff = i === 0 ? endX - fhXs[0] : fhXs[i - 1] - fhXs[i];
         const spacing = fhXsDiff;
         const cutoff = cutoffForHole(i, boreDiameter, wallThickness, hole.diameter, fhXsDiff);
+        const physicalPosition = endX - fhXs[i];
+        
+        if (physicalPosition < 0) {
+            throw new Error(`Impossible hole configuration: hole ${i + 1} position is negative (beyond embouchure)`);
+        }
         
         return {
             frequency: hole.frequency,
             diameter: hole.diameter,
             acousticPosition: fhXs[i],
-            physicalPosition: endX - fhXs[i],
+            physicalPosition,
             cutoffFrequency: cutoff,
             spacing
         };
