@@ -1,7 +1,7 @@
 <script lang="ts">
 	import MainGeometry from '$lib/components/generation/generation-steps/MainGeometry.svelte';
 	import ProcessForPrinting from '$lib/components/generation/generation-steps/ProcessForPrinting.svelte';
-	import PlacetoneHoles from '$lib/components/generation/generation-steps/PlacetoneHoles.svelte';
+	import PlacetoneHoles from '$lib/components/generation/generation-steps/PlaceToneHoles.svelte';
     import { viewMode } from '$lib/stores/fluteStore';
 
 	let currentStep = 1;
@@ -70,7 +70,7 @@
 				>
 					<div class="relative flex items-center justify-center h-8">
 						<!-- Background to block line through icon center -->
-						<div class="absolute w-10 h-10 bg-gray-900 rounded-full z-[5]"></div>
+						<div class="absolute w-10 h-10 bg-gray-900 rounded-full z-5"></div>
 						
 						<i 
 							class="relative z-10 {step.icon} text-3xl transition-colors duration-200 {

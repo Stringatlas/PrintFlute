@@ -13,6 +13,7 @@ export interface FluteParameters {
 	embouchureHoleLength: number;
 	embouchureHoleWidth: number;
 	lipCoveragePercent: number;
+	embouchureDistance: number;
 	
 	// Tuning Parameters
 	numberOfToneHoles: number;
@@ -35,6 +36,7 @@ export const DEFAULT_PARAMETERS: FluteParameters = {
 	embouchureHoleLength: 9.5,
 	embouchureHoleWidth: 9.5,
 	lipCoveragePercent: 5,
+	embouchureDistance: 0,
 	numberOfToneHoles: 6,
 	fundamentalFrequency: 587.33,
 	toneHoleFilletRadius: 1.5,
@@ -63,7 +65,42 @@ function createFluteStore() {
 export const fluteParams = createFluteStore();
 
 export type ViewMode = 'basic' | 'advanced';
-export const viewMode = writable<ViewMode>('basic');
+
+function createViewModeStore() {
+	const STORAGE_KEY = 'flute-generator-view-mode';
+	const defaultValue: ViewMode = 'basic';
+	
+	let storedValue: ViewMode = defaultValue;
+	if (typeof localStorage !== 'undefined') {
+		const stored = localStorage.getItem(STORAGE_KEY);
+		if (stored === 'basic' || stored === 'advanced') {
+			storedValue = stored;
+		}
+	}
+	
+	const { subscribe, set, update } = writable<ViewMode>(storedValue);
+	
+	return {
+		subscribe,
+		set: (value: ViewMode) => {
+			if (typeof localStorage !== 'undefined') {
+				localStorage.setItem(STORAGE_KEY, value);
+			}
+			set(value);
+		},
+		update: (fn: (value: ViewMode) => ViewMode) => {
+			update(currentValue => {
+				const newValue = fn(currentValue);
+				if (typeof localStorage !== 'undefined') {
+					localStorage.setItem(STORAGE_KEY, newValue);
+				}
+				return newValue;
+			});
+		}
+	};
+}
+
+export const viewMode = createViewModeStore();
 
 export interface MeshResolution {
 	preview: {
@@ -135,6 +172,12 @@ function createToneHoleStore() {
 				newRatios[index] = value;
 				return { ...params, cutoffRatios: newRatios };
 			});
+		},
+		updateToneHoleParams: (params: Partial<ToneHoleParameters>) => {
+			update(current => ({
+				...current,
+				...params
+			}));
 		},
 		resetAll: () => {
 			set({ ...DEFAULT_TONEHOLE_PARAMETERS });

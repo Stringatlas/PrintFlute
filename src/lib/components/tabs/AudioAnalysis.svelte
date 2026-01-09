@@ -63,7 +63,7 @@
 
 <div class="space-y-6">
 	<div>
-		<h2 class="text-xl font-semibold text-secondary-400 mb-4">Tuner</h2>
+		<h2 class="text-xl font-semibold text-primary-400 mb-4">Tuner</h2>
 		<div class="space-y-4">
 			<div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
 				<div class="flex items-center justify-between mb-4">
@@ -76,7 +76,7 @@
 					<button
 						class="px-4 py-2 {$audioStore.isRecording
 							? 'bg-red-600 hover:bg-red-700'
-							: 'bg-secondary-600 hover:bg-secondary-700'} text-white rounded text-sm transition-colors duration-200"
+							: 'bg-primary-600 hover:bg-primary-700'} text-white rounded text-sm transition-colors duration-200"
 						on:click={$audioStore.isRecording ? stopRecording : startRecording}
 					>
                     <i class="bi bi-{$audioStore.isRecording ? 'stop-circle' : 'mic-fill'}"></i>
@@ -94,6 +94,13 @@
 				<Waveform timeData={$audioStore.currentAnalysis?.timeData || null} />
 			</div>
 
+            <ChromaticTuner 
+                centsOff={$audioStore.currentAnalysis?.centsOff} 
+                noteName={$audioStore.currentAnalysis?.noteName} 
+                octave={$audioStore.currentAnalysis?.octave}
+                frequency={$audioStore.currentAnalysis?.fundamentalFrequency}
+            />
+
 			<div class="space-y-2">
 				<SpectrogramViz
 					frequencyData={$audioStore.currentAnalysis?.frequencyData || null}
@@ -102,14 +109,6 @@
 			</div>
 		</div>
 	</div>
-
-
-    <ChromaticTuner 
-        centsOff={$audioStore.currentAnalysis?.centsOff} 
-        noteName={$audioStore.currentAnalysis?.noteName} 
-        octave={$audioStore.currentAnalysis?.octave}
-        frequency={$audioStore.currentAnalysis?.fundamentalFrequency}
-    />
 
     <!-- For debug -->
 	<!-- <div class="p-4 bg-gray-900/50 rounded-lg border border-gray-600 font-mono text-xs">

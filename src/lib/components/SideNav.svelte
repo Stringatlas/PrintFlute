@@ -34,7 +34,7 @@
             <p class="text-sm text-gray-400 mt-1 text-center w-full">Design & Analysis for 3D Printed Flutes</p>
 		</div>
 		{#if isCollapsed}
-			<img src={favicon} alt="Print Flute Logo" class="size-14 flex-shrink-0 mx-auto" />
+			<img src={favicon} alt="Print Flute Logo" class="size-14 shrink-0 mx-auto" />
 		{/if}
 		<button
 			class="text-gray-400 hover:text-gray-200 transition-colors {isCollapsed ? 'hidden' : ''}"

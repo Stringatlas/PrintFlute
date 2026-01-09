@@ -2,6 +2,7 @@
 	import { viewMode, toneHoleParams } from '$lib/stores/fluteStore';
 	import { DIATONIC_SCALE_CENTS } from '$lib/audio/musicTheory';
     import { validateDiameter } from '$lib/components/generation/designParametersValidation';
+	import { calculatedFluteData, calculationError, updateCalculatedValues } from '$lib/utils/fluteCalculationHelper';
 	import Tooltip from './Tooltip.svelte';
 
 	export let numberOfHoles: number;
@@ -62,40 +63,22 @@
 		}
 	}
 
-	function placeholderCalculateDistances(numHoles: number): number[] {
-		const distances: number[] = [];
-		const baseDistance = 50;
-		const spacing = 25;
-		for (let i = 0; i < numHoles; i++) {
-			distances[i] = baseDistance + (i * spacing);
-		}
-		return distances;
-	}
-
-	function placeholderCalculateCutoffRatios(numHoles: number): number[] {
-		return Array(numHoles).fill(1.5);
-	}
-
 	$: visibleColumns = columns.filter(col => 
 		col.visibility === 'always' || $viewMode === 'advanced'
 	);
 
 	$: {
-		const calculatedDistances = placeholderCalculateDistances(numberOfHoles);
-		calculatedDistances.forEach((dist, i) => {
-			toneHoleParams.updateHoleDistance(i, dist);
-		});
-
-		const calculatedRatios = placeholderCalculateCutoffRatios(numberOfHoles);
-		calculatedRatios.forEach((ratio, i) => {
-			toneHoleParams.updateCutoffRatio(i, ratio);
-		});
-
 		for (let i = 0; i < numberOfHoles; i++) {
-			if (i < DIATONIC_SCALE_CENTS.length) {
-				toneHoleParams.updateHoleCents(i, DIATONIC_SCALE_CENTS[i]);
+			if ($toneHoleParams.holeCents[i] === undefined || $toneHoleParams.holeCents[i] === 0) {
+				if (i + 1 < DIATONIC_SCALE_CENTS.length) {
+					toneHoleParams.updateHoleCents(i, DIATONIC_SCALE_CENTS[i + 1]);
+				}
 			}
 		}
+	}
+
+	$: {
+		updateCalculatedValues($calculatedFluteData, numberOfHoles);
 	}
 
 	let validationResults: Record<number, { status: 'success' | 'warning' | 'error'; message?: string }> = {};
@@ -108,15 +91,31 @@
 	}
 </script>
 
+{#if $calculationError}
+	<div class="mb-4 px-4 py-3 bg-red-900/30 border border-red-600 rounded-lg">
+		<div class="flex items-start gap-3">
+			<svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+			</svg>
+			<div>
+				<h4 class="font-semibold text-red-400 mb-1">Calculation Error</h4>
+				<p class="text-sm text-red-300">{$calculationError}</p>
+			</div>
+		</div>
+	</div>
+{/if}
+
 <div class="overflow-x-auto">
 	<table class="w-full text-sm">
 		<thead>
 			<tr class="border-b border-gray-700">
 				{#each visibleColumns as column}
-					<th class="px-3 py-2 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+					<th class="px-3 py-2 text-left">
 						<div class="flex items-center gap-2">
-							<span>{column.label}</span>
-							<Tooltip text={column.info} type="info" />
+							<span class="uppercase font-medium text-gray-400 text-xs tracking-wider">{column.label}</span>
+							<div class="font-normal">
+								<Tooltip text={column.info} type="info" />
+							</div>
 						</div>
 					</th>
 				{/each}
@@ -151,7 +150,7 @@
 							{:else if column.key === 'pitch'}
 								<input
 									type="number"
-									value={$toneHoleParams.holeCents[index] || 0}
+									value={$toneHoleParams.holeCents[index]}
 									min={0}
 									max={2400}
 									step={1}
@@ -159,7 +158,7 @@
 									class="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-200 focus:outline-none focus:border-primary-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 								/>
 							{:else if column.key === 'distance'}
-								<span class="text-gray-300">{($toneHoleParams.holeDistances[index] || 0).toFixed(1)}</span>
+								<span class="text-gray-300">{($toneHoleParams.holeDistances[index] || 0).toFixed(2)}</span>
 							{:else if column.key === 'cutoff'}
 								<span class="text-gray-300">{($toneHoleParams.cutoffRatios[index] || 0).toFixed(2)}</span>
 							{/if}

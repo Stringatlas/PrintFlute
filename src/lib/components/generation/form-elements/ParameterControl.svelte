@@ -78,7 +78,7 @@
 					on:input={handleInput}
 					class="w-64 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
 				/>
-				<span class="text-sm text-gray-400 min-w-[60px] text-right">{value}{unit}</span>
+				<span class="text-sm text-gray-400 min-w-15 text-right">{value}{unit}</span>
 			{:else if inputType === 'checkbox'}
 				<input
 					id={inputId}
@@ -98,7 +98,7 @@
 					on:input={handleInput}
 					class="w-32 px-3 py-1.5 bg-gray-800 border {borderColor} rounded-lg text-gray-200 focus:outline-none focus:border-primary-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 				/>
-				<span class="text-sm text-gray-400 min-w-[60px]">{unit}</span>
+				<span class="text-sm text-gray-400 min-w-15">{unit}</span>
 			{/if}
 		</div>
 	</div>

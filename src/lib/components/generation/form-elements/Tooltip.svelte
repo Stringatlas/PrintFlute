@@ -52,7 +52,7 @@
 
 {#if showTooltip}
 	<div 
-		class="fixed px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-normal w-64 z-[9999] border border-gray-700 shadow-lg pointer-events-none"
+		class="fixed px-3 py-2 bg-gray-900 text-white text-xs rounded-lg whitespace-normal w-64 z-9999 border border-gray-700 shadow-lg pointer-events-none"
 		style="left: {tooltipX}px; top: {tooltipY}px;"
 	>
 		{text}

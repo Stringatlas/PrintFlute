@@ -29,8 +29,6 @@
 </script>
 
 <div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-	<h3 class="text-sm font-medium text-gray-300 mb-4">Chromatic Tuner</h3>
-	
 	<div class="flex flex-col items-center space-y-4">
 		<div class="text-4xl font-bold" style="color: {color}">
 			{lastFrequency > 0 ? `${lastNoteName}${lastOctave}` : '--'}
