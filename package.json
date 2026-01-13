@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"bootstrap-icons": "^1.13.1",
-		"three": "^0.182.0"
+		"three": "^0.182.0",
+		"three-bvh-csg": "^0.0.17"
 	}
 }
