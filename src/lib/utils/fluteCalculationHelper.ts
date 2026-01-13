@@ -1,4 +1,4 @@
-import { derived, get, type Readable } from 'svelte/store';
+import { derived, get, writable, type Readable } from 'svelte/store';
 import { fluteParams, toneHoleParams, type FluteParameters, type ToneHoleParameters } from '$lib/stores/fluteStore';
 import { calculateFlutePositions, type FluteParams, type FluteResult, midiNoteToFrequency } from '$lib/acoustics/fluteCalculator';
 
@@ -11,7 +11,7 @@ function centsToFrequency(fundamentalHz: number, cents: number): number {
 	return fundamentalHz * Math.pow(2, cents / 1200);
 }
 
-let lastCalculationError: string | null = null;
+const calculationErrorStore = writable<string | null>(null);
 
 export const calculatedFluteData: Readable<FluteResult | null> = derived(
 	[fluteParams, toneHoleParams],
@@ -39,26 +39,33 @@ export const calculatedFluteData: Readable<FluteResult | null> = derived(
 			};
 
 			const result = calculateFlutePositions(calculationParams);
-			lastCalculationError = null;
+			calculationErrorStore.set(null);
 			return result;
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : 'Unknown calculation error';
-			lastCalculationError = errorMessage;
+			calculationErrorStore.set(errorMessage);
 			console.error('Flute calculation error:', errorMessage);
 			return null;
 		}
 	}
 );
 
-export const calculationError: Readable<string | null> = derived(
-	calculatedFluteData,
-	() => lastCalculationError
-);
+export const calculationError: Readable<string | null> = calculationErrorStore;
 
 export function updateCalculatedValues(result: FluteResult | null, numberOfHoles: number): void {
 	if (!result) return;
 
-	fluteParams.updateParameter('embouchureDistance', result.embouchurePhysicalPosition);
+	const currentFluteParams = get(fluteParams);
+	const embouchureDistance = result.embouchurePhysicalPosition;
+	
+	// Calculate total flute length: embouchureDistance + corkDistance + corkThickness + overhangLength
+	const fluteLength = embouchureDistance + 
+		(currentFluteParams.corkDistance || 0) + 
+		(currentFluteParams.corkThickness || 0) + 
+		currentFluteParams.overhangLength;
+	
+	fluteParams.updateParameter('embouchureDistance', embouchureDistance);
+	fluteParams.updateParameter('fluteLength', fluteLength);
 
 	const currentParams = get(toneHoleParams);
 	const newDistances = [...currentParams.holeDistances];

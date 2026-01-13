@@ -100,7 +100,7 @@ export function calculateFlutePositions(params: FluteParams): FluteResult {
     const discriminant = b * b - 4 * a * c;
     
     if (discriminant < 0) {
-        throw new Error('Impossible hole configuration: first hole cannot be placed (try adjusting hole size, frequency, or bore diameter)');
+        throw new Error('Impossible hole configuration: first hole cannot be placed (try adjusting hole size or bore diameter)');
     }
     
     fhXs[0] = (-b - Math.sqrt(discriminant)) / (2 * a);
@@ -126,7 +126,7 @@ export function calculateFlutePositions(params: FluteParams): FluteResult {
         const discriminant = b * b - 4 * a * c;
         
         if (discriminant < 0) {
-            throw new Error(`Impossible hole configuration: hole ${holeNum + 1} cannot be placed (try adjusting frequencies, hole sizes, or spacing)`);
+            throw new Error(`Impossible hole configuration: hole ${holeNum + 1} cannot be placed (try adjusting hole sizes)`);
         }
         
         fhXs[holeNum] = (-b - Math.sqrt(discriminant)) / (2 * a);
@@ -151,7 +151,7 @@ export function calculateFlutePositions(params: FluteParams): FluteResult {
     const embouchurePhysicalPosition = endX - embX;
     
     if (embouchurePhysicalPosition < 0) {
-        throw new Error('Impossible configuration: embouchure position is negative (flute would be too short)');
+        throw new Error('Impossible configuration: embouchure position is negative');
     }
     
     const calculatedHoles: FluteHole[] = holes.map((hole, i) => {
@@ -161,7 +161,7 @@ export function calculateFlutePositions(params: FluteParams): FluteResult {
         const physicalPosition = endX - fhXs[i];
         
         if (physicalPosition < 0) {
-            throw new Error(`Impossible hole configuration: hole ${i + 1} position is negative (beyond embouchure)`);
+            throw new Error(`Impossible hole configuration: hole ${i + 1} position is beyond embouchure`);
         }
         
         return {

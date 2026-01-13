@@ -2,8 +2,9 @@
 	import MainGeometry from '$lib/components/generation/generation-steps/MainGeometry.svelte';
 	import ProcessForPrinting from '$lib/components/generation/generation-steps/ProcessForPrinting.svelte';
 	import PlacetoneHoles from '$lib/components/generation/generation-steps/PlaceToneHoles.svelte';
-    import { viewMode } from '$lib/stores/fluteStore';
-
+	import Tooltip from '$lib/components/generation/form-elements/Tooltip.svelte';
+    import { viewMode, fluteParams, toneHoleParams } from '$lib/stores/fluteStore';
+    
 	let currentStep = 1;
 
 	const steps = [
@@ -23,12 +24,31 @@
 	}
 
 	$: progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
+	
+	$: fluteParamsText = (() => {
+		const holeInfo = Array.from({ length: $fluteParams.numberOfToneHoles }, (_, i) => {
+			const diameter = $toneHoleParams.holeDiameters[i] || 0;
+			const distance = $toneHoleParams.holeDistances[i] || 0;
+			return `  Hole ${i + 1}: ${diameter}mm @ ${distance.toFixed(1)}mm`;
+		}).join('\n');
+		
+		return `Bore: ${$fluteParams.boreDiameter}mm
+                Wall: ${$fluteParams.wallThickness}mm
+                Embouchure: ${$fluteParams.embouchureHoleLength}×${$fluteParams.embouchureHoleWidth}mm
+                Embouchure Distance: ${$fluteParams.embouchureDistance.toFixed(1)}mm
+                Fundamental: ${$fluteParams.fundamentalFrequency.toFixed(2)}Hz
+                Holes: ${$fluteParams.numberOfToneHoles}
+                Flute Length: ${$fluteParams.fluteLength.toFixed(1)}mm
+                ${holeInfo}`;
+	})();
 </script>
 
 <div class="space-y-6 p-4 sm:p-6 md:p-8">
-	<!-- Header with View Mode Toggle -->
 	<div class="flex items-center justify-between">
-		<h2 class="text-xl font-semibold text-primary-400">Flute Designer</h2>
+		<div class="flex items-center gap-2">
+			<h2 class="text-xl font-semibold text-primary-400">Flute Designer</h2>
+			<Tooltip text={fluteParamsText} type="info" />
+		</div>
 		<div class="flex rounded-lg bg-gray-800 p-1 border border-gray-700">
 			<button
 				on:click={toggleViewMode}
@@ -69,7 +89,6 @@
 					class="flex flex-col items-center gap-2 group"
 				>
 					<div class="relative flex items-center justify-center h-8">
-						<!-- Background to block line through icon center -->
 						<div class="absolute w-10 h-10 bg-gray-900 rounded-full z-5"></div>
 						
 						<i 

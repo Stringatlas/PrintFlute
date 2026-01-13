@@ -3,6 +3,8 @@
 
 	export let text: string;
 	export let type: 'info' | 'error' | 'warning' = 'info';
+	export let imageSrc: string | undefined = undefined;
+	export let imageAlt: string = '';
 	
 	let showTooltip = false;
 	let buttonElement: HTMLButtonElement;
@@ -56,6 +58,9 @@
 		style="left: {tooltipX}px; top: {tooltipY}px;"
 	>
 		{text}
+		{#if imageSrc}
+			<img src={imageSrc} alt={imageAlt} class="mt-2 w-full rounded border border-gray-700" />
+		{/if}
 		<div class="absolute left-2 bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900"></div>
 	</div>
 {/if}

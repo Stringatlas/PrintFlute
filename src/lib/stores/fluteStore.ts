@@ -14,6 +14,7 @@ export interface FluteParameters {
 	embouchureHoleWidth: number;
 	lipCoveragePercent: number;
 	embouchureDistance: number;
+	fluteLength: number;
 	
 	// Tuning Parameters
 	numberOfToneHoles: number;
@@ -37,6 +38,7 @@ export const DEFAULT_PARAMETERS: FluteParameters = {
 	embouchureHoleWidth: 9.5,
 	lipCoveragePercent: 5,
 	embouchureDistance: 0,
+	fluteLength: 0,
 	numberOfToneHoles: 6,
 	fundamentalFrequency: 587.33,
 	toneHoleFilletRadius: 1.5,

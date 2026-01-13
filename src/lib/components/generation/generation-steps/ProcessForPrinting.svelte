@@ -49,6 +49,11 @@
 			onChange={(v) => handleParameterChange('toneHoleFilletRadius', v)}
 			info={PARAMETER_INFO.toneHoleFilletRadius}
 		/>
+	</div>
+
+	<!-- Cut Configuration -->
+	<div class="space-y-4 mt-8">
+		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Cut Configuration</h3>
 		<ParameterControl
 			label="Connector Length"
 			value={$fluteParams.connectorLength}
@@ -62,12 +67,8 @@
 			onChange={(v) => handleParameterChange('connectorLength', v)}
 			info={PARAMETER_INFO.connectorLength}
 		/>
-	</div>
-
-	<!-- Cut Configuration -->
-	<div class="space-y-4 mt-8">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Cut Configuration</h3>
-		<ParameterControl
+        
+        <ParameterControl
 			label="Number of Cuts"
 			value={$fluteParams.numberOfCuts}
 			min={0}
