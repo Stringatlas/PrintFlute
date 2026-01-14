@@ -61,14 +61,6 @@ Built with modern web technologies for performance and accessibility:
 - **Acoustic Calculations**: Custom algorithms for frequency prediction and hole positioning
 - **File Export**: STL generation for 3D printing compatibility
 
-## Project Structure
-
-The codebase is organized by functional domain:
-- `acoustics/`: Pure acoustic calculations and frequency algorithms
-- `geometry/`: Three.js mesh generation and 3D modeling
-- `audio/`: Pitch detection, harmonic analysis, and audio capture
-- `components/`: Svelte UI components for design and analysis
-- `stores/`: Application state management
 
 ## Use Cases
 

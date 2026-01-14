@@ -10,7 +10,7 @@
 	) {
 		fluteParams.updateParameter(key, value as (typeof $fluteParams)[K]);
 	}
-
+    
 	export let onBack: () => void;
 	export let onNext: () => void;
 </script>

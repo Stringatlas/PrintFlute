@@ -96,7 +96,10 @@
 		sectionAnalysisEnabled = true;
 		originalGeometryGroup = geometryGroup.clone();
 		
-		const cutGroup = applySectionCut(geometryGroup);
+		// Calculate outer diameter: bore diameter + 2 * wall thickness
+		const outerDiameter = $fluteParams.boreDiameter + (2 * $fluteParams.wallThickness);
+		
+		const cutGroup = applySectionCut(geometryGroup, outerDiameter);
 		scene.remove(geometryGroup);
 		geometryGroup = cutGroup;
 		scene.add(geometryGroup);
