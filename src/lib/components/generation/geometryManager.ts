@@ -1,0 +1,21 @@
+import type { FluteParameters, ToneHoleParameters, DesignStep } from '$lib/stores/fluteStore';
+import { createHeadJointGeometry } from '$lib/geometry/headjointGeometry';
+import { createFullFluteGeometry } from '$lib/geometry/fullFluteGeometry';
+import { createPrintingFluteGeometry } from '$lib/geometry/printingFluteGeometry';
+
+export function createGeometryForStep(
+	step: DesignStep,
+	fluteParams: FluteParameters,
+	toneHoleParams: ToneHoleParameters
+) {
+	switch (step) {
+		case 1:
+			return createHeadJointGeometry(fluteParams);
+		case 2:
+			return createFullFluteGeometry(fluteParams, toneHoleParams);
+		case 3:
+			return createPrintingFluteGeometry(fluteParams, toneHoleParams);
+		default:
+			return createHeadJointGeometry(fluteParams);
+	}
+}
