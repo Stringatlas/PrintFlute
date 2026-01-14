@@ -2,7 +2,7 @@
 	import ParameterControl from '$lib/components/generation/form-elements/ParameterControl.svelte';
 	import ToneHoleTable from '$lib/components/generation/form-elements/ToneHoleTable.svelte';
 	import { fluteParams, DEFAULT_PARAMETERS } from '$lib/stores/fluteStore';
-	import { PARAMETER_INFO } from '$lib/components/generation/designParametersInfo';
+	import { PARAMETER_INFO } from '$lib/components/generation/generation-steps/designParametersInfo';
 
 	function handleParameterChange<K extends keyof typeof $fluteParams>(
 		key: K,

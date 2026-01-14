@@ -1,13 +1,18 @@
 import { writable } from 'svelte/store';
 
+export type ComputedParameter<T> = {
+	mode: 'auto' | 'manual';
+	value?: T;
+};
+
 export interface FluteParameters {
 	// Physical Parameters
 	boreDiameter: number;
 	wallThickness: number;
 	hasThumbHole: boolean;
 	overhangLength: number;
-	corkDistance: number | undefined;
-	corkThickness: number | undefined;
+	corkDistance: ComputedParameter<number>;
+	corkThickness: ComputedParameter<number>;
 	
 	// Embouchure Hole Parameters
 	embouchureHoleLength: number;
@@ -32,8 +37,8 @@ export const DEFAULT_PARAMETERS: FluteParameters = {
 	wallThickness: 2.5,
 	hasThumbHole: true,
 	overhangLength: 20,
-	corkDistance: undefined,
-	corkThickness: undefined,
+	corkDistance: { mode: 'auto' },
+	corkThickness: { mode: 'auto' },
 	embouchureHoleLength: 9.5,
 	embouchureHoleWidth: 9.5,
 	lipCoveragePercent: 5,
@@ -57,6 +62,18 @@ function createFluteStore() {
 		},
 		resetParameter: <K extends keyof FluteParameters>(key: K) => {
 			update(params => ({ ...params, [key]: DEFAULT_PARAMETERS[key] }));
+		},
+		setComputedOverride: (key: 'corkDistance' | 'corkThickness', value: number) => {
+			update(params => ({
+				...params,
+				[key]: { mode: 'manual' as const, value }
+			}));
+		},
+		resetComputedToAuto: (key: 'corkDistance' | 'corkThickness') => {
+			update(params => ({
+				...params,
+				[key]: { mode: 'auto' as const }
+			}));
 		},
 		resetAll: () => {
 			set({ ...DEFAULT_PARAMETERS });
@@ -188,3 +205,7 @@ function createToneHoleStore() {
 }
 
 export const toneHoleParams = createToneHoleStore();
+
+export type DesignStep = 1 | 2 | 3;
+
+export const currentDesignStep = writable<DesignStep>(1);

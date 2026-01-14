@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
 import type { FluteParameters } from '../stores/fluteStore';
+import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
 
 const HEADJOINT_LENGTH_MM = 150;
 
@@ -9,18 +10,14 @@ interface HeadJointGeometryResult {
 	dispose: () => void;
 }
 
-/**
- * Creates a hollow cylinder using CSG subtraction with cork wall and embouchure hole
- * Order: overhang (hollow) -> cork wall (solid) -> rest (hollow with embouchure)
- */
 export function createHeadJointGeometry(params: FluteParameters): HeadJointGeometryResult {
 	const group = new THREE.Group();
 	const geometries: THREE.BufferGeometry[] = [];
 	
 	const innerRadius = params.boreDiameter / 2;
 	const outerRadius = innerRadius + params.wallThickness;
-	const corkThickness = params.corkThickness ?? 5;
-	const corkDistance = params.corkDistance ?? 30; // Cork to embouchure center
+	const corkThickness = resolveComputedParameter('corkThickness', params);
+	const corkDistance = resolveComputedParameter('corkDistance', params);
 	const overhang = params.overhangLength;
 	
 	// Create layer line texture simulating 2mm 3D printing layers
@@ -33,17 +30,9 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	ctx.fillStyle = '#10b981';
 	ctx.fillRect(0, 0, 256, 256);
 	
-	// Add visible horizontal layer lines (0.2mm spacing)
-	// ctx.fillStyle = 'rgba(0, 0, 0, 0.15)'; // Darker lines for visibility
-	// for (let i = 0; i < 256; i += 4) {
-	// 	ctx.fillRect(0, i, 256, 1);
-	// }
-	
 	const texture = new THREE.CanvasTexture(canvas);
 	texture.wrapS = THREE.RepeatWrapping;
 	texture.wrapT = THREE.RepeatWrapping;
-    
-	// texture.repeat.set(1, HEADJOINT_LENGTH_MM / 0.2);
 	
 	const material = new THREE.MeshStandardMaterial({
 		map: texture,
@@ -53,7 +42,7 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	
 	const evaluator = new Evaluator();
 	
-	// Positions along the flute (starting from -HEADJOINT_LENGTH_MM/2)
+	// Start at the top of headjoint
 	const startPos = -HEADJOINT_LENGTH_MM / 2;
 	const overhangEnd = startPos + overhang;
 	const corkEnd = overhangEnd + corkThickness;
@@ -69,7 +58,7 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	outerGeometry.rotateZ(Math.PI / 2);
 	const outerBrush = new Brush(outerGeometry);
 	
-	// Create first bore section (overhang)
+	// Overhang cut
 	const bore1Geometry = new THREE.CylinderGeometry(
 		innerRadius,
 		innerRadius,
@@ -80,7 +69,7 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	bore1Geometry.translate(startPos + overhang / 2, 0, 0);
 	const bore1Brush = new Brush(bore1Geometry);
 	
-	// Create second bore section (after cork to end)
+	// Main bore cut
 	const bore2Length = HEADJOINT_LENGTH_MM / 2 - corkEnd;
 	const bore2Geometry = new THREE.CylinderGeometry(
 		innerRadius,
@@ -96,7 +85,7 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	let resultBrush = evaluator.evaluate(outerBrush, bore1Brush, SUBTRACTION);
 	resultBrush = evaluator.evaluate(resultBrush, bore2Brush, SUBTRACTION);
 	
-	// Create embouchure hole (elliptical cylinder)
+	// Create embouchure hole elliptical cylinder
 	const embouchureRadius = Math.max(params.embouchureHoleLength, params.embouchureHoleWidth) / 2;
 	const embouchureGeometry = new THREE.CylinderGeometry(
 		embouchureRadius,

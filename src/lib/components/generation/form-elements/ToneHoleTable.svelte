@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { viewMode, toneHoleParams } from '$lib/stores/fluteStore';
 	import { DIATONIC_SCALE_CENTS } from '$lib/audio/musicTheory';
-    import { validateDiameter } from '$lib/components/generation/designParametersValidation';
+    import { validateDiameter } from '$lib/components/generation/generation-steps/designParametersValidation';
 	import { calculatedFluteData, calculationError, updateCalculatedValues } from '$lib/utils/fluteCalculationHelper';
 	import Tooltip from './Tooltip.svelte';
 

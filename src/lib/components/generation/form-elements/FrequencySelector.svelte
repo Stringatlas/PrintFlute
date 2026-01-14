@@ -94,7 +94,7 @@
 				class="w-32 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-primary-500"
 			/>
 		{/if}
-		<span class="text-sm text-gray-400 min-w-[60px]">{value.toFixed(2)} Hz</span>
+		<span class="text-sm text-gray-400 min-w-15">{value.toFixed(2)} Hz</span>
 	</div>
 </div>
 

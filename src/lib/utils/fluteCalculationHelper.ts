@@ -1,6 +1,7 @@
 import { derived, get, writable, type Readable } from 'svelte/store';
 import { fluteParams, toneHoleParams, type FluteParameters, type ToneHoleParameters } from '$lib/stores/fluteStore';
 import { calculateFlutePositions, type FluteParams, type FluteResult, midiNoteToFrequency } from '$lib/acoustics/fluteCalculator';
+import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
 
 export interface CalculatedHoleData {
 	physicalPosition: number;
@@ -60,8 +61,8 @@ export function updateCalculatedValues(result: FluteResult | null, numberOfHoles
 	
 	// Calculate total flute length: embouchureDistance + corkDistance + corkThickness + overhangLength
 	const fluteLength = embouchureDistance + 
-		(currentFluteParams.corkDistance || 0) + 
-		(currentFluteParams.corkThickness || 0) + 
+		resolveComputedParameter('corkDistance', currentFluteParams) +
+		resolveComputedParameter('corkThickness', currentFluteParams) +
 		currentFluteParams.overhangLength;
 	
 	fluteParams.updateParameter('embouchureDistance', embouchureDistance);

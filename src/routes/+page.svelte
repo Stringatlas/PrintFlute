@@ -1,9 +1,9 @@
 <script lang="ts">
 	import SideNav from '$lib/components/SideNav.svelte';
 	import Preview3D from '$lib/components/generation/Preview3D.svelte';
-	import Designer from '$lib/components/tabs/Designer.svelte';
-	import AudioAnalysis from '$lib/components/tabs/AudioAnalysis.svelte';
-	import TimbreAnalysis from '$lib/components/tabs/TimbreAnalysis.svelte';
+	import Designer from '$lib/components/tabs/DesignerTab.svelte';
+	import AudioAnalysis from '$lib/components/tabs/TunerTab.svelte';
+	import TimbreAnalysis from '$lib/components/tabs/TimbreAnalysisTab.svelte';
     import type { Tab } from '$lib/components/SideNav.svelte';
 
 	let currentTab: Tab = $state('designer');

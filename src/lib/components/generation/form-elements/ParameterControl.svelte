@@ -17,6 +17,11 @@
 	export let onChange: (value: number | boolean) => void;
 	export let info: string | undefined = undefined;
 
+	// Computed parameter props
+	export let isComputed: boolean = false;
+	export let computedMode: 'auto' | 'manual' | undefined = undefined;
+	export let onResetComputed: (() => void) | undefined = undefined;
+
 	function handleInput(event: Event) {
 		const target = event.target as HTMLInputElement;
 		if (inputType === 'checkbox') {
@@ -35,6 +40,7 @@
 	}
 
 	$: isDefault = value === getDefault();
+	$: isAutoMode = isComputed && computedMode === 'auto';
 	$: validationResult = validate && typeof value === 'number' ? validate(value) : { status: 'success' as const };
 	$: isVisible = visibility === 'always' || $viewMode === visibility;
 	$: borderColor = validationResult.status === 'error' 
@@ -55,16 +61,33 @@
 					<Tooltip text={validationResult.message} type={validationResult.status} />
 				{/if}
 			</div>
-			<button
-				on:click={resetToDefault}
-				disabled={isDefault}
-				class="text-xs px-2 py-0.5 rounded transition-colors duration-200 {isDefault
-					? 'text-gray-600 cursor-not-allowed'
-					: 'text-primary-400 hover:text-primary-300 hover:bg-gray-800'}"
-				title="Reset to default"
-			>
-				Reset
-			</button>
+			{#if isComputed}
+				<div class="flex items-center gap-2">
+					<span class="text-xs px-2 py-0.5 rounded {isAutoMode ? 'bg-blue-900/30 text-blue-400' : 'bg-amber-900/30 text-amber-400'}">
+						{isAutoMode ? 'Auto' : 'Manual'}
+					</span>
+					{#if !isAutoMode && onResetComputed}
+						<button
+							on:click={onResetComputed}
+							class="text-xs px-2 py-0.5 rounded transition-colors duration-200 text-primary-400 hover:text-primary-300 hover:bg-gray-800"
+							title="Reset to auto-calculated"
+						>
+							Reset to Auto
+						</button>
+					{/if}
+				</div>
+			{:else}
+				<button
+					on:click={resetToDefault}
+					disabled={isDefault}
+					class="text-xs px-2 py-0.5 rounded transition-colors duration-200 {isDefault
+						? 'text-gray-600 cursor-not-allowed'
+						: 'text-primary-400 hover:text-primary-300 hover:bg-gray-800'}"
+					title="Reset to default"
+				>
+					Reset
+				</button>
+			{/if}
 		</div>
 		<div class="flex items-center gap-2">
 			{#if inputType === 'slider'}

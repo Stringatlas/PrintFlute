@@ -5,9 +5,13 @@
 	import {
 		validateBoreDiameter,
 		validateWallThickness
-	} from '$lib/components/generation/designParametersValidation';
-	import { PARAMETER_INFO } from '$lib/components/generation/designParametersInfo';
-	import { getDefaultCorkDistance, getDefaultCorkThickness } from '$lib/components/generation/designParamtersDefault';
+	} from '$lib/components/generation/generation-steps/designParametersValidation';
+	import { PARAMETER_INFO } from '$lib/components/generation/generation-steps/designParametersInfo';
+	import { 
+		getDefaultCorkDistance, 
+		getDefaultCorkThickness,
+		resolveComputedParameter 
+	} from '$lib/components/generation/generation-steps/designParametersDefault';
 
 	function handleParameterChange<K extends keyof typeof $fluteParams>(
 		key: K,
@@ -16,14 +20,26 @@
 		fluteParams.updateParameter(key, value as (typeof $fluteParams)[K]);
 	}
 
+	function handleComputedParameterChange(
+		key: 'corkDistance' | 'corkThickness',
+		value: number
+	) {
+		fluteParams.setComputedOverride(key, value);
+	}
+
+	function handleComputedParameterReset(
+		key: 'corkDistance' | 'corkThickness'
+	) {
+		fluteParams.resetComputedToAuto(key);
+	}
+
 	export let onNext: () => void;
 
-	$: defaultCorkDistance = getDefaultCorkDistance($fluteParams);
-	$: defaultCorkThickness = getDefaultCorkThickness($fluteParams);
+	$: resolvedCorkDistance = resolveComputedParameter('corkDistance', $fluteParams);
+	$: resolvedCorkThickness = resolveComputedParameter('corkThickness', $fluteParams);
 </script>
 
 <div class="space-y-6">
-	<!-- Physical Parameters -->
 	<div class="space-y-4">
 		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Physical Parameters</h3>
 		<ParameterControl
@@ -78,33 +94,38 @@
 		/>
 		<ParameterControl
 			label="Cork Distance"
-			value={$fluteParams.corkDistance ? $fluteParams.corkDistance : defaultCorkDistance}
+			value={resolvedCorkDistance}
 			min={5}
 			max={30}
 			step={0.5}
 			unit="mm"
 			inputType="number"
 			visibility="advanced"
-			getDefault={() => defaultCorkDistance}
-			onChange={(v) => handleParameterChange('corkDistance', v)}
+			isComputed={true}
+			computedMode={$fluteParams.corkDistance.mode}
+			getDefault={() => getDefaultCorkDistance($fluteParams)}
+			onChange={(v) => handleComputedParameterChange('corkDistance', v as number)}
+			onResetComputed={() => handleComputedParameterReset('corkDistance')}
 			info={PARAMETER_INFO.corkDistance}
 		/>
 		<ParameterControl
 			label="Cork Thickness"
-			value={$fluteParams.corkThickness ? $fluteParams.corkThickness : defaultCorkThickness}
+			value={resolvedCorkThickness}
 			min={1}
 			max={5}
 			step={0.1}
 			unit="mm"
 			inputType="number"
 			visibility="advanced"
-			getDefault={() => defaultCorkThickness}
-			onChange={(v) => handleParameterChange('corkThickness', v)}
+			isComputed={true}
+			computedMode={$fluteParams.corkThickness.mode}
+			getDefault={() => getDefaultCorkThickness($fluteParams)}
+			onChange={(v) => handleComputedParameterChange('corkThickness', v as number)}
+			onResetComputed={() => handleComputedParameterReset('corkThickness')}
 			info={PARAMETER_INFO.corkThickness}
 		/>
 	</div>
 
-	<!-- Embouchure Hole Parameters -->
 	<div class="space-y-4 mt-8">
 		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Embouchure Hole Parameters</h3>
 		<ParameterControl

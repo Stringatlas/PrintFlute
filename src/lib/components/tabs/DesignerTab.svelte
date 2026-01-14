@@ -3,7 +3,8 @@
 	import ProcessForPrinting from '$lib/components/generation/generation-steps/ProcessForPrinting.svelte';
 	import PlacetoneHoles from '$lib/components/generation/generation-steps/PlaceToneHoles.svelte';
 	import Tooltip from '$lib/components/generation/form-elements/Tooltip.svelte';
-    import { viewMode, fluteParams, toneHoleParams } from '$lib/stores/fluteStore';
+    import { viewMode, fluteParams, toneHoleParams, currentDesignStep } from '$lib/stores/fluteStore';
+	import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
     
 	let currentStep = 1;
 
@@ -21,6 +22,7 @@
 
 	function goToStep(step: number) {
 		currentStep = step;
+		currentDesignStep.set(step as 1 | 2 | 3);
 	}
 
 	$: progressPercent = ((currentStep - 1) / (totalSteps - 1)) * 100;
@@ -32,14 +34,19 @@
 			return `  Hole ${i + 1}: ${diameter}mm @ ${distance.toFixed(1)}mm`;
 		}).join('\n');
 		
+		const corkDistance = resolveComputedParameter('corkDistance', $fluteParams);
+		const corkThickness = resolveComputedParameter('corkThickness', $fluteParams);
+		
 		return `Bore: ${$fluteParams.boreDiameter}mm
-                Wall: ${$fluteParams.wallThickness}mm
-                Embouchure: ${$fluteParams.embouchureHoleLength}×${$fluteParams.embouchureHoleWidth}mm
-                Embouchure Distance: ${$fluteParams.embouchureDistance.toFixed(1)}mm
-                Fundamental: ${$fluteParams.fundamentalFrequency.toFixed(2)}Hz
-                Holes: ${$fluteParams.numberOfToneHoles}
-                Flute Length: ${$fluteParams.fluteLength.toFixed(1)}mm
-                ${holeInfo}`;
+Wall: ${$fluteParams.wallThickness}mm
+Cork Distance: ${corkDistance.toFixed(1)}mm
+Cork Thickness: ${corkThickness.toFixed(1)}mm
+Embouchure: ${$fluteParams.embouchureHoleLength}×${$fluteParams.embouchureHoleWidth}mm
+Embouchure Distance: ${$fluteParams.embouchureDistance.toFixed(1)}mm
+Fundamental: ${$fluteParams.fundamentalFrequency.toFixed(2)}Hz
+Holes: ${$fluteParams.numberOfToneHoles}
+Flute Length: ${$fluteParams.fluteLength.toFixed(1)}mm
+${holeInfo}`;
 	})();
 </script>
 
