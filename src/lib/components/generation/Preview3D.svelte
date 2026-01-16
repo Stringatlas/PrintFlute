@@ -31,11 +31,16 @@
 	let cameraAnimating = false;
 	let activeTrigger: ParameterTrigger | null = null;
 
-	// Create triggers with section analysis callbacks
+	// Camera pose triggers from cameraAnimations.ts:
+	// [0] = Bore diameter & wall thickness -> side view
+	// [1] = Embouchure hole dimensions -> angled close-up
+	// [2] = Cork parameters -> headjoint interior view (with section cut)
+	const CORK_TRIGGER_INDEX = 2;
+	
 	const triggers = cameraPoseTriggers.map((trigger, index) => ({
 		...trigger,
-		onActivate: index === 2 ? enableSectionAnalysis : disableSectionAnalysis,
-		onDeactivate: index === 2 ? disableSectionAnalysis : undefined
+		onActivate: index === CORK_TRIGGER_INDEX ? enableSectionAnalysis : disableSectionAnalysis,
+		onDeactivate: index === CORK_TRIGGER_INDEX ? disableSectionAnalysis : undefined
 	}));
 
 	onMount(() => {
@@ -91,7 +96,8 @@
 	}
 
 	function enableSectionAnalysis() {
-		if (!scene || sectionAnalysisEnabled || !geometryGroup) return;
+		// Only enable section analysis on step 1 (Main Geometry)
+		if (!scene || sectionAnalysisEnabled || !geometryGroup || $currentDesignStep !== 1) return;
 		
 		sectionAnalysisEnabled = true;
 		originalGeometryGroup = geometryGroup.clone();

@@ -13,7 +13,7 @@ function createCrossSectionMaterial(): THREE.Material {
 	ctx.fillRect(0, 0, 64, 64);
 	
 	// Draw diagonal hatching lines
-	ctx.strokeStyle = '#333333';
+	ctx.strokeStyle = '#212121';
 	ctx.lineWidth = 1.5;
 	const spacing = 8;
 	

@@ -49,7 +49,7 @@ export const DEFAULT_PARAMETERS: FluteParameters = {
 	toneHoleFilletRadius: 1.5,
 	connectorLength: 15,
 	numberOfCuts: 1,
-	cutDistances: [0],
+	cutDistances: [180],
 };
 
 function createFluteStore() {
@@ -83,68 +83,6 @@ function createFluteStore() {
 
 export const fluteParams = createFluteStore();
 
-export type ViewMode = 'basic' | 'advanced';
-
-function createViewModeStore() {
-	const STORAGE_KEY = 'flute-generator-view-mode';
-	const defaultValue: ViewMode = 'basic';
-	
-	let storedValue: ViewMode = defaultValue;
-	if (typeof localStorage !== 'undefined') {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		if (stored === 'basic' || stored === 'advanced') {
-			storedValue = stored;
-		}
-	}
-	
-	const { subscribe, set, update } = writable<ViewMode>(storedValue);
-	
-	return {
-		subscribe,
-		set: (value: ViewMode) => {
-			if (typeof localStorage !== 'undefined') {
-				localStorage.setItem(STORAGE_KEY, value);
-			}
-			set(value);
-		},
-		update: (fn: (value: ViewMode) => ViewMode) => {
-			update(currentValue => {
-				const newValue = fn(currentValue);
-				if (typeof localStorage !== 'undefined') {
-					localStorage.setItem(STORAGE_KEY, newValue);
-				}
-				return newValue;
-			});
-		}
-	};
-}
-
-export const viewMode = createViewModeStore();
-
-export interface MeshResolution {
-	preview: {
-		radialSegments: number;
-		heightSegments: number;
-	};
-	export: {
-		radialSegments: number;
-		heightSegments: number;
-	};
-}
-
-export const DEFAULT_MESH_RESOLUTION: MeshResolution = {
-	preview: {
-		radialSegments: 32,
-		heightSegments: 1,
-	},
-	export: {
-		radialSegments: 64,
-		heightSegments: 4,
-	},
-};
-
-export const meshResolution = writable<MeshResolution>({ ...DEFAULT_MESH_RESOLUTION });
-
 export interface ToneHoleParameters {
 	holeDiameters: number[];
 	holeCents: number[];
@@ -153,10 +91,10 @@ export interface ToneHoleParameters {
 }
 
 export const DEFAULT_TONEHOLE_PARAMETERS: ToneHoleParameters = {
-	holeDiameters: [8, 8, 8, 8, 8, 8, 8, 8],
+	holeDiameters: [7.5, 8, 5, 6, 6.5, 5.5],
 	holeCents: [200, 400, 500, 700, 900, 1100, 1200, 1400],
-	holeDistances: [0, 0, 0, 0, 0, 0, 0, 0],
-	cutoffRatios: [0, 0, 0, 0, 0, 0, 0, 0],
+	holeDistances: [0, 0, 0, 0, 0, 0],
+	cutoffRatios: [0, 0, 0, 0, 0, 0],
 };
 
 function createToneHoleStore() {
@@ -205,7 +143,3 @@ function createToneHoleStore() {
 }
 
 export const toneHoleParams = createToneHoleStore();
-
-export type DesignStep = 1 | 2 | 3;
-
-export const currentDesignStep = writable<DesignStep>(1);

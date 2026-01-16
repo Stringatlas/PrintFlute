@@ -1,11 +1,15 @@
 import type { FluteParameters } from '$lib/stores/fluteStore';
 
+function round(value: number, precision: number = 2): number {
+    return Number(value.toFixed(precision));
+}
+
 export function getDefaultCorkDistance(params: FluteParameters): number {
-	return params.embouchureHoleLength / 2 + 0.2 * params.boreDiameter;
+	return round(params.embouchureHoleLength / 2 + 0.2 * params.boreDiameter, 3);
 }
 
 export function getDefaultCorkThickness(params: FluteParameters): number {
-	return params.boreDiameter * 0.4;
+	return round(params.boreDiameter * 0.4, 3);
 }
 
 export function resolveComputedParameter(
