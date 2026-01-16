@@ -1,7 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ParameterControl from '$lib/components/generation/form-elements/ParameterControl.svelte';
-	import { fluteParams, DEFAULT_PARAMETERS } from '$lib/stores/fluteStore';
+	import { fluteParams, DEFAULT_PARAMETERS, toneHoleParams } from '$lib/stores/fluteStore';
 	import { PARAMETER_INFO } from '$lib/components/generation/generation-steps/designParametersInfo';
+	import { validateCutDistance } from '$lib/components/generation/generation-steps/designParametersValidation';
+	import { DIATONIC_SCALE_CENTS } from '$lib/audio/musicTheory';
+	import { calculatedFluteData, updateCalculatedValues } from '$lib/utils/fluteCalculationHelper';
 
 	function handleParameterChange<K extends keyof typeof $fluteParams>(
 		key: K,
@@ -18,6 +22,22 @@
 
 	export let onBack: () => void;
 
+	onMount(() => {
+		// Ensure tone holes have default cents values if not set
+		for (let i = 0; i < $fluteParams.numberOfToneHoles; i++) {
+			if ($toneHoleParams.holeCents[i] === undefined || $toneHoleParams.holeCents[i] === 0) {
+				if (i + 1 < DIATONIC_SCALE_CENTS.length) {
+					toneHoleParams.updateHoleCents(i, DIATONIC_SCALE_CENTS[i + 1]);
+				}
+			}
+		}
+		
+		// Trigger calculation if not already done
+		if ($calculatedFluteData) {
+			updateCalculatedValues($calculatedFluteData, $fluteParams.numberOfToneHoles);
+		}
+	});
+
 	// Update cutDistances array when numberOfCuts changes
 	$: {
 		const currentLength = $fluteParams.cutDistances.length;
@@ -29,6 +49,11 @@
 			);
 			fluteParams.updateParameter('cutDistances', newDistances);
 		}
+	}
+	
+	// Recalculate when parameters change
+	$: if ($calculatedFluteData) {
+		updateCalculatedValues($calculatedFluteData, $fluteParams.numberOfToneHoles);
 	}
 </script>
 
@@ -94,6 +119,15 @@
 				getDefault={() => 0}
 				onChange={(v) => updateCutDistance(i, v)}
 				info={PARAMETER_INFO.cutDistance}
+				validate={(v) => validateCutDistance(
+					v as number,
+					i,
+					$fluteParams.cutDistances,
+					$fluteParams.connectorLength,
+					$fluteParams.embouchureDistance,
+					$fluteParams.embouchureHoleLength,
+					$fluteParams.fluteLength
+				)}
 			/>
 		{/each}
 	</div>

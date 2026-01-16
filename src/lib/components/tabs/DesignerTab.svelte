@@ -3,7 +3,8 @@
 	import ProcessForPrinting from '$lib/components/generation/generation-steps/ProcessForPrinting.svelte';
 	import PlacetoneHoles from '$lib/components/generation/generation-steps/PlaceToneHoles.svelte';
 	import Tooltip from '$lib/components/generation/form-elements/Tooltip.svelte';
-    import { viewMode, fluteParams, toneHoleParams, currentDesignStep } from '$lib/stores/fluteStore';
+    import { fluteParams, toneHoleParams } from '$lib/stores/fluteStore';
+    import { viewMode, currentDesignStep } from '$lib/stores/uiStore';
 	import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
     
 	let currentStep = 1;

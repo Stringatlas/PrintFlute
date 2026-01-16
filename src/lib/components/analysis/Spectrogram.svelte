@@ -31,6 +31,6 @@
 </script>
 
 <div class="bg-gray-900 rounded-lg border border-gray-700 p-2 relative">
-	<!-- <div class="text-xs text-gray-400 mb-1">Spectrogram (Time vs Frequency)</div> -->
+	<!-- <div class="text-xs text-gray-400 mb-1">Spectrogram</div> -->
 	<canvas bind:this={canvas} class="w-full h-64"></canvas>
 </div>

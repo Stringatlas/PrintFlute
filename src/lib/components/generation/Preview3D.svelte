@@ -1,13 +1,15 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
-	import { fluteParams, toneHoleParams, currentDesignStep, type FluteParameters } from '$lib/stores/fluteStore';
+    import { currentDesignStep } from '$lib/stores/uiStore';
+	import { fluteParams, toneHoleParams, type FluteParameters } from '$lib/stores/fluteStore';
 	import { createThreeScene, handleCanvasResize } from '$lib/geometry/sceneSetup';
 	import { applySectionCut, restoreOriginalGeometry } from './sectionAnalysis';
 	import { 
 		cameraPoseTriggers, 
 		detectChangedParameters, 
 		updateCameraAnimation,
+		BIRDS_EYE_VIEW_POSE,
 		type ParameterTrigger 
 	} from './cameraAnimations';
 	import { createGeometryForStep } from './geometryManager';
@@ -93,6 +95,12 @@
 		}
 		
 		updateGeometry();
+	}
+	
+	$: if (scene && camera && $currentDesignStep === 3) {
+		targetCameraPosition = BIRDS_EYE_VIEW_POSE.position.clone();
+		targetLookAt = BIRDS_EYE_VIEW_POSE.lookAt?.clone() || new THREE.Vector3(0, 0, 0);
+		cameraAnimating = true;
 	}
 
 	function enableSectionAnalysis() {

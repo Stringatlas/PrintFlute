@@ -53,6 +53,5 @@
 </script>
 
 <div class="bg-gray-900 rounded-lg border border-gray-700 p-2">
-	<!-- <div class="text-xs text-gray-400 mb-1">Waveform</div> -->
 	<canvas bind:this={canvas} class="w-full h-24"></canvas>
 </div>

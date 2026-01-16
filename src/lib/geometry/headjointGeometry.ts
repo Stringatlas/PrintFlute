@@ -10,6 +10,7 @@ interface HeadJointGeometryResult {
 	dispose: () => void;
 }
 
+// IMPORTANT: This function constructs the geometry from the top of the headjoint downwards
 export function createHeadJointGeometry(params: FluteParameters): HeadJointGeometryResult {
 	const group = new THREE.Group();
 	const geometries: THREE.BufferGeometry[] = [];

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { viewMode } from '$lib/stores/fluteStore';
+	import { viewMode } from '$lib/stores/uiStore';
 	import Tooltip from './Tooltip.svelte';
 
 	export let label: string;

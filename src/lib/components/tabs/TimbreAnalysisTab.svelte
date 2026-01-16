@@ -15,8 +15,16 @@
 	let error: string | null = null;
 	let sampleRate: number = 48000;
 
+	let frozenHarmonics: number[] = [400, 600, 800, 1000, 1200];
+	let frozenAmplitudes: number[] = [80, 60, 40, 20, 10];
+
 	$: if (predictedFrequency !== null) {
 		audioStore.update((state) => ({ ...state, predictedFrequency }));
+	}
+
+	$: if ($audioStore.currentAnalysis?.harmonics && $audioStore.currentAnalysis?.fundamentalFrequency > 0) {
+		frozenHarmonics = $audioStore.currentAnalysis.harmonics;
+		frozenAmplitudes = $audioStore.currentAnalysis.harmonicAmplitudes;
 	}
 
 	async function startRecording() {
@@ -42,6 +50,8 @@
 		}
 		await analyzer.stop();
 		setRecording(false);
+		frozenHarmonics = [];
+		frozenAmplitudes = [];
 		updateAnalysis(null);
 	}
 
@@ -93,10 +103,10 @@
 				<Waveform timeData={$audioStore.currentAnalysis?.timeData || null} />
 			</div>
 
-			{#if $audioStore.currentAnalysis?.harmonics && $audioStore.currentAnalysis?.harmonicAmplitudes}
+			{#if frozenHarmonics.length > 0}
 				<HarmonicsChart
-					harmonics={$audioStore.currentAnalysis.harmonics}
-					amplitudes={$audioStore.currentAnalysis.harmonicAmplitudes}
+					harmonics={frozenHarmonics}
+					amplitudes={frozenAmplitudes}
 				/>
 			{/if}
 

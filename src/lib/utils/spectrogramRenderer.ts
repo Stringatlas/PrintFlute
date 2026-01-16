@@ -2,7 +2,7 @@ const MIN_FREQUENCY = 80;
 const MAX_FREQUENCY = 4000;
 const FREQUENCY_BINS = 256;
 const TIME_RESOLUTION = 30;
-const LABEL_PADDING = 50;
+const LABEL_PADDING = 40;
 
 export interface SpectrogramConfig {
 	width: number;

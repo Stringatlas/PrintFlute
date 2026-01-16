@@ -28,6 +28,11 @@ export const cameraPoseTriggers: ParameterTrigger[] = [
 	}
 ];
 
+export const BIRDS_EYE_VIEW_POSE: CameraPose = {
+	position: new THREE.Vector3(0, 300, 0),
+	lookAt: new THREE.Vector3(0, 0, 0)
+};
+
 export function detectChangedParameters(
 	current: FluteParameters,
 	previous: FluteParameters

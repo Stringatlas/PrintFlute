@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { viewMode, toneHoleParams } from '$lib/stores/fluteStore';
+	import { toneHoleParams } from '$lib/stores/fluteStore';
+    import { viewMode } from '$lib/stores/uiStore';
 	import { DIATONIC_SCALE_CENTS } from '$lib/audio/musicTheory';
     import { validateDiameter } from '$lib/components/generation/generation-steps/designParametersValidation';
 	import { calculatedFluteData, calculationError, updateCalculatedValues } from '$lib/utils/fluteCalculationHelper';

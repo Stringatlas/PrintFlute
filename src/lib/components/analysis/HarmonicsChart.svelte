@@ -28,7 +28,7 @@
 		chart.data.labels = labels;
 		chart.data.datasets[0].data = chartData;
 		chart.data.datasets[0].backgroundColor = backgroundColors;
-		chart.update();
+		chart.update('none');
 	}
 
 	onMount(() => {
@@ -47,19 +47,28 @@
 			options: {
 				responsive: true,
 				maintainAspectRatio: false,
+				animation: {
+					duration: 0
+				},
 				plugins: {
 					legend: {
 						display: false
 					},
 					tooltip: {
 						callbacks: {
-							label: (context: any) => `${context.parsed.y.toFixed(1)}%`
+							label: (context: any) => {
+								const index = context.dataIndex;
+								const percent = context.parsed.y.toFixed(1);
+								const db = amplitudes[index]?.toFixed(1) || '0.0';
+								return `${percent}% (${db} dB)`;
+							}
 						}
 					}
 				},
 				scales: {
 					y: {
-						beginAtZero: true,
+						min: 0,
+						max: 100,
 						ticks: {
 							callback: (value: any) => `${value}%`,
 							color: 'rgb(156, 163, 175)'
