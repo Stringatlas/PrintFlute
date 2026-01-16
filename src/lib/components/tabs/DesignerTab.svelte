@@ -1,7 +1,7 @@
 <script lang="ts">
 	import MainGeometry from '$lib/components/generation/generation-steps/MainGeometry.svelte';
 	import ProcessForPrinting from '$lib/components/generation/generation-steps/ProcessForPrinting.svelte';
-	import PlacetoneHoles from '$lib/components/generation/generation-steps/PlaceToneHoles.svelte';
+	import PlaceToneHoles from '$lib/components/generation/generation-steps/PlaceToneHoles.svelte';
 	import Tooltip from '$lib/components/generation/form-elements/Tooltip.svelte';
     import { fluteParams, toneHoleParams } from '$lib/stores/fluteStore';
     import { viewMode, currentDesignStep } from '$lib/stores/uiStore';
@@ -124,7 +124,7 @@ ${holeInfo}`;
 		{#if currentStep === 1}
 			<MainGeometry onNext={() => goToStep(2)} />
 		{:else if currentStep === 2}
-			<PlacetoneHoles onBack={() => goToStep(1)} onNext={() => goToStep(3)} />
+			<PlaceToneHoles onBack={() => goToStep(1)} onNext={() => goToStep(3)} />
         {:else if currentStep === 3}
 			<ProcessForPrinting onBack={() => goToStep(2)} />
 		{/if}

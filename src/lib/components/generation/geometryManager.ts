@@ -1,4 +1,5 @@
-import type { FluteParameters, ToneHoleParameters, DesignStep } from '$lib/stores/fluteStore';
+import type { FluteParameters, ToneHoleParameters } from '$lib/stores/fluteStore';
+import type { DesignStep } from '$lib/stores/uiStore';
 import { createHeadJointGeometry } from '$lib/geometry/headjointGeometry';
 import { createFullFluteGeometry } from '$lib/geometry/fullFluteGeometry';
 import { createPrintingFluteGeometry } from '$lib/geometry/printingFluteGeometry';

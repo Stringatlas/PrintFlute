@@ -134,7 +134,7 @@
 
 	<div class="space-y-2 mt-8">
 		<button class="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
-			Generate STL
+			Export
 			<i class="bi bi-download"></i>
 		</button>
 		<button
