@@ -37,7 +37,6 @@
 		<ToneHoleTable numberOfHoles={$fluteParams.numberOfToneHoles} />
 	</div>
 
-	<!-- Navigation -->
 	<div class="space-y-2 mt-8">
 		<button
 			on:click={onNext}
