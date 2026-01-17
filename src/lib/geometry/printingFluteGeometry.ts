@@ -1,37 +1,11 @@
 import * as THREE from 'three';
 import type { FluteParameters, ToneHoleParameters } from '../stores/fluteStore';
 import { createFullFluteGeometry } from './fullFluteGeometry';
+import { createLabelSprite } from './sceneAnnotations';
 
 interface PrintingFluteGeometryResult {
 	group: THREE.Group;
 	dispose: () => void;
-}
-
-function createTextSprite(text: string): { sprite: THREE.Sprite; texture: THREE.CanvasTexture } {
-	const canvas = document.createElement('canvas');
-	const ctx = canvas.getContext('2d')!;
-	
-	canvas.width = 256;
-	canvas.height = 128;
-	
-	ctx.fillStyle = 'rgba(255, 26, 26, 0.9)';
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
-	
-	ctx.font = 'bold 48px sans-serif';
-	ctx.fillStyle = '#ffffff';
-	ctx.textAlign = 'center';
-	ctx.textBaseline = 'middle';
-	ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-	
-	const texture = new THREE.CanvasTexture(canvas);
-	const spriteMaterial = new THREE.SpriteMaterial({ 
-		map: texture,
-		toneMapped: false
-	});
-	const sprite = new THREE.Sprite(spriteMaterial);
-	sprite.scale.set(20, 10, 1);
-	
-	return { sprite, texture };
 }
 
 export function createPrintingFluteGeometry(
@@ -111,10 +85,13 @@ export function createPrintingFluteGeometry(
 			group.add(rightConnectorMesh);
 			geometries.push(rightConnectorGeometry);
 			
-			const { sprite, texture } = createTextSprite(`Cut ${index + 1}`);
 			const spriteWidth = 20;
 			const zOffset = outerRadius + spriteWidth / 2 + 5;
-			sprite.position.set(centerOffset + cutDistance, 0, zOffset);
+			const { sprite, texture } = createLabelSprite(`Cut ${index + 1}`, {
+				x: centerOffset + cutDistance,
+				y: 0,
+				z: zOffset
+			});
 			group.add(sprite);
 			textures.push(texture);
 			materials.push(sprite.material);
