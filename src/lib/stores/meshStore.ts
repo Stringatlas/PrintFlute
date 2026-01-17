@@ -1,3 +1,6 @@
+/**
+ * Note: These stores are currently not being used.
+ */
 import { writable } from 'svelte/store';
 export interface MeshResolution {
 	preview: {

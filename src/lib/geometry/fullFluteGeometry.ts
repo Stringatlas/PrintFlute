@@ -49,9 +49,9 @@ export function createFullFluteGeometry(
 	const centerOffset = -fluteLength / 2;
 	
 	// Calculate positions from base
-	const overhangStart = embouchureDistance - overhang;
 	const corkStart = embouchureDistance + corkDistance;
 	const corkEnd = corkStart + corkThickness;
+    const overhangStart = corkEnd + overhang;
 	
 	// Create outer cylinder brush
 	const outerGeometry = new THREE.CylinderGeometry(
@@ -86,8 +86,8 @@ export function createFullFluteGeometry(
 	bore2Geometry.rotateZ(Math.PI / 2);
 	bore2Geometry.translate(centerOffset + corkEnd + bore2Length / 2, 0, 0);
 	const bore2Brush = new Brush(bore2Geometry);
-	
-	// Subtract both bore sections
+
+	// Subtract all bore sections
 	let resultBrush = evaluator.evaluate(outerBrush, bore1Brush, SUBTRACTION);
 	resultBrush = evaluator.evaluate(resultBrush, bore2Brush, SUBTRACTION);
 	
