@@ -133,13 +133,13 @@
 	</div>
 
 	<div class="space-y-2 mt-8">
-		<button class="w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-200 flex items-center justify-center gap-2">
+		<button class="w-full btn-primary">
 			Export
 			<i class="bi bi-download"></i>
 		</button>
 		<button
 			on:click={onBack}
-			class="w-full px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 rounded-lg transition-colors duration-200 border border-gray-700 flex items-center justify-center gap-2"
+			class="w-full btn-secondary"
 		>
 			<i class="bi bi-arrow-left"></i>
 			Back

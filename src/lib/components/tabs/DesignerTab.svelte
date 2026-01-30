@@ -54,7 +54,7 @@ ${holeInfo}`;
 <div class="space-y-6 p-4 sm:p-6 md:p-8">
 	<div class="flex items-center justify-between">
 		<div class="flex items-center gap-2">
-			<h2 class="text-xl font-semibold text-primary-400">Flute Designer</h2>
+			<h2 class="heading-page">Flute Designer</h2>
 			<Tooltip text={fluteParamsText} type="info" />
 		</div>
 		<div class="flex rounded-lg bg-gray-800 p-1 border border-gray-700">

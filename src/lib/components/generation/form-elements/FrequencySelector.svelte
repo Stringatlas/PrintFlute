@@ -57,13 +57,11 @@
 
 <div class="flex flex-col gap-2">
 	<div class="flex items-center justify-between">
-		<label for={selectId} class="block text-sm font-medium text-gray-300">Fundamental Frequency</label>
+		<label for={selectId} class="label">Fundamental Frequency</label>
 		<button
 			on:click={resetToDefault}
 			disabled={isDefault}
-			class="text-xs px-2 py-0.5 rounded transition-colors duration-200 {isDefault
-				? 'text-gray-600 cursor-not-allowed'
-				: 'text-primary-400 hover:text-primary-300 hover:bg-gray-800'}"
+			class="btn-reset"
 			title="Reset to default"
 		>
 			Reset
@@ -74,7 +72,7 @@
 			id={selectId}
 			bind:value={selectedFreq}
 			on:change={handleSelectChange}
-			class="w-32 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-primary-500"
+			class="input-select w-32"
 		>
 			<option value="custom">Custom</option>
 			{#each COMMON_FREQUENCIES as freq}
@@ -91,10 +89,10 @@
 				step={0.1}
 				value={customValue}
 				on:input={handleCustomInput}
-				class="w-32 px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-primary-500"
+				class="input-number"
 			/>
 		{/if}
-		<span class="text-sm text-gray-400 min-w-15">{value.toFixed(2)} Hz</span>
+		<span class="text-muted min-w-15">{value.toFixed(2)} Hz</span>
 	</div>
 </div>
 

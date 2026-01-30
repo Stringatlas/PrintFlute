@@ -107,13 +107,13 @@
 {/if}
 
 <div class="overflow-x-auto">
-	<table class="w-full text-sm">
+	<table class="table">
 		<thead>
-			<tr class="border-b border-gray-700">
+			<tr class="table-header">
 				{#each visibleColumns as column}
-					<th class="px-3 py-2 text-left">
+					<th class="table-header-cell">
 						<div class="flex items-center gap-2">
-							<span class="uppercase font-medium text-gray-400 text-xs tracking-wider">{column.label}</span>
+							<span>{column.label}</span>
 							<div class="font-normal">
 								<Tooltip text={column.info} type="info" />
 							</div>
@@ -124,11 +124,11 @@
 		</thead>
 		<tbody>
 			{#each Array(numberOfHoles) as _, index}
-				<tr class="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+				<tr class="table-row">
 					{#each visibleColumns as column}
-						<td class="px-3 py-2">
+						<td class="table-cell">
 							{#if column.key === 'number'}
-								<span class="text-gray-300">{index + 1}</span>
+								<span>{index + 1}</span>
 							{:else if column.key === 'diameter'}
 								<div class="flex items-center gap-2">
 									<input
@@ -159,9 +159,9 @@
 									class="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-200 focus:outline-none focus:border-primary-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 								/>
 							{:else if column.key === 'distance'}
-								<span class="text-gray-300">{($toneHoleParams.holeDistances[index] || 0).toFixed(2)}</span>
+								<span>{($toneHoleParams.holeDistances[index] || 0).toFixed(2)}</span>
 							{:else if column.key === 'cutoff'}
-								<span class="text-gray-300">{($toneHoleParams.cutoffRatios[index] || 0).toFixed(2)}</span>
+								<span>{($toneHoleParams.cutoffRatios[index] || 0).toFixed(2)}</span>
 							{/if}
 						</td>
 					{/each}

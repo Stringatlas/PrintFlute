@@ -63,9 +63,9 @@
 
 <div class="space-y-6">
 	<div>
-		<h2 class="text-xl font-semibold text-primary-400 mb-4">Tuner</h2>
+		<h2 class="heading-page mb-4">Tuner</h2>
 		<div class="space-y-4">
-			<div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+			<div class="card">
 				<div class="flex items-center justify-between mb-4">
 					<div class="flex flex-col">
 						<span class="text-sm font-medium text-gray-300">Microphone Input</span>
@@ -74,18 +74,16 @@
 						{/if}
 					</div>
 					<button
-						class="px-4 py-2 {$audioStore.isRecording
-							? 'bg-red-600 hover:bg-red-700'
-							: 'bg-primary-600 hover:bg-primary-700'} text-white rounded text-sm transition-colors duration-200"
+						class="btn-sm {$audioStore.isRecording ? 'btn-danger' : 'btn-primary'}"
 						on:click={$audioStore.isRecording ? stopRecording : startRecording}
 					>
                     <i class="bi bi-{$audioStore.isRecording ? 'stop-circle' : 'mic-fill'}"></i>
 						{$audioStore.isRecording ? 'Stop Recording' : 'Start Recording'}
 					</button>
 				</div>
-				<div class="h-2 bg-gray-700 rounded-full overflow-hidden mb-3">
+				<div class="progress-bar mb-3">
 					<div
-						class="h-full bg-secondary-500 transition-all duration-100"
+						class="progress-bar-fill"
 						style="width: {$audioStore.currentAnalysis
 							? $audioStore.currentAnalysis.amplitude * 100
 							: 0}%"

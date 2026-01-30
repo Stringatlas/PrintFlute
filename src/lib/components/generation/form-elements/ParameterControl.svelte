@@ -54,7 +54,7 @@
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-2">
-				<label for={inputId} class="block text-sm font-medium text-gray-300">{label}</label>
+				<label for={inputId} class="label">{label}</label>
 				{#if info && validationResult.status === 'success'}
 					<Tooltip text={info} type="info" />
 				{:else if validationResult.status !== 'success' && validationResult.message}
@@ -63,13 +63,13 @@
 			</div>
 			{#if isComputed}
 				<div class="flex items-center gap-2">
-					<span class="text-xs px-2 py-0.5 rounded {isAutoMode ? 'bg-blue-900/30 text-blue-400' : 'bg-amber-900/30 text-amber-400'}">
+					<span class="{isAutoMode ? 'badge-auto' : 'badge-manual'}">
 						{isAutoMode ? 'Auto' : 'Manual'}
 					</span>
 					{#if !isAutoMode && onResetComputed}
 						<button
 							on:click={onResetComputed}
-							class="text-xs px-2 py-0.5 rounded transition-colors duration-200 text-primary-400 hover:text-primary-300 hover:bg-gray-800"
+							class="btn-reset"
 							title="Reset to auto-calculated"
 						>
 							Reset to Auto
@@ -80,9 +80,7 @@
 				<button
 					on:click={resetToDefault}
 					disabled={isDefault}
-					class="text-xs px-2 py-0.5 rounded transition-colors duration-200 {isDefault
-						? 'text-gray-600 cursor-not-allowed'
-						: 'text-primary-400 hover:text-primary-300 hover:bg-gray-800'}"
+					class="btn-reset"
 					title="Reset to default"
 				>
 					Reset
@@ -99,16 +97,16 @@
 					{step}
 					{value}
 					on:input={handleInput}
-					class="w-64 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+					class="input-slider"
 				/>
-				<span class="text-sm text-gray-400 min-w-15 text-right">{value}{unit}</span>
+				<span class="text-muted min-w-15 text-right">{value}{unit}</span>
 			{:else if inputType === 'checkbox'}
 				<input
 					id={inputId}
 					type="checkbox"
 					checked={typeof value === 'boolean' ? value : false}
 					on:change={handleInput}
-					class="w-4 h-4 bg-gray-800 border border-gray-700 rounded text-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-offset-gray-900"
+					class="input-checkbox"
 				/>
 			{:else}
 				<input
@@ -119,9 +117,9 @@
 					{step}
 					{value}
 					on:input={handleInput}
-					class="w-32 px-3 py-1.5 bg-gray-800 border {borderColor} rounded-lg text-gray-200 focus:outline-none focus:border-primary-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+					class="input-number {borderColor}"
 				/>
-				<span class="text-sm text-gray-400 min-w-15">{unit}</span>
+				<span class="text-muted min-w-15">{unit}</span>
 			{/if}
 		</div>
 	</div>

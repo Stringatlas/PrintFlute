@@ -32,6 +32,7 @@
 	let targetLookAt: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
 	let cameraAnimating = false;
 	let activeTrigger: ParameterTrigger | null = null;
+	let resizeObserver: ResizeObserver | null = null;
 
 	// Camera pose triggers from cameraAnimations.ts:
 	// [0] = Bore diameter & wall thickness -> side view
@@ -57,17 +58,24 @@
 		animate();
 		previousParams = { ...$fluteParams };
 
-		window.addEventListener('resize', () => handleCanvasResize(canvas, camera, renderer));
+		resizeObserver = new ResizeObserver((entries) => {
+			const entry = entries[0];
+			if (!entry) return;
+			const { width, height } = entry.contentRect;
+			if (width === 0 || height === 0) return;
+			handleCanvasResize(canvas, camera, renderer);
+		});
+		resizeObserver.observe(canvas);
 
 		return () => {
 			if (animationId) cancelAnimationFrame(animationId);
 			if (disposeGeometry) disposeGeometry();
 			if (disposeScene) disposeScene();
-			window.removeEventListener('resize', () => handleCanvasResize(canvas, camera, renderer));
+			if (resizeObserver) resizeObserver.disconnect();
 		};
 	});
 
-	$: if (scene && ($fluteParams || $currentDesignStep)) {
+	function handleParameterChange() {
 		const changedKeys = detectChangedParameters($fluteParams, previousParams);
 		
 		if (changedKeys.length > 0) {
@@ -96,6 +104,10 @@
 		
 		updateGeometry();
 	}
+
+	$: if (scene && ($fluteParams || $currentDesignStep)) {
+		handleParameterChange();
+	}
 	
 	$: if (scene && camera && $currentDesignStep === 3) {
 		targetCameraPosition = BIRDS_EYE_VIEW_POSE.position.clone();
@@ -109,8 +121,7 @@
 		
 		sectionAnalysisEnabled = true;
 		originalGeometryGroup = geometryGroup.clone();
-		
-		// Calculate outer diameter: bore diameter + 2 * wall thickness
+
 		const outerDiameter = $fluteParams.boreDiameter + (2 * $fluteParams.wallThickness);
 		
 		const cutGroup = applySectionCut(geometryGroup, outerDiameter);

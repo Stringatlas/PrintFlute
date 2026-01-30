@@ -98,7 +98,6 @@
 </script>
 
 <div class="flex flex-col gap-4">
-	<!-- Header with fundamental info -->
 	<div class="flex justify-between items-top">
 		<h2 class="text-xl font-semibold text-secondary-400">Harmonic Spectrum</h2>
 		<div class="text-right">
@@ -114,16 +113,5 @@
 	
 	<div class="bg-gray-800/50 rounded border border-gray-700 p-4 h-64">
 		<canvas bind:this={chartCanvas}></canvas>
-	</div>
-	
-	<div class="flex gap-4 text-xs text-gray-400 justify-center">
-		<div class="flex items-center gap-2">
-			<div class="w-3 h-3 bg-secondary-500 rounded"></div>
-			<span>Fundamental</span>
-		</div>
-		<div class="flex items-center gap-2">
-			<div class="w-3 h-3 bg-primary-500 rounded"></div>
-			<span>Harmonics</span>
-		</div>
 	</div>
 </div>
