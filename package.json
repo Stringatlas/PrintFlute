@@ -30,7 +30,13 @@
 	"dependencies": {
 		"bootstrap-icons": "^1.13.1",
 		"chart.js": "^4.5.1",
+		"comlink": "^4.4.2",
+		"replicad": "^0.20.5",
+		"replicad-opencascadejs": "^0.20.2",
+		"replicad-threejs-helper": "^0.20.0",
 		"three": "^0.182.0",
-		"three-bvh-csg": "^0.0.17"
+		"three-bvh-csg": "^0.0.17",
+		"vite-plugin-top-level-await": "^1.6.0",
+		"vite-plugin-wasm": "^3.5.0"
 	}
 }

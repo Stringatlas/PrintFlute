@@ -10,6 +10,8 @@ export interface FluteParameters {
 	boreDiameter: number;
 	wallThickness: number;
 	hasThumbHole: boolean;
+	thumbHoleDiameter: number;
+	thumbHoleAngle: number;
 	overhangLength: number;
 	corkDistance: ComputedParameter<number>;
 	corkThickness: ComputedParameter<number>;
@@ -36,6 +38,8 @@ export const DEFAULT_PARAMETERS: FluteParameters = {
 	boreDiameter: 14.3,
 	wallThickness: 2.5,
 	hasThumbHole: true,
+	thumbHoleDiameter: 6,
+	thumbHoleAngle: 0,
 	overhangLength: 20,
 	corkDistance: { mode: 'auto' },
 	corkThickness: { mode: 'auto' },

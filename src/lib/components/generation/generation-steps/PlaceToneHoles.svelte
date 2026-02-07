@@ -37,6 +37,50 @@
 		<ToneHoleTable numberOfHoles={$fluteParams.numberOfToneHoles} />
 	</div>
 
+	<div class="space-y-4">
+		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Thumb Hole</h3>
+		
+		<ParameterControl
+			label="Enable Thumb Hole"
+			value={$fluteParams.hasThumbHole}
+			inputType="checkbox"
+			visibility="always"
+			getDefault={() => DEFAULT_PARAMETERS.hasThumbHole}
+			onChange={(v) => handleParameterChange('hasThumbHole', v)}
+			info={PARAMETER_INFO.hasThumbHole}
+		/>
+
+		{#if $fluteParams.hasThumbHole}
+			<ParameterControl
+				label="Thumb Hole Diameter"
+				value={$fluteParams.thumbHoleDiameter}
+				min={3}
+				max={12}
+				step={0.5}
+				unit="mm"
+				inputType="number"
+				visibility="always"
+				getDefault={() => DEFAULT_PARAMETERS.thumbHoleDiameter}
+				onChange={(v) => handleParameterChange('thumbHoleDiameter', v)}
+				info={PARAMETER_INFO.thumbHoleDiameter}
+			/>
+
+			<ParameterControl
+				label="Thumb Hole Angle"
+				value={$fluteParams.thumbHoleAngle}
+				min={0}
+				max={90}
+				step={5}
+				unit="deg"
+				inputType="slider"
+				visibility="always"
+				getDefault={() => DEFAULT_PARAMETERS.thumbHoleAngle}
+				onChange={(v) => handleParameterChange('thumbHoleAngle', v)}
+				info={PARAMETER_INFO.thumbHoleAngle}
+			/>
+		{/if}
+	</div>
+
 	<div class="space-y-2 mt-8">
 		<button
 			on:click={onNext}

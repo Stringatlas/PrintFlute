@@ -1,11 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ParameterControl from '$lib/components/generation/form-elements/ParameterControl.svelte';
-	import { fluteParams, DEFAULT_PARAMETERS, toneHoleParams } from '$lib/stores/fluteStore';
+	import ExportModal from '$lib/components/generation/form-elements/ExportModal.svelte';
+    import { fluteParams, DEFAULT_PARAMETERS, toneHoleParams } from '$lib/stores/fluteStore';
 	import { PARAMETER_INFO } from '$lib/components/generation/generation-steps/designParametersInfo';
 	import { validateCutDistance } from '$lib/components/generation/generation-steps/designParametersValidation';
 	import { DIATONIC_SCALE_CENTS } from '$lib/audio/musicTheory';
 	import { calculatedFluteData, updateCalculatedValues } from '$lib/utils/fluteCalculationHelper';
+
+
+    let exportModalOpen = false;
+	let exportModalRef: ExportModal;
 
 	function handleParameterChange<K extends keyof typeof $fluteParams>(
 		key: K,
@@ -18,6 +23,11 @@
 		const newDistances = [...$fluteParams.cutDistances];
 		newDistances[index] = value as number;
 		fluteParams.updateParameter('cutDistances', newDistances);
+	}
+
+    function handleExport() {
+		exportModalOpen = true;
+		exportModalRef?.startExport();
 	}
 
 	export let onBack: () => void;
@@ -133,16 +143,22 @@
 	</div>
 
 	<div class="space-y-2 mt-8">
-		<button class="w-full btn-primary">
+		<button class="w-full btn-primary" on:click={handleExport}>
 			Export
 			<i class="bi bi-download"></i>
 		</button>
 		<button
 			on:click={onBack}
-			class="w-full btn-secondary"
-		>
+			class="w-full btn-secondary">
 			<i class="bi bi-arrow-left"></i>
 			Back
 		</button>
 	</div>
+
+    <ExportModal
+        bind:this={exportModalRef}
+        bind:open={exportModalOpen}
+        onClose={() => exportModalOpen = false}
+    />
 </div>
+

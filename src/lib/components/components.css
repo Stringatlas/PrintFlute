@@ -119,9 +119,13 @@
 	@apply border-red-500;
 }
 
-/* Modal styles */
 .modal-dialog {
 	@apply p-0 border-none rounded-lg w-[90%] bg-transparent overflow-visible backdrop:bg-black/50 backdrop:backdrop-blur-sm;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	margin: 0;
 }
 
 .modal-content {

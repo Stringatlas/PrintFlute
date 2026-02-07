@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { FluteParameters, ToneHoleParameters } from '../stores/fluteStore';
+import type { FluteParameters, ToneHoleParameters } from '../../stores/fluteStore';
 import { createFullFluteGeometry } from './fullFluteGeometry';
 import { createLabelSprite } from './sceneAnnotations';
 

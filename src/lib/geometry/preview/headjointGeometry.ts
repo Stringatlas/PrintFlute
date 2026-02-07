@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
-import type { FluteParameters } from '../stores/fluteStore';
+import type { FluteParameters } from '../../stores/fluteStore';
 import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
 
 const HEADJOINT_LENGTH_MM = 150;

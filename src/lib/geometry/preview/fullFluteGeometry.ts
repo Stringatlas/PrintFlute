@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
-import type { FluteParameters, ToneHoleParameters } from '../stores/fluteStore';
+import type { FluteParameters, ToneHoleParameters } from '../../stores/fluteStore';
 import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
 
 interface FullFluteGeometryResult {
@@ -129,6 +129,36 @@ export function createFullFluteGeometry(
 			
 			resultBrush = evaluator.evaluate(resultBrush, holeBrush, SUBTRACTION);
 			geometries.push(holeGeometry);
+		}
+	}
+	
+	// Add thumb hole if enabled
+	if (fluteParams.hasThumbHole && fluteParams.numberOfToneHoles >= 2) {
+		const lastHoleDistance = toneHoleParams.holeDistances[fluteParams.numberOfToneHoles - 1] || 0;
+		const secondLastHoleDistance = toneHoleParams.holeDistances[fluteParams.numberOfToneHoles - 2] || 0;
+		const thumbHoleDistance = (lastHoleDistance + secondLastHoleDistance) / 2;
+		
+		if (thumbHoleDistance > 0 && thumbHoleDistance < fluteLength) {
+			const thumbRadius = fluteParams.thumbHoleDiameter / 2;
+			const thumbHoleGeometry = new THREE.CylinderGeometry(
+				thumbRadius,
+				thumbRadius,
+				fluteParams.wallThickness * 2 + 1,
+				32
+			);
+			
+			// Convert angle to radians (0 = bottom opposite tone holes, 90 = side)
+			const angleRad = (fluteParams.thumbHoleAngle * Math.PI) / 180;
+			const yOffset = -Math.cos(angleRad) * outerRadius;
+			const zOffset = -Math.sin(angleRad) * outerRadius;
+			
+			// Rotate cylinder to point radially inward at the correct angle
+			thumbHoleGeometry.rotateX(angleRad);
+			thumbHoleGeometry.translate(centerOffset + thumbHoleDistance, yOffset, zOffset);
+			
+			const thumbHoleBrush = new Brush(thumbHoleGeometry);
+			resultBrush = evaluator.evaluate(resultBrush, thumbHoleBrush, SUBTRACTION);
+			geometries.push(thumbHoleGeometry);
 		}
 	}
 	
