@@ -3,7 +3,7 @@
 	import * as THREE from 'three';
     import { currentDesignStep } from '$lib/stores/uiStore';
 	import { fluteParams, toneHoleParams, type FluteParameters } from '$lib/stores/fluteStore';
-	import { createThreeScene, handleCanvasResize } from '$lib/geometry/sceneSetup';
+	import { createThreeScene, handleCanvasResize } from '$lib/geometry/preview/sceneSetup';
 	import { applySectionCut, restoreOriginalGeometry } from './sectionAnalysis';
 	import { 
 		cameraPoseTriggers, 
