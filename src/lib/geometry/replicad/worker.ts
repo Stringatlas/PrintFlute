@@ -3,13 +3,16 @@ import opencascade from "replicad-opencascadejs/src/replicad_single.js";
 import opencascadeWasm from "replicad-opencascadejs/src/replicad_single.wasm?url";
 import { setOC } from "replicad";
 import { expose } from "comlink";
-import { createBox, createCylinder } from "$lib/geometry/replicad/testcad";
 import { createFluteCAD } from "$lib/geometry/replicad/fluteCAD";
 import type { FluteParameters, ToneHoleParameters } from "$lib/stores/fluteStore";
 
 interface MeshData {
     faces: unknown;
     edges: unknown;
+    parts?: Array<{
+        faces: unknown;
+        edges: unknown;
+    }>;
 }
 
 let loaded = false;
@@ -25,84 +28,63 @@ const init = async (): Promise<boolean> => {
 
 const started = init();
 
-async function createBoxMesh(
-  width: number,
-  height: number,
-  depth: number,
-  fillet: number
-): Promise<MeshData> {
-  await started;
-  const shape = createBox(width, height, depth, fillet);
-  return {
-    faces: shape.mesh({ tolerance: 0.01, angularTolerance: 30 }),
-    edges: shape.meshEdges({ tolerance: 0.01, angularTolerance: 30 }),
-  };
-}
-
-async function createCylinderMesh(
-  radius: number,
-  height: number
-): Promise<MeshData> {
-  await started;
-  const shape = createCylinder(radius, height);
-  return {
-    faces: shape.mesh({ tolerance: 0.01, angularTolerance: 30 }),
-    edges: shape.meshEdges({ tolerance: 0.01, angularTolerance: 30 }),
-  };
-}
 
 async function createFluteMesh(
   fluteParams: FluteParameters,
   toneHoleParams: ToneHoleParameters
 ): Promise<MeshData> {
   await started;
-  const { solid } = createFluteCAD(fluteParams, toneHoleParams);
-  return {
-    faces: solid.mesh({ tolerance: 0.01, angularTolerance: 30 }),
-    edges: solid.meshEdges({ tolerance: 0.01, angularTolerance: 30 }),
+  const { full, parts } = createFluteCAD(fluteParams, toneHoleParams);
+  
+  const meshData: MeshData = {
+    faces: full.mesh({ tolerance: 0.01, angularTolerance: 30 }),
+    edges: full.meshEdges({ tolerance: 0.01, angularTolerance: 30 }),
   };
-}
 
-async function exportBoxSTL(width: number, height: number, depth: number, fillet: number): Promise<Blob> {
-  await started;
-  return createBox(width, height, depth, fillet).blobSTL();
-}
+  if (parts && parts.length > 0) {
+    meshData.parts = parts.map(part => ({
+      faces: part.mesh({ tolerance: 0.01, angularTolerance: 30 }),
+      edges: part.meshEdges({ tolerance: 0.01, angularTolerance: 30 }),
+    }));
+  }
 
-async function exportBoxSTEP(width: number, height: number, depth: number, fillet: number): Promise<Blob> {
-  await started;
-  return createBox(width, height, depth, fillet).blobSTEP();
-}
-
-async function exportCylinderSTL(radius: number, height: number): Promise<Blob> {
-  await started;
-  return createCylinder(radius, height).blobSTL();
-}
-
-async function exportCylinderSTEP(radius: number, height: number): Promise<Blob> {
-  await started;
-  return createCylinder(radius, height).blobSTEP();
+  return meshData;
 }
 
 async function exportFluteSTL(fluteParams: FluteParameters, toneHoleParams: ToneHoleParameters): Promise<Blob> {
     await started;
-    const { solid } = createFluteCAD(fluteParams, toneHoleParams);
-    return solid.blobSTL();
+    const { full } = createFluteCAD(fluteParams, toneHoleParams);
+    return full.blobSTL();
 }
 
 async function exportFluteSTEP(fluteParams: FluteParameters, toneHoleParams: ToneHoleParameters): Promise<Blob> {
     await started;
-    const { solid } = createFluteCAD(fluteParams, toneHoleParams);
-    return solid.blobSTEP();
+    const { full } = createFluteCAD(fluteParams, toneHoleParams);
+    return full.blobSTEP();
+}
+
+async function exportPartsSTL(fluteParams: FluteParameters, toneHoleParams: ToneHoleParameters): Promise<Blob[]> {
+    await started;
+    const { parts } = createFluteCAD(fluteParams, toneHoleParams);
+    if (!parts || parts.length === 0) {
+        return [];
+    }
+    return Promise.all(parts.map(part => part.blobSTL()));
+}
+
+async function exportPartsSTEP(fluteParams: FluteParameters, toneHoleParams: ToneHoleParameters): Promise<Blob[]> {
+    await started;
+    const { parts } = createFluteCAD(fluteParams, toneHoleParams);
+    if (!parts || parts.length === 0) {
+        return [];
+    }
+    return Promise.all(parts.map(part => part.blobSTEP()));
 }
 
 expose({ 
-    createBoxMesh, 
-    createCylinderMesh, 
     createFluteMesh,
-    exportBoxSTL, 
-    exportBoxSTEP, 
-    exportCylinderSTL, 
-    exportCylinderSTEP,
     exportFluteSTL,
     exportFluteSTEP,
+    exportPartsSTL,
+    exportPartsSTEP,
 });

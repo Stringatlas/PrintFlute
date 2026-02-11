@@ -1,11 +1,11 @@
-// @ts-nocheck
 import { makeCylinder, drawEllipse } from "replicad";
 import type { Solid } from "replicad";
 import type { FluteParameters, ToneHoleParameters } from "../../stores/fluteStore";
 import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
 
 export interface FluteCADResult {
-	solid: Solid;
+	full: Solid;
+	parts?: Solid[];
 }
 
 function createEllipticalHole(lengthX: number, widthY: number, depth: number): Solid {
@@ -17,139 +17,232 @@ function createEllipticalHole(lengthX: number, widthY: number, depth: number): S
 		.extrude(depth) as Solid;
 }
 
-export function createFluteCAD(fluteParams: FluteParameters, toneHoleParams: ToneHoleParameters): FluteCADResult {
-	const innerRadius = fluteParams.boreDiameter / 2;
-	const outerRadius = innerRadius + fluteParams.wallThickness;
-	const corkThickness = resolveComputedParameter("corkThickness", fluteParams);
-	const corkDistance = resolveComputedParameter("corkDistance", fluteParams);
-	const overhang = fluteParams.overhangLength;
-	const fluteLength = fluteParams.fluteLength;
-	const embouchureDistance = fluteParams.embouchureDistance;
-	const filletRadius = fluteParams.toneHoleFilletRadius;
+class FluteCADBuilder {
+	private flute: Solid;
+	private fluteParams: FluteParameters;
+	private toneHoleParams: ToneHoleParameters;
+	private innerRadius: number;
+	private outerRadius: number;
+	private fluteLength: number;
+	private holePositions: number[] = [];
 
-	// Calculate positions from base (0 is at base, fluteLength is at top)
-	const corkStart = embouchureDistance + corkDistance;
-	const corkEnd = corkStart + corkThickness;
-	const overhangStart = corkEnd + overhang;
-
-	// Track hole positions (z-coordinates) for tone holes and thumb hole (excluding embouchure)
-	const holePositions: number[] = [];
-
-	// Create outer cylinder (the main flute body)
-	// Replicad cylinders are created along Z axis by default
-	let flute = makeCylinder(outerRadius, fluteLength);
-
-	// Create main bore (from base to cork start)
-	const bore1Length = corkStart;
-	if (bore1Length > 0) {
-		const bore1 = makeCylinder(innerRadius, bore1Length);
-		flute = flute.cut(bore1);
+	constructor(fluteParams: FluteParameters, toneHoleParams: ToneHoleParameters) {
+		this.fluteParams = fluteParams;
+		this.toneHoleParams = toneHoleParams;
+		this.innerRadius = fluteParams.boreDiameter / 2;
+		this.outerRadius = this.innerRadius + fluteParams.wallThickness;
+		this.fluteLength = fluteParams.fluteLength;
+		this.flute = makeCylinder(this.outerRadius, this.fluteLength);
 	}
 
-	// Create bore section after cork (from cork end to overhang start)
-	const bore2Length = overhangStart - corkEnd;
-	if (bore2Length > 0) {
-		const bore2 = makeCylinder(innerRadius, bore2Length).translate([
-			0,
-			0,
-			corkEnd,
-		]);
-		flute = flute.cut(bore2);
-	}
+	private createMainBore(): void {
+		const corkThickness = resolveComputedParameter("corkThickness", this.fluteParams);
+		const corkDistance = resolveComputedParameter("corkDistance", this.fluteParams);
+		const embouchureDistance = this.fluteParams.embouchureDistance;
+		const overhang = this.fluteParams.overhangLength;
 
-	// Create embouchure hole (elliptical)
-	const embouchureDepth = fluteParams.wallThickness * 2 + 1;
-	const embouchureHole = createEllipticalHole(
-		fluteParams.embouchureHoleLength,
-		fluteParams.embouchureHoleWidth,
-		embouchureDepth
-	)
-		.rotate(90, [0, 0, 0], [1, 0, 0])
-		.translate([0, outerRadius, embouchureDistance]);
+		const corkStart = embouchureDistance + corkDistance;
+		const corkEnd = corkStart + corkThickness;
+		const overhangStart = corkEnd + overhang;
 
-	flute = flute.cut(embouchureHole);
+		const bore1Length = corkStart;
+		if (bore1Length > 0) {
+			const bore1 = makeCylinder(this.innerRadius, bore1Length);
+			this.flute = this.flute.cut(bore1);
+		}
 
-	// Add all tone holes
-	for (let i = 0; i < fluteParams.numberOfToneHoles; i++) {
-		const holeDiameter = toneHoleParams.holeDiameters[i] || 0;
-		const holeDistance = toneHoleParams.holeDistances[i] || 0;
-
-		if (holeDiameter > 0 && holeDistance > 0 && holeDistance < fluteLength) {
-			const holeRadius = holeDiameter / 2;
-			const holeDepth = fluteParams.wallThickness * 2 + 1;
-
-			const toneHole = makeCylinder(holeRadius, holeDepth)
-				.rotate(90, [0, 0, 0], [1, 0, 0])
-				.translate([0, outerRadius, holeDistance]);
-
-			flute = flute.cut(toneHole);
-			holePositions.push(holeDistance);
+		const bore2Length = overhangStart - corkEnd;
+		if (bore2Length > 0) {
+			const bore2 = makeCylinder(this.innerRadius, bore2Length).translate([
+				0,
+				0,
+				corkEnd,
+			]);
+			this.flute = this.flute.cut(bore2);
 		}
 	}
 
-	// Add thumb hole if enabled
-	if (fluteParams.hasThumbHole && fluteParams.numberOfToneHoles >= 2) {
+	private cutEmbouchureHole(): void {
+		const embouchureDepth = this.fluteParams.wallThickness * 2 + 1;
+		const embouchureHole = createEllipticalHole(
+			this.fluteParams.embouchureHoleLength,
+			this.fluteParams.embouchureHoleWidth,
+			embouchureDepth
+		)
+			.rotate(90, [0, 0, 0], [1, 0, 0])
+			.translate([0, this.outerRadius, this.fluteParams.embouchureDistance]);
+
+		this.flute = this.flute.cut(embouchureHole);
+	}
+
+	private cutToneHoles(): void {
+		for (let i = 0; i < this.fluteParams.numberOfToneHoles; i++) {
+			const holeDiameter = this.toneHoleParams.holeDiameters[i] || 0;
+			const holeDistance = this.toneHoleParams.holeDistances[i] || 0;
+
+			if (holeDiameter > 0 && holeDistance > 0 && holeDistance < this.fluteLength) {
+				const holeRadius = holeDiameter / 2;
+				const holeDepth = this.fluteParams.wallThickness * 2 + 1;
+
+				const toneHole = makeCylinder(holeRadius, holeDepth)
+					.rotate(90, [0, 0, 0], [1, 0, 0])
+					.translate([0, this.outerRadius, holeDistance]);
+
+				this.flute = this.flute.cut(toneHole);
+				this.holePositions.push(holeDistance);
+			}
+		}
+	}
+
+	private cutThumbHole(): void {
+		const enableThumbHole = this.fluteParams.hasThumbHole && this.fluteParams.numberOfToneHoles >= 2;
+		if (!enableThumbHole) return;
+
 		const lastHoleDistance =
-			toneHoleParams.holeDistances[fluteParams.numberOfToneHoles - 1] || 0;
+			this.toneHoleParams.holeDistances[this.fluteParams.numberOfToneHoles - 1] || 0;
 		const secondLastHoleDistance =
-			toneHoleParams.holeDistances[fluteParams.numberOfToneHoles - 2] || 0;
+			this.toneHoleParams.holeDistances[this.fluteParams.numberOfToneHoles - 2] || 0;
 		const thumbHoleDistance = (lastHoleDistance + secondLastHoleDistance) / 2;
 
-		if (thumbHoleDistance > 0 && thumbHoleDistance < fluteLength) {
-			const thumbRadius = fluteParams.thumbHoleDiameter / 2;
-			const thumbDepth = fluteParams.wallThickness * 2 + 1;
+		if (thumbHoleDistance > 0 && thumbHoleDistance < this.fluteLength) {
+			const thumbRadius = this.fluteParams.thumbHoleDiameter / 2;
+			const thumbDepth = this.fluteParams.wallThickness * 2 + 1;
 
-			// Convert angle to radians (0 = bottom opposite tone holes, 90 = side)
-			const angleRad = (fluteParams.thumbHoleAngle * Math.PI) / 180;
-			const yOffset = -Math.cos(angleRad) * outerRadius;
-			const zOffset = -Math.sin(angleRad) * outerRadius;
+			const angleRad = (this.fluteParams.thumbHoleAngle * Math.PI) / 180;
+			const yOffset = -Math.cos(angleRad) * this.outerRadius;
+			const zOffset = -Math.sin(angleRad) * this.outerRadius;
 
-			// Create thumb hole pointing radially inward at the correct angle
 			const thumbHole = makeCylinder(thumbRadius, thumbDepth)
 				.rotate(90, [0, 0, 0], [1, 0, 0])
-				.rotate(-fluteParams.thumbHoleAngle, [0, 0, 0], [0, 0, 1])
+				.rotate(-this.fluteParams.thumbHoleAngle, [0, 0, 0], [0, 0, 1])
 				.translate([zOffset, yOffset, thumbHoleDistance]);
 
-			flute = flute.cut(thumbHole);
-			holePositions.push(thumbHoleDistance);
+			this.flute = this.flute.cut(thumbHole);
+			this.holePositions.push(thumbHoleDistance);
 		}
 	}
 
-	// Apply fillets to tone holes and thumb hole edges
-	// Note: Replicad's fillet API doesn't support selective edge filtering the same way as Three-BVH-CSG
-	// For now, we skip fillets on the CAD model. Fillets can be applied in the final mesh generation.
-	if (filletRadius > 0 && holePositions.length > 0) {
-        flute = flute.fillet(filletRadius, (edge) => {
-            try {
-                const center = edge.center;
-                if (!center) {
-                    console.warn('Edge has no center property');
-                    return false;
-                }
-                
-                // Check if edge is on the outer surface (Y ≈ outerRadius or radially at outerRadius)
-                const radialDist = Math.sqrt(center.x * center.x + center.y * center.y);
-                const isOuterSurface = Math.abs(radialDist - outerRadius) < 0.1;
-                
-                // Check if edge Z-coordinate matches any hole position (with tolerance)
-                const isAtHolePosition = holePositions.some(
-                    pos => Math.abs(center.z - pos) < 0.5
-                );
+	private filletHoles(): void {
+		const filletRadius = this.fluteParams.toneHoleFilletRadius;
+		const shouldFilletHoles = filletRadius > 0 && this.holePositions.length > 0;
+		if (!shouldFilletHoles) return;
 
-                return isOuterSurface && isAtHolePosition;
-            } catch (edgeError) {
-                console.error('Error filtering edge:', edgeError);
-                return false;
-            }
-        });
+        
+		try {
+			this.flute = this.flute.fillet(filletRadius, (e) => 
+				e.when((edge) => {
+					try {
+						const center = edge.center;
+						if (!center) return false;
+						
+						const radialDist = Math.sqrt(center.x * center.x + center.y * center.y);
+						const isOuterSurface = Math.abs(radialDist - this.outerRadius) < 0.1;
+						
+						const isAtHolePosition = this.holePositions.some(
+							pos => Math.abs(center.z - pos) < 2
+						);
+
+						return isOuterSurface && isAtHolePosition;
+					} catch (edgeError) {
+						console.error('Error filtering edge:', edgeError);
+						return false;
+					}
+				})
+			);
+		} catch (filletError) {
+			console.warn('Could not apply fillet to tone holes:', filletError);
+		}
 	}
 
-	// Center the geometry at origin (translate by -fluteLength/2 on Z axis)
-	flute = flute.translate([0, 0, -fluteLength / 2]);
+	private cutIntoParts(): Solid[] {
+		const { numberOfCuts, cutDistances, connectorLength, wallThickness, boreDiameter } = this.fluteParams;
+		
+		if (numberOfCuts === 0 || cutDistances.length === 0) {
+			return [this.flute];
+		}
 
-	// Rotate to match Three.js orientation (flute along X axis)
-	flute = flute.rotate(90, [0, 0, 0], [0, 1, 0]);
-    flute = flute.rotate(90, [0, 0, 0], [0, 0, 1]);
+		const parts: Solid[] = [];
+		const connectorRadius = wallThickness / 2 + boreDiameter / 2;
+		const sortedCutDistances = [...cutDistances].sort((a, b) => a - b);
 
-	return { solid: flute };
+		let currentStart = 0;
+    
+		for (let i = 0; i < sortedCutDistances.length; i++) {
+			const cutPosition = sortedCutDistances[i];
+
+            let isValidCut = cutPosition > currentStart && cutPosition < this.fluteLength;
+			if (!isValidCut) {
+				continue;
+			}
+
+			const partLength = cutPosition - currentStart;
+			const includeRegion = makeCylinder(this.outerRadius, partLength).translate([
+				0,
+				0,
+				currentStart,
+			]);
+
+			let part = this.flute.intersect(includeRegion) as Solid;
+			const connector = makeCylinder(connectorRadius, connectorLength)
+                .translate([0,0,cutPosition])
+                .cut(makeCylinder(this.innerRadius, connectorLength).translate([0, 0, cutPosition]));
+
+            // Cut connector cavity if this is not the first part
+            const needsCavity = i > 0;
+            if (needsCavity) {
+                const cutTool = makeCylinder(this.innerRadius + wallThickness / 2, connectorLength).translate([0, 0, currentStart]);
+                part = part.cut(cutTool);
+            }
+
+			part = part.fuse(connector);
+			parts.push(part);
+			currentStart = cutPosition;
+		}
+
+        // let partRemaining = currentStart < this.fluteLength;
+        // if (!partRemaining) return parts;
+
+        const finalLength = this.fluteLength - currentStart;
+        const includeRegion = makeCylinder(this.outerRadius, finalLength)
+            .translate([0, 0, currentStart]);
+
+        let finalPart = this.flute.intersect(includeRegion) as Solid;
+        const cutTool = makeCylinder(connectorRadius, connectorLength).translate([0, 0, currentStart]);
+
+        finalPart = finalPart.cut(cutTool);
+
+        parts.push(finalPart);
+		
+
+		return parts;
+	}
+
+	private centerAndRotate(solid: Solid): Solid {
+		let centered = solid.translate([0, 0, -this.fluteLength / 2]);
+		return centered.rotate(90, [0, 0, 0], [0, 1, 0]);
+	}
+
+	public build(): FluteCADResult {
+		this.createMainBore();
+		this.cutEmbouchureHole();
+		this.cutToneHoles();
+		this.cutThumbHole();
+		this.filletHoles();
+
+		const parts = this.cutIntoParts();
+		
+        const centeredFlute = this.centerAndRotate(this.flute);
+
+		if (parts.length > 1) {
+			const centeredParts = parts.map(part => this.centerAndRotate(part));
+			return { full: centeredFlute, parts: centeredParts };
+		} else {
+			return { full: centeredFlute };
+		}
+	}
+}
+
+export function createFluteCAD(fluteParams: FluteParameters, toneHoleParams: ToneHoleParameters): FluteCADResult {
+	const builder = new FluteCADBuilder(fluteParams, toneHoleParams);
+	return builder.build();
 }

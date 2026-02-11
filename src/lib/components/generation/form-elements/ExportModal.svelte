@@ -16,6 +16,7 @@
 	let mesh = null;
 	let cad = null;
 	let error = null;
+	let activeView: 'full' | number = 'full';
 
 	onMount(async () => {
 		try {
@@ -95,14 +96,61 @@
 		}
 	}
 
+	async function downloadPartsSTL() {
+		if (!cad || !mesh?.parts) return;
+		try {
+			console.log('Exporting parts as STL...');
+			const blobs = await cad.exportPartsSTL($fluteParams, $toneHoleParams);
+			blobs.forEach((blob, index) => {
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `flute-part-${index + 1}.stl`;
+				a.click();
+				URL.revokeObjectURL(url);
+			});
+			console.log('Parts STL download complete');
+		} catch (e) {
+			console.error('Parts STL export failed:', e);
+			error = `Parts STL export failed: ${e?.message || String(e)}`;
+		}
+	}
+
+	async function downloadPartsSTEP() {
+		if (!cad || !mesh?.parts) return;
+		try {
+			console.log('Exporting parts as STEP...');
+			const blobs = await cad.exportPartsSTEP($fluteParams, $toneHoleParams);
+			blobs.forEach((blob, index) => {
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `flute-part-${index + 1}.step`;
+				a.click();
+				URL.revokeObjectURL(url);
+			});
+			console.log('Parts STEP download complete');
+		} catch (e) {
+			console.error('Parts STEP export failed:', e);
+			error = `Parts STEP export failed: ${e?.message || String(e)}`;
+		}
+	}
+
 	function handleClose() {
 		onClose();
 		setTimeout(() => {
 			state = 'generating';
 			mesh = null;
 			error = null;
+			activeView = 'full';
 		}, 300);
 	}
+
+	$: hasParts = mesh?.parts && mesh.parts.length > 0;
+	$: currentMesh = activeView === 'full' 
+		? { faces: mesh?.faces, edges: mesh?.edges }
+		: mesh?.parts?.[activeView];
+
 </script>
 
 <Modal bind:open maxWidth="48rem" {onClose}>
@@ -131,9 +179,31 @@
 			</div>
 		{:else if mesh && ReplicadViewer}
 			<div class="space-y-4">
+				{#if hasParts}
+					<div class="flex space-x-2 overflow-x-auto pb-2">
+						<button 
+							class="px-4 py-2 rounded transition-colors whitespace-nowrap {activeView === 'full' ? 'bg-blue-500 text-white' : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'}"
+							on:click={() => activeView = 'full'}
+						>
+							Full Flute
+						</button>
+						{#each mesh.parts as _, index}
+							<button 
+								class="px-4 py-2 rounded transition-colors whitespace-nowrap {activeView === index ? 'bg-blue-500 text-white' : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'}"
+								on:click={() => activeView = index}
+							>
+								Part {index + 1}
+							</button>
+						{/each}
+					</div>
+				{/if}
+				
 				<div class="h-96">
-					<svelte:component this={ReplicadViewer} faces={mesh.faces} edges={mesh.edges} />
+					{#if currentMesh}
+						<svelte:component this={ReplicadViewer} faces={currentMesh.faces} edges={currentMesh.edges} />
+					{/if}
 				</div>
+				
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm p-4 bg-neutral-800 rounded">
 					<div>
 						<span class="text-neutral-400">Bore:</span>
@@ -160,11 +230,19 @@
 		<div class="flex space-x-3">
 			{#if state === 'complete' && mesh}
 				<button class="btn-secondary" on:click={downloadSTL}>
-					Download STL
+					Download Full STL
 				</button>
 				<button class="btn-secondary" on:click={downloadSTEP}>
-					Download STEP
+					Download Full STEP
 				</button>
+				{#if hasParts}
+					<button class="btn-secondary" on:click={downloadPartsSTL}>
+						Download Parts STL
+					</button>
+					<button class="btn-secondary" on:click={downloadPartsSTEP}>
+						Download Parts STEP
+					</button>
+				{/if}
 			{/if}
 		</div>
 		<button class="btn-primary" on:click={handleClose}>
