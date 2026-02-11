@@ -1,4 +1,5 @@
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
+import { localStorageStore } from '$lib/utils/localStorageStore';
 
 export type ComputedParameter<T> = {
 	mode: 'auto' | 'manual';
@@ -57,7 +58,7 @@ export const DEFAULT_PARAMETERS: FluteParameters = {
 };
 
 function createFluteStore() {
-	const { subscribe, set, update } = writable<FluteParameters>({ ...DEFAULT_PARAMETERS });
+	const { subscribe, set, update } = localStorageStore<FluteParameters>('flute-generator-parameters', { ...DEFAULT_PARAMETERS });
 
 	return {
 		subscribe,
@@ -102,7 +103,7 @@ export const DEFAULT_TONEHOLE_PARAMETERS: ToneHoleParameters = {
 };
 
 function createToneHoleStore() {
-	const { subscribe, set, update } = writable<ToneHoleParameters>({ ...DEFAULT_TONEHOLE_PARAMETERS });
+	const { subscribe, set, update } = localStorageStore<ToneHoleParameters>('flute-generator-tone-holes', { ...DEFAULT_TONEHOLE_PARAMETERS });
 
 	return {
 		subscribe,
