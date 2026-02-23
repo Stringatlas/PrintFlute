@@ -203,25 +203,6 @@
 						<svelte:component this={ReplicadViewer} faces={currentMesh.faces} edges={currentMesh.edges} />
 					{/if}
 				</div>
-				
-				<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm p-4 bg-neutral-800 rounded">
-					<div>
-						<span class="text-neutral-400">Bore:</span>
-						<span class="font-medium">{$fluteParams?.boreDiameter ?? 0}mm</span>
-					</div>
-					<div>
-						<span class="text-neutral-400">Wall:</span>
-						<span class="font-medium">{$fluteParams?.wallThickness ?? 0}mm</span>
-					</div>
-					<div>
-						<span class="text-neutral-400">Length:</span>
-						<span class="font-medium">{$fluteParams?.fluteLength ?? 0}mm</span>
-					</div>
-					<div>
-						<span class="text-neutral-400">Holes:</span>
-						<span class="font-medium">{$fluteParams?.numberOfToneHoles ?? 0}</span>
-					</div>
-				</div>
 			</div>
 		{/if}
 	</div>

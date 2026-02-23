@@ -127,28 +127,34 @@ class FluteCADBuilder {
 		const shouldFilletHoles = filletRadius > 0 && this.holePositions.length > 0;
 		if (!shouldFilletHoles) return;
 
-        
 		try {
-			this.flute = this.flute.fillet(filletRadius, (e) => 
-				e.when((edge) => {
-					try {
-						const center = edge.center;
-						if (!center) return false;
-						
-						const radialDist = Math.sqrt(center.x * center.x + center.y * center.y);
-						const isOuterSurface = Math.abs(radialDist - this.outerRadius) < 0.1;
-						
-						const isAtHolePosition = this.holePositions.some(
-							pos => Math.abs(center.z - pos) < 2
-						);
-
-						return isOuterSurface && isAtHolePosition;
-					} catch (edgeError) {
-						console.error('Error filtering edge:', edgeError);
-						return false;
-					}
-				})
+			const maxHoleRadius = Math.max(
+				...this.toneHoleParams.holeDiameters.map(d => d / 2),
+				this.fluteParams.thumbHoleDiameter / 2
 			);
+			const zTolerance = maxHoleRadius + 1;
+
+			this.flute = this.flute.fillet((edge) => {
+				try {
+					const start = edge.startPoint;
+					const mid = edge.pointAt(0.5);
+					const end = edge.endPoint;
+
+					const points = [start, mid, end];
+					const allOnOuterSurface = points.every(p => {
+						const radial = Math.sqrt(p.x * p.x + p.y * p.y);
+						return Math.abs(radial - this.outerRadius) < 0.5;
+					});
+
+					const isAtHolePosition = this.holePositions.some(pos =>
+						points.some(p => Math.abs(p.z - pos) < zTolerance)
+					);
+
+					return (allOnOuterSurface && isAtHolePosition) ? filletRadius : null;
+				} catch {
+					return null;
+				}
+			}) as Solid;
 		} catch (filletError) {
 			console.warn('Could not apply fillet to tone holes:', filletError);
 		}

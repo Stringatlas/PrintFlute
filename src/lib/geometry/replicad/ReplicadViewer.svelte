@@ -1,5 +1,6 @@
 <script>
   // @ts-nocheck
+  // FIXME: Flute clipping / disappearing at certain angles
   import { onMount, onDestroy } from "svelte";
   import * as THREE from "three";
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";

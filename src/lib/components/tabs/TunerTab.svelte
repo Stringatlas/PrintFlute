@@ -107,18 +107,4 @@
 			</div>
 		</div>
 	</div>
-
-    <!-- For debug -->
-	<!-- <div class="p-4 bg-gray-900/50 rounded-lg border border-gray-600 font-mono text-xs">
-		<h3 class="text-sm font-medium text-gray-300 mb-2">Debug: Current Analysis</h3>
-		<pre class="text-gray-400 whitespace-pre-wrap break-all">{JSON.stringify({
-			fundamentalFrequency: $audioStore.currentAnalysis?.fundamentalFrequency,
-			noteName: $audioStore.currentAnalysis?.noteName,
-			octave: $audioStore.currentAnalysis?.octave,
-			centsOff: $audioStore.currentAnalysis?.centsOff,
-			amplitude: $audioStore.currentAnalysis?.amplitude,
-			clarity: $audioStore.currentAnalysis?.clarity,
-			harmonicsCount: $audioStore.currentAnalysis?.harmonics?.length
-		}, null, 2)}</pre>
-	</div> -->
 </div>

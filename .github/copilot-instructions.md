@@ -1,7 +1,7 @@
 ## Overview
 Web tool: design 3D printed flutes → generate STL files + predict pitches → analyze real audio to validate.
 
-**Stack**: Svelte, Three.js (Mesh preview), Tailwind CSS OpenCascade (CAD kernel), Web Audio API, STL/STEP export
+**Stack**: Svelte, Three.js (Mesh preview), Tailwind CSS, Replicad (CAD kernel), Web Audio API, STL/STEP export
 
 ## Architecture: Modular by Concern
 ```
