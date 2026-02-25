@@ -1,6 +1,5 @@
 <script>
   // @ts-nocheck
-  // FIXME: Flute clipping / disappearing at certain angles
   import { onMount, onDestroy } from "svelte";
   import * as THREE from "three";
   import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
@@ -49,10 +48,13 @@
         side: THREE.DoubleSide
       })
     );
+    mesh.frustumCulled = false;
+
     lineSegments = new THREE.LineSegments(
       linesGeometry,
       new THREE.LineBasicMaterial({ color: 0x3c5a6e })
     );
+    lineSegments.frustumCulled = false;
     
     scene.add(mesh);
     scene.add(lineSegments);

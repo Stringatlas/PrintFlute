@@ -50,6 +50,8 @@
 		const sceneSetup = createThreeScene(canvas);
 		scene = sceneSetup.scene;
 		camera = sceneSetup.camera;
+        camera.near = 0.1;
+        camera.far = 10000;
 		renderer = sceneSetup.renderer;
 		controls = sceneSetup.controls;
 		disposeScene = sceneSetup.dispose;
