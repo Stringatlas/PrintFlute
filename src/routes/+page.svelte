@@ -4,21 +4,41 @@
 	import Designer from '$lib/components/tabs/DesignerTab.svelte';
 	import AudioAnalysis from '$lib/components/tabs/TunerTab.svelte';
 	import TimbreAnalysis from '$lib/components/tabs/TimbreAnalysisTab.svelte';
-    import type { Tab } from '$lib/components/SideNav.svelte';
+	import LibraryTab from '$lib/components/tabs/LibraryTab.svelte';
+	import type { Tab } from '$lib/components/SideNav.svelte';
 
 	let currentTab: Tab = $state('designer');
+	let visitedTabs = $state(new Set<Tab>(['designer']));
+
+	$effect(() => {
+		visitedTabs.add(currentTab);
+	});
 </script>
 
 <div class="flex h-screen bg-gray-950">
 	<SideNav bind:currentTab />
 
 	<main class="flex-1 flex overflow-hidden">
-		<div class="flex-1 overflow-y-auto p-6">
-			{#if currentTab === 'designer'}
+		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'designer'}>
+			{#if visitedTabs.has('designer')}
 				<Designer />
-			{:else if currentTab === 'tuner'}
+			{/if}
+		</div>
+
+		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'library'}>
+			{#if visitedTabs.has('library')}
+				<LibraryTab />
+			{/if}
+		</div>
+
+		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'tuner'}>
+			{#if visitedTabs.has('tuner')}
 				<AudioAnalysis />
-			{:else if currentTab === 'timbre'}
+			{/if}
+		</div>
+
+		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'timbre'}>
+			{#if visitedTabs.has('timbre')}
 				<TimbreAnalysis />
 			{/if}
 		</div>
