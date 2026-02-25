@@ -22,8 +22,10 @@
 	export let computedMode: 'auto' | 'manual' | undefined = undefined;
 	export let onResetComputed: (() => void) | undefined = undefined;
 
+	import { browser } from '$app/environment';
+
 	let localValue = String(value);
-	$: if (document.activeElement?.id !== inputId) {
+	$: if (!browser || document.activeElement?.id !== inputId) {
 		localValue = String(value);
 	}
 
