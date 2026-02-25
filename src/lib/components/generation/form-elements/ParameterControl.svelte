@@ -22,15 +22,36 @@
 	export let computedMode: 'auto' | 'manual' | undefined = undefined;
 	export let onResetComputed: (() => void) | undefined = undefined;
 
-	function handleInput(event: Event) {
+	let localValue = String(value);
+	$: if (document.activeElement?.id !== inputId) {
+		localValue = String(value);
+	}
+
+	function handleSliderInput(event: Event) {
 		const target = event.target as HTMLInputElement;
-		if (inputType === 'checkbox') {
-			onChange(target.checked as any);
+		const newValue = parseFloat(target.value);
+		if (!isNaN(newValue)) {
+			onChange(newValue);
+		}
+	}
+
+	function handleCheckboxChange(event: Event) {
+		const target = event.target as HTMLInputElement;
+		onChange(target.checked as any);
+	}
+
+	function handleNumberCommit() {
+		const newValue = parseFloat(localValue);
+		if (!isNaN(newValue)) {
+			onChange(newValue);
 		} else {
-			const newValue = parseFloat(target.value);
-			if (!isNaN(newValue)) {
-				onChange(newValue);
-			}
+			localValue = String(value);
+		}
+	}
+
+	function handleNumberKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			(event.target as HTMLInputElement).blur();
 		}
 	}
 
@@ -96,7 +117,7 @@
 					{max}
 					{step}
 					{value}
-					on:input={handleInput}
+					on:input={handleSliderInput}
 					class="input-slider"
 				/>
 				<span class="text-muted min-w-15 text-right">{value}{unit}</span>
@@ -105,7 +126,7 @@
 					id={inputId}
 					type="checkbox"
 					checked={typeof value === 'boolean' ? value : false}
-					on:change={handleInput}
+					on:change={handleCheckboxChange}
 					class="input-checkbox"
 				/>
 			{:else}
@@ -115,8 +136,9 @@
 					{min}
 					{max}
 					{step}
-					{value}
-					on:input={handleInput}
+					bind:value={localValue}
+					on:blur={handleNumberCommit}
+					on:keydown={handleNumberKeydown}
 					class="input-number {borderColor}"
 				/>
 				<span class="text-muted min-w-15">{unit}</span>
