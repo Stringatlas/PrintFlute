@@ -6,8 +6,6 @@ export type ComputedParameter<T> = {
 	value?: T;
 };
 
-// TODO: Create interface for storing presets
-
 export interface FluteParameters {
 	// Physical Parameters
 	boreDiameter: number;
