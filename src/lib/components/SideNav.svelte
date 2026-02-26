@@ -1,13 +1,14 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.png';
 
-	export type Tab = 'designer' | 'tuner' | 'timbre';
+	export type Tab = 'designer' | 'tuner' | 'timbre' | 'library';
 	
 	let { currentTab = $bindable('designer') }: { currentTab: Tab } = $props();
 	let isCollapsed = $state(false);
 
 	const tabs: { id: Tab; label: string }[] = [
 		{ id: 'designer', label: 'Flute Designer' },
+        { id: 'library', label: 'Flute Library' },
 		{ id: 'tuner', label: 'Tuner' },
 		{ id: 'timbre', label: 'Timbre Analysis' }
 	];
@@ -20,6 +21,8 @@
 				return 'bi-music-note';
 			case 'timbre':
 				return 'bi-soundwave';
+			case 'library':
+				return 'bi-collection-fill';
 		}
 	}
 </script>

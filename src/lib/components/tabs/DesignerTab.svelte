@@ -38,16 +38,18 @@
 		const corkDistance = resolveComputedParameter('corkDistance', $fluteParams);
 		const corkThickness = resolveComputedParameter('corkThickness', $fluteParams);
 		
-		return `Bore: ${$fluteParams.boreDiameter}mm
-Wall: ${$fluteParams.wallThickness}mm
-Cork Distance: ${corkDistance.toFixed(1)}mm
-Cork Thickness: ${corkThickness.toFixed(1)}mm
-Embouchure: ${$fluteParams.embouchureHoleLength}×${$fluteParams.embouchureHoleWidth}mm
-Embouchure Distance: ${$fluteParams.embouchureDistance.toFixed(1)}mm
-Fundamental: ${$fluteParams.fundamentalFrequency.toFixed(2)}Hz
-Holes: ${$fluteParams.numberOfToneHoles}
-Flute Length: ${$fluteParams.fluteLength.toFixed(1)}mm
-${holeInfo}`;
+		return [
+			`Bore: ${$fluteParams.boreDiameter}mm`,
+			`Wall: ${$fluteParams.wallThickness}mm`,
+			`Cork Distance: ${corkDistance.toFixed(1)}mm`,
+			`Cork Thickness: ${corkThickness.toFixed(1)}mm`,
+			`Embouchure: ${$fluteParams.embouchureHoleLength}x${$fluteParams.embouchureHoleWidth}mm`,
+			`Embouchure Distance: ${$fluteParams.embouchureDistance.toFixed(1)}mm`,
+			`Fundamental: ${$fluteParams.fundamentalFrequency.toFixed(2)}Hz`,
+			`Holes: ${$fluteParams.numberOfToneHoles}`,
+			`Flute Length: ${$fluteParams.fluteLength.toFixed(1)}mm`,
+			holeInfo
+		].join('\n');
 	})();
 </script>
 
