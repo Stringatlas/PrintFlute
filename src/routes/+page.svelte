@@ -8,6 +8,8 @@
 	import type { Tab } from '$lib/components/SideNav.svelte';
 
     // TODO: First load welcome screen
+    // TODO: PWA
+    // TODO: Auth/Account-based platform
 	let currentTab: Tab = $state('designer');
 	let visited: Record<Tab, boolean> = $state({
 		designer: true,

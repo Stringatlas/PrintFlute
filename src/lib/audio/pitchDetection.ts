@@ -1,7 +1,8 @@
-const MIN_RMS_THRESHOLD = 0.01;
-const MIN_CORRELATION = 0.9;
+const MIN_RMS_THRESHOLD = 0.005;
+const MIN_CORRELATION = 0.75;
 const FREQ_STABILITY_THRESHOLD = 0.05;
 const SPECTRAL_ENERGY_THRESHOLD_DB = 20;
+const OCTAVE_JUMP_CORRELATION_THRESHOLD = 0.85;
 
 export interface PitchCandidate {
 	offset: number;
@@ -175,7 +176,7 @@ function selectBestCandidate(
 		for (const candidate of candidates) {
 			const ratio = candidate.frequency / previousFreq;
 
-			if (candidate.spectralEnergy === maxEnergy && candidate.correlation > 0.95) {
+			if (candidate.spectralEnergy === maxEnergy && candidate.correlation > OCTAVE_JUMP_CORRELATION_THRESHOLD) {
 				if (
 					Math.abs(ratio - 2.0) < freqThreshold ||
 					Math.abs(ratio - 0.5) < freqThreshold
