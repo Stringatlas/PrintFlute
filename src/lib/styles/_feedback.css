@@ -40,6 +40,14 @@
 		@apply h-full bg-secondary-500 transition-all duration-100;
 	}
 
+	.progress-bar-sm {
+		@apply h-1.5 bg-gray-700 rounded-full overflow-hidden;
+	}
+
+	.progress-bar-sm-fill {
+		@apply h-full rounded-full transition-all duration-150;
+	}
+
 	/* Validation border states */
 	.border-valid {
 		@apply border-gray-700;
