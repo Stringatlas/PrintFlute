@@ -9,6 +9,15 @@ const MIN_FREQUENCY = 80;
 const MAX_FREQUENCY = 4000;
 const CLARITY_THRESHOLD = 0.85;
 
+export interface TimbreMetrics {
+	spectralCentroid: number;
+	spectralFlatness: number;
+	spectralRolloff: number;
+	spectralCrest: number;
+	spectralSlope: number;
+	zeroCrossingRate: number;
+}
+
 export interface AudioAnalysisResult {
 	fundamentalFrequency: number;
 	noteName: string;
@@ -18,6 +27,7 @@ export interface AudioAnalysisResult {
 	harmonicAmplitudes: number[];
 	amplitude: number;
 	clarity: number;
+	timbre: TimbreMetrics;
 	frequencyData: Float32Array;
 	timeData: Float32Array;
 }
@@ -46,7 +56,15 @@ export class AudioAnalyzer {
 				audioContext,
 				source: sourceNode,
 				bufferSize: 512,
-				featureExtractors: ['rms', 'spectralCentroid', 'spectralFlatness'],
+				featureExtractors: [
+					'rms',
+					'spectralCentroid',
+					'spectralFlatness',
+					'spectralRolloff',
+					'spectralCrest',
+					'spectralSlope',
+					'zcr'
+				],
 				callback: (features: Partial<MeydaFeaturesObject>) => {
 					this.latestFeatures = features;
 				}
@@ -72,6 +90,8 @@ export class AudioAnalyzer {
 			pitch >= MIN_FREQUENCY &&
 			pitch <= MAX_FREQUENCY;
 
+		const timbre = this.extractTimbreMetrics();
+
 		if (!isValidPitch) {
 			return {
 				fundamentalFrequency: 0,
@@ -82,6 +102,7 @@ export class AudioAnalyzer {
 				harmonicAmplitudes: [],
 				amplitude,
 				clarity: 0,
+				timbre,
 				frequencyData,
 				timeData
 			};
@@ -105,8 +126,20 @@ export class AudioAnalyzer {
 			harmonicAmplitudes: amplitudes,
 			amplitude,
 			clarity,
+			timbre,
 			frequencyData,
 			timeData
+		};
+	}
+
+	private extractTimbreMetrics(): TimbreMetrics {
+		return {
+			spectralCentroid: this.latestFeatures.spectralCentroid ?? 0,
+			spectralFlatness: this.latestFeatures.spectralFlatness ?? 0,
+			spectralRolloff: this.latestFeatures.spectralRolloff ?? 0,
+			spectralCrest: this.latestFeatures.spectralCrest ?? 0,
+			spectralSlope: this.latestFeatures.spectralSlope ?? 0,
+			zeroCrossingRate: this.latestFeatures.zcr ?? 0
 		};
 	}
 

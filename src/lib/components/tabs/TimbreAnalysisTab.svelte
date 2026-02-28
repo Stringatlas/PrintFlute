@@ -5,6 +5,7 @@
 	import Waveform from '$lib/components/analysis/Waveform.svelte';
 	import SpectrogramViz from '$lib/components/analysis/Spectrogram.svelte';
 	import HarmonicsChart from '$lib/components/analysis/HarmonicsChart.svelte';
+	import TimbreMetrics from '$lib/components/analysis/TimbreMetrics.svelte';
 	import DetectionMetrics from '$lib/components/analysis/DetectionMetrics.svelte';
 	import QualityMetrics from '$lib/components/analysis/QualityMetrics.svelte';
 
@@ -101,26 +102,17 @@
 				<Waveform timeData={$audioStore.currentAnalysis?.timeData || null} />
 			</div>
 
+			<TimbreMetrics
+				timbre={$audioStore.currentAnalysis?.timbre}
+				{sampleRate}
+			/>
+
 			{#if frozenHarmonics.length > 0}
 				<HarmonicsChart
 					harmonics={frozenHarmonics}
 					amplitudes={frozenAmplitudes}
 				/>
 			{/if}
-
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-				<!-- <DetectionMetrics
-					frequency={$audioStore.currentAnalysis?.fundamentalFrequency}
-					clarity={$audioStore.currentAnalysis?.clarity}
-					amplitude={$audioStore.currentAnalysis?.amplitude}
-				/>
-
-				<QualityMetrics
-					clarity={$audioStore.currentAnalysis?.clarity}
-					amplitude={$audioStore.currentAnalysis?.amplitude}
-					harmonics={$audioStore.currentAnalysis?.harmonics || []}
-				/> -->
-			</div>
 
 			<SpectrogramViz
 				frequencyData={$audioStore.currentAnalysis?.frequencyData || null}

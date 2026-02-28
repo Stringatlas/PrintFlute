@@ -1,8 +1,8 @@
 const MIN_FREQUENCY = 80;
 const MAX_FREQUENCY = 4000;
-const FREQUENCY_BINS = 256;
-const TIME_RESOLUTION = 30;
-const LABEL_PADDING = 40;
+const LEFT_PADDING = 44;
+const TOP_PADDING = 12;
+const BOTTOM_PADDING = 6;
 
 export interface SpectrogramConfig {
 	width: number;
@@ -19,6 +19,7 @@ export class SpectrogramRenderer {
 	private config: SpectrogramConfig;
 	private columnIndex: number = 0;
 	private spectrogramWidth: number;
+	private spectrogramHeight: number;
 
 	constructor(canvas: HTMLCanvasElement, config?: Partial<SpectrogramConfig>) {
 		const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -35,17 +36,18 @@ export class SpectrogramRenderer {
 			...config
 		};
 
-		this.spectrogramWidth = this.config.width - LABEL_PADDING;
-		this.imageData = ctx.createImageData(this.spectrogramWidth, this.config.height);
+		this.spectrogramWidth = this.config.width - LEFT_PADDING;
+		this.spectrogramHeight = this.config.height - TOP_PADDING - BOTTOM_PADDING;
+		this.imageData = ctx.createImageData(this.spectrogramWidth, this.spectrogramHeight);
 		this.clearSpectrogram();
 	}
 
 	addFrequencyData(frequencyData: Float32Array, sampleRate: number): void {
-		const { height, minDb, maxDb, minFreq, maxFreq } = this.config;
+		const { minDb, maxDb, minFreq, maxFreq } = this.config;
 		const nyquist = sampleRate / 2;
 
-		for (let y = 0; y < height; y++) {
-			const freqRatio = y / height;
+		for (let y = 0; y < this.spectrogramHeight; y++) {
+			const freqRatio = y / this.spectrogramHeight;
 			const freq = minFreq + freqRatio * (maxFreq - minFreq);
 
 			if (freq > maxFreq) continue;
@@ -57,7 +59,7 @@ export class SpectrogramRenderer {
 			const clamped = Math.max(0, Math.min(1, normalized));
 
 			const color = this.getHotColor(clamped);
-			this.setPixel(this.columnIndex, height - 1 - y, color);
+			this.setPixel(this.columnIndex, this.spectrogramHeight - 1 - y, color);
 		}
 
 		this.columnIndex = (this.columnIndex + 1) % this.spectrogramWidth;
@@ -68,34 +70,38 @@ export class SpectrogramRenderer {
 	render(): void {
 		const { width, height } = this.config;
 
-		// Clear entire canvas including label area
 		this.ctx.fillStyle = '#111827';
 		this.ctx.fillRect(0, 0, width, height);
 
-		// Draw spectrogram with offset for labels
-		this.ctx.putImageData(this.imageData, LABEL_PADDING, 0);
+		this.ctx.putImageData(this.imageData, LEFT_PADDING, TOP_PADDING);
 
 		const wrapX = this.columnIndex;
 		if (wrapX > 0) {
-			const rightPart = this.ctx.getImageData(LABEL_PADDING + wrapX, 0, this.spectrogramWidth - wrapX, height);
-			const leftPart = this.ctx.getImageData(LABEL_PADDING, 0, wrapX, height);
+			const rightPart = this.ctx.getImageData(
+				LEFT_PADDING + wrapX, TOP_PADDING,
+				this.spectrogramWidth - wrapX, this.spectrogramHeight
+			);
+			const leftPart = this.ctx.getImageData(
+				LEFT_PADDING, TOP_PADDING,
+				wrapX, this.spectrogramHeight
+			);
 
-			this.ctx.putImageData(rightPart, LABEL_PADDING, 0);
-			this.ctx.putImageData(leftPart, LABEL_PADDING + this.spectrogramWidth - wrapX, 0);
+			this.ctx.putImageData(rightPart, LEFT_PADDING, TOP_PADDING);
+			this.ctx.putImageData(leftPart, LEFT_PADDING + this.spectrogramWidth - wrapX, TOP_PADDING);
 		}
 
 		this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
 		this.ctx.lineWidth = 1;
 		this.ctx.beginPath();
-		this.ctx.moveTo(width - 1, 0);
-		this.ctx.lineTo(width - 1, height);
+		this.ctx.moveTo(width - 1, TOP_PADDING);
+		this.ctx.lineTo(width - 1, TOP_PADDING + this.spectrogramHeight);
 		this.ctx.stroke();
 
 		this.renderFrequencyAxis();
 	}
 
 	private renderFrequencyAxis(): void {
-		const { width, height, minFreq, maxFreq } = this.config;
+		const { width, minFreq, maxFreq } = this.config;
 		const frequencies = [500, 1000, 2000, 3000, 4000];
 
 		this.ctx.font = '10px monospace';
@@ -106,16 +112,15 @@ export class SpectrogramRenderer {
 			if (freq < minFreq || freq > maxFreq) return;
 
 			const ratio = (freq - minFreq) / (maxFreq - minFreq);
-			const y = height - ratio * height;
+			const y = TOP_PADDING + this.spectrogramHeight - ratio * this.spectrogramHeight;
 
-			// Draw label on the left
-			this.ctx.fillText(`${freq}`, LABEL_PADDING - 5, y + 3);
+			const label = freq >= 1000 ? `${freq / 1000}k` : `${freq}`;
+			this.ctx.fillText(label, LEFT_PADDING - 5, y + 3);
 
-			// Draw gridline across spectrogram area only
-			this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+			this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
 			this.ctx.lineWidth = 1;
 			this.ctx.beginPath();
-			this.ctx.moveTo(LABEL_PADDING, y);
+			this.ctx.moveTo(LEFT_PADDING, y);
 			this.ctx.lineTo(width, y);
 			this.ctx.stroke();
 		});
@@ -131,8 +136,7 @@ export class SpectrogramRenderer {
 	}
 
 	private clearSpectrogram(): void {
-		const { height } = this.config;
-		for (let i = 0; i < this.spectrogramWidth * height * 4; i += 4) {
+		for (let i = 0; i < this.spectrogramWidth * this.spectrogramHeight * 4; i += 4) {
 			this.imageData.data[i] = 17;
 			this.imageData.data[i + 1] = 24;
 			this.imageData.data[i + 2] = 39;
@@ -141,8 +145,7 @@ export class SpectrogramRenderer {
 	}
 
 	private clearColumn(x: number): void {
-		const { height } = this.config;
-		for (let y = 0; y < height; y++) {
+		for (let y = 0; y < this.spectrogramHeight; y++) {
 			this.setPixel(x, y, { r: 17, g: 24, b: 39 });
 		}
 	}
