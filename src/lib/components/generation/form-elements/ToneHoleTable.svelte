@@ -93,7 +93,7 @@
 </script>
 
 {#if $calculationError}
-	<div class="mb-4 px-4 py-3 bg-red-900/30 border border-red-600 rounded-lg">
+	<div class="alert-error mb-4">
 		<div class="flex items-start gap-3">
 			<svg class="w-5 h-5 text-red-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -171,15 +171,3 @@
 	</table>
 </div>
 
-<style>
-	input[type='number'] {
-		-moz-appearance: textfield;
-		appearance: textfield;
-	}
-	input[type='number']::-webkit-outer-spin-button,
-	input[type='number']::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		appearance: none;
-		margin: 0;
-	}
-</style>

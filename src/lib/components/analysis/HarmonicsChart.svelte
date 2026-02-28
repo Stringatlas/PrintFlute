@@ -99,7 +99,7 @@
 
 <div class="flex flex-col gap-4">
 	<div class="flex justify-between items-top">
-		<h2 class="text-xl font-semibold text-secondary-400">Harmonic Spectrum</h2>
+		<h2 class="heading-analysis">Harmonic Spectrum</h2>
 		<div class="text-right">
 			<div class="text-sm text-gray-400">Fundamental</div>
 			<div class="text-lg font-mono text-secondary-400">
@@ -111,7 +111,7 @@
 		</div>
 	</div>
 	
-	<div class="bg-gray-800/50 rounded border border-gray-700 p-4 h-64">
+	<div class="card h-64">
 		<canvas bind:this={chartCanvas}></canvas>
 	</div>
 </div>

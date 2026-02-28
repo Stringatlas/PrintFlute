@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import '$lib/components/components.css';
+@import '$lib/styles/components.css';
 
 @theme {
 	--color-primary-50: #ecfdf5;

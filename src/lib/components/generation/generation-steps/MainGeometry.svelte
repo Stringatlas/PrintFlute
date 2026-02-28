@@ -42,7 +42,7 @@
 
 <div class="space-y-6">
 	<div class="space-y-4">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Physical Parameters</h3>
+		<h3 class="heading-section">Physical Parameters</h3>
 		<ParameterControl
 			label="Bore Diameter"
 			value={$fluteParams.boreDiameter}
@@ -128,7 +128,7 @@
 	</div>
 
 	<div class="space-y-4 mt-8">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Embouchure Hole Parameters</h3>
+		<h3 class="heading-section">Embouchure Hole Parameters</h3>
 		<ParameterControl
 			label="Hole Length"
 			value={$fluteParams.embouchureHoleLength}
@@ -172,7 +172,7 @@
 
 	<!-- Tuning Parameters -->
 	<div class="space-y-4 mt-8">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Tuning Parameters</h3>
+		<h3 class="heading-section">Tuning Parameters</h3>
 		<FrequencySelector
 			value={$fluteParams.fundamentalFrequency}
 			getDefault={() => DEFAULT_PARAMETERS.fundamentalFrequency}
@@ -192,8 +192,7 @@
 		/>
 	</div>
 
-	<!-- Navigation -->
-	<div class="space-y-2 mt-8">
+	<div class="step-nav">
 		<button
 			on:click={onNext}
 			class="w-full btn-primary"

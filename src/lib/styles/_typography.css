@@ -1,0 +1,36 @@
+/* Typography components */
+
+@layer components {
+	.heading-page {
+		@apply text-xl font-semibold text-primary-400;
+	}
+
+	.heading-section {
+		@apply text-sm font-semibold text-gray-400 uppercase tracking-wide;
+	}
+
+	.heading-analysis {
+		@apply text-xl font-semibold text-secondary-400;
+	}
+
+	.label {
+		@apply block text-sm font-medium text-gray-300;
+	}
+
+	.text-muted {
+		@apply text-sm text-gray-400;
+	}
+
+	/* Stat card inner elements */
+	.stat-label {
+		@apply text-sm font-medium text-gray-300 mb-2;
+	}
+
+	.stat-value {
+		@apply text-2xl font-bold;
+	}
+
+	.stat-unit {
+		@apply text-sm text-gray-400;
+	}
+}

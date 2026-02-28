@@ -53,41 +53,34 @@
 	})();
 </script>
 
-<div class="space-y-6 p-4 sm:p-6 md:p-8">
-	<div class="flex items-center justify-between">
-		<div class="flex items-center gap-2">
+<div class="page-container">
+	<div class="flex-between">
+		<div class="flex-center">
 			<h2 class="heading-page">Flute Designer</h2>
 			<Tooltip text={fluteParamsText} type="info" />
 		</div>
-		<div class="flex rounded-lg bg-gray-800 p-1 border border-gray-700">
+		<div class="toggle-group">
 			<button
 				on:click={toggleViewMode}
-				class="px-3 py-1 text-sm rounded transition-colors duration-200 {$viewMode === 'basic'
-					? 'bg-primary-600 text-white'
-					: 'text-gray-400 hover:text-gray-200'}"
+				class={$viewMode === 'basic' ? 'toggle-btn-active' : 'toggle-btn'}
 			>
 				Basic
 			</button>
 			<button
 				on:click={toggleViewMode}
-				class="px-3 py-1 text-sm rounded transition-colors duration-200 {$viewMode === 'advanced'
-					? 'bg-primary-600 text-white'
-					: 'text-gray-400 hover:text-gray-200'}"
+				class={$viewMode === 'advanced' ? 'toggle-btn-active' : 'toggle-btn'}
 			>
 				Advanced
 			</button>
 		</div>
 	</div>
 
-	<!-- Step Progress Bar -->
-	<div class="relative py-6">
-		<!-- Step Indicators -->
+	<div class="step-progress">
 		<div class="relative flex justify-between">
-			<!-- Progress Lines (behind icons) -->
-			<div class="absolute left-0 right-0 top-4 -translate-y-1/2 px-12 pointer-events-none">
-				<div class="relative h-0.5 bg-gray-700">
+			<div class="step-progress-track">
+				<div class="step-progress-track-bg">
 					<div 
-						class="absolute h-full bg-primary-500 transition-all duration-300"
+						class="step-progress-track-fill"
 						style="width: {progressPercent}%;"
 					></div>
 				</div>

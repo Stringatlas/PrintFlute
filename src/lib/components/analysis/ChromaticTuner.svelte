@@ -28,7 +28,7 @@
 	$: color = getTuningColor(lastCentsOff);
 </script>
 
-<div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+<div class="card">
 	<div class="flex flex-col items-center space-y-4">
 		<div class="text-4xl font-bold" style="color: {color}">
 			{lastFrequency > 0 ? `${lastNoteName}${lastOctave}` : '--'}

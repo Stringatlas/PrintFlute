@@ -1,0 +1,32 @@
+/* Modal components */
+
+@layer components {
+	.modal-dialog {
+		@apply p-0 border-none rounded-lg w-[90%] bg-transparent overflow-visible backdrop:bg-black/50 backdrop:backdrop-blur-sm;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		margin: 0;
+	}
+
+	.modal-content {
+		@apply bg-neutral-900 border border-neutral-700 rounded-lg overflow-hidden;
+	}
+
+	.modal-header {
+		@apply flex items-center justify-between px-5 py-4 border-b border-neutral-700;
+	}
+
+	.modal-title {
+		@apply m-0 text-lg font-semibold text-white;
+	}
+
+	.modal-body {
+		@apply p-5 text-white;
+	}
+
+	.modal-footer {
+		@apply flex items-center justify-end gap-3 px-5 py-4 border-t border-neutral-700;
+	}
+}

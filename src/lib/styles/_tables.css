@@ -1,0 +1,23 @@
+/* Table components */
+
+@layer components {
+	.table {
+		@apply w-full text-sm;
+	}
+
+	.table-header {
+		@apply border-b border-gray-700;
+	}
+
+	.table-header-cell {
+		@apply px-3 py-2 text-left uppercase font-medium text-gray-400 text-xs tracking-wider;
+	}
+
+	.table-row {
+		@apply border-b border-gray-800 hover:bg-gray-800/50 transition-colors;
+	}
+
+	.table-cell {
+		@apply px-3 py-2 text-gray-300;
+	}
+}

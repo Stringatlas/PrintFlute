@@ -8,10 +8,10 @@
 </script>
 
 <div>
-	<h2 class="text-xl font-semibold text-secondary-400 mb-4">Harmonics</h2>
+	<h2 class="heading-analysis mb-4">Harmonics</h2>
 	<div class="space-y-2">
 		{#each harmonics.slice(0, 6) as harmonic, i}
-			<div class="p-3 bg-gray-800/50 rounded border border-gray-700">
+			<div class="card p-3 rounded">
 				<div class="flex justify-between items-center">
 					<span class="text-sm text-gray-300">
 						{i === 0 ? 'Fundamental' : `${i + 1}x Harmonic`}

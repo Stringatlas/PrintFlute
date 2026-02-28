@@ -70,7 +70,7 @@
 <div class="space-y-6">
 	<!-- Printing Parameters -->
 	<div class="space-y-4">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Printing Parameters</h3>
+		<h3 class="heading-section">Printing Parameters</h3>
 		<ParameterControl
 			label="Tone Hole Fillet Radius"
 			value={$fluteParams.toneHoleFilletRadius}
@@ -88,7 +88,7 @@
 
 	<!-- Cut Configuration -->
 	<div class="space-y-4 mt-8">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Cut Configuration</h3>
+		<h3 class="heading-section">Cut Configuration</h3>
 		<ParameterControl
 			label="Connector Length"
 			value={$fluteParams.connectorLength}
@@ -142,7 +142,7 @@
 		{/each}
 	</div>
 
-	<div class="space-y-2 mt-8">
+	<div class="step-nav">
 		<button class="w-full btn-primary" on:click={handleExport}>
 			Export
 			<i class="bi bi-download"></i>

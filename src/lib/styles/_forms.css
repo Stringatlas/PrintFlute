@@ -1,0 +1,27 @@
+/* Form input components */
+
+@layer components {
+	.input {
+		@apply px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-primary-500;
+	}
+
+	.input-number {
+		@apply px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-primary-500 w-32 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
+	}
+
+	.input-number-sm {
+		@apply w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-200 focus:outline-none focus:border-primary-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none;
+	}
+
+	.input-select {
+		@apply px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-lg text-gray-200 focus:outline-none focus:border-primary-500;
+	}
+
+	.input-checkbox {
+		@apply w-4 h-4 bg-gray-800 border border-gray-700 rounded text-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-offset-gray-900;
+	}
+
+	.input-slider {
+		@apply w-64 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-primary-500;
+	}
+}

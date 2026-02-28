@@ -10,7 +10,7 @@
 </script>
 
 <div>
-	<h2 class="text-xl font-semibold text-secondary-400 mb-4">Current Detection</h2>
+	<h2 class="heading-analysis mb-4">Current Detection</h2>
 	<div class="grid grid-cols-2 gap-4">
 		<ChromaticTuner 
 			centsOff={analysis.centsOff} 
@@ -19,8 +19,7 @@
             frequency={analysis.fundamentalFrequency}
 		/>
 		
-		<div class="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-			<div class="text-sm text-gray-400 mb-1">Frequency</div>
+		<div class="card">
 			<div class="text-3xl font-bold text-secondary-400">
 				{formatFrequency(analysis.fundamentalFrequency)}
 			</div>

@@ -166,15 +166,15 @@
 
 	<div class="space-y-4">
 		{#if error}
-			<div class="p-4 bg-red-100 text-red-800 rounded-lg">
+			<div class="alert-error">
 				<strong>Error:</strong> {error}
 			</div>
 		{:else if state === 'generating'}
 			<div class="min-h-96 flex items-center justify-center">
 				<div class="flex flex-col items-center space-y-4">
-					<div class="w-16 h-16 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
-					<p class="text-neutral-300 text-lg">Generating flute geometry...</p>
-					<p class="text-neutral-500 text-sm">This may take a few moments</p>
+					<div class="spinner"></div>
+					<p class="text-gray-300 text-lg">Generating flute geometry...</p>
+					<p class="text-gray-500 text-sm">This may take a few moments</p>
 				</div>
 			</div>
 		{:else if mesh && ReplicadViewer}
@@ -182,14 +182,14 @@
 				{#if hasParts}
 					<div class="flex space-x-2 overflow-x-auto pb-2">
 						<button 
-							class="px-4 py-2 rounded transition-colors whitespace-nowrap {activeView === 'full' ? 'bg-blue-500 text-white' : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'}"
+							class="px-4 py-2 rounded transition-colors whitespace-nowrap {activeView === 'full' ? 'bg-primary-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
 							on:click={() => activeView = 'full'}
 						>
 							Full Flute
 						</button>
 						{#each mesh.parts as _, index}
 							<button 
-								class="px-4 py-2 rounded transition-colors whitespace-nowrap {activeView === index ? 'bg-blue-500 text-white' : 'bg-neutral-700 text-neutral-300 hover:bg-neutral-600'}"
+								class="px-4 py-2 rounded transition-colors whitespace-nowrap {activeView === index ? 'bg-primary-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
 								on:click={() => activeView = index}
 							>
 								Part {index + 1}

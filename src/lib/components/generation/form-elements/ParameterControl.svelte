@@ -149,15 +149,3 @@
 	</div>
 {/if}
 
-<style>
-	input[type='number'] {
-		-moz-appearance: textfield;
-        appearance: textfield;
-	}
-	input[type='number']::-webkit-outer-spin-button,
-	input[type='number']::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		appearance: none;
-		margin: 0;
-	}
-</style>

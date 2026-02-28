@@ -75,15 +75,15 @@
 	</div>
 
 	<div class="grid grid-cols-3 gap-2 mb-3">
-		<div class="bg-gray-900/50 rounded px-2 py-1.5">
+		<div class="stat-cell">
 			<div class="text-xs text-gray-500">Key</div>
 			<div class="text-sm font-medium text-primary-400">{note}</div>
 		</div>
-		<div class="bg-gray-900/50 rounded px-2 py-1.5">
+		<div class="stat-cell">
 			<div class="text-xs text-gray-500">Bore</div>
 			<div class="text-sm font-medium text-gray-300">{preset.fluteParameters.boreDiameter}mm</div>
 		</div>
-		<div class="bg-gray-900/50 rounded px-2 py-1.5">
+		<div class="stat-cell">
 			<div class="text-xs text-gray-500">Holes</div>
 			<div class="text-sm font-medium text-gray-300">{preset.fluteParameters.numberOfToneHoles}</div>
 		</div>

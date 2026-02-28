@@ -87,13 +87,13 @@
 	}
 </script>
 
-<div class="space-y-6 p-4 sm:p-6 md:p-8">
-	<div class="flex items-center justify-between">
-		<div class="flex items-center gap-2">
+<div class="page-container">
+	<div class="flex-between">
+		<div class="flex-center">
 			<h2 class="heading-page">Flute Library</h2>
 			<Tooltip text="Save, load, and manage flute parameter presets. Export as JSON to share designs." type="info" />
 		</div>
-		<div class="flex items-center gap-2">
+		<div class="flex-center">
 			<button class="btn-secondary btn-sm" onclick={importPreset}>
 				<i class="bi bi-upload"></i>
 				Import
@@ -138,7 +138,7 @@
 	{/if}
 
 	{#if filteredPresets.length === 0 && presets.length === 0}
-		<div class="flex flex-col items-center justify-center py-20 text-center">
+		<div class="empty-state py-20">
 			<i class="bi bi-collection text-5xl text-gray-600 mb-4"></i>
 			<h3 class="text-lg font-medium text-gray-300 mb-2">No saved presets</h3>
 			<p class="text-sm text-gray-500 mb-6 max-w-sm">
@@ -150,7 +150,7 @@
 			</button>
 		</div>
 	{:else if filteredPresets.length === 0}
-		<div class="flex flex-col items-center justify-center py-12 text-center">
+		<div class="empty-state py-12">
 			<i class="bi bi-search text-3xl text-gray-600 mb-3"></i>
 			<p class="text-sm text-gray-500">No presets match "{searchQuery}"</p>
 		</div>

@@ -1,0 +1,61 @@
+/* Layout and structural components */
+
+@layer components {
+	.card {
+		@apply p-4 bg-gray-800/50 rounded-lg border border-gray-700;
+	}
+
+	.page-container {
+		@apply space-y-6 p-4 sm:p-6 md:p-8;
+	}
+
+	.flex-between {
+		@apply flex items-center justify-between;
+	}
+
+	.flex-center {
+		@apply flex items-center gap-2;
+	}
+
+	/* Canvas / visualization panel (spectrogram, waveform) */
+	.canvas-panel {
+		@apply bg-gray-900 rounded-lg border border-gray-700 p-2;
+	}
+
+	/* Step progress bar */
+	.step-progress {
+		@apply relative py-6;
+	}
+
+	.step-progress-track {
+		@apply absolute left-0 right-0 top-4 -translate-y-1/2 px-12 pointer-events-none;
+	}
+
+	.step-progress-track-bg {
+		@apply relative h-0.5 bg-gray-700;
+	}
+
+	.step-progress-track-fill {
+		@apply absolute h-full bg-primary-500 transition-all duration-300;
+	}
+
+	/* Step navigation (bottom of each generation step) */
+	.step-nav {
+		@apply space-y-2 mt-8;
+	}
+
+	/* Empty state (library, search results) */
+	.empty-state {
+		@apply flex flex-col items-center justify-center py-16 text-center;
+	}
+
+	/* Spinner */
+	.spinner {
+		@apply w-16 h-16 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin;
+	}
+
+	/* Stat cell (preset card mini-stats) */
+	.stat-cell {
+		@apply bg-gray-900/50 rounded px-2 py-1.5;
+	}
+}

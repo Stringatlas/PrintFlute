@@ -52,6 +52,6 @@
 	});
 </script>
 
-<div class="bg-gray-900 rounded-lg border border-gray-700 p-2">
+<div class="canvas-panel">
 	<canvas bind:this={canvas} class="w-full h-24"></canvas>
 </div>

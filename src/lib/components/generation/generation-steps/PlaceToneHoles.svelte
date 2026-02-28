@@ -17,7 +17,7 @@
 
 <div class="space-y-6">
 	<div class="space-y-4">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Tone Hole Placement</h3>
+		<h3 class="heading-section">Tone Hole Placement</h3>
 		
 		<ParameterControl
 			label="Number of Tone Holes"
@@ -38,7 +38,7 @@
 	</div>
 
 	<div class="space-y-4">
-		<h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Thumb Hole</h3>
+		<h3 class="heading-section">Thumb Hole</h3>
 		
 		<ParameterControl
 			label="Enable Thumb Hole"
@@ -81,7 +81,7 @@
 		{/if}
 	</div>
 
-	<div class="space-y-2 mt-8">
+	<div class="step-nav">
 		<button
 			on:click={onNext}
 			class="w-full btn-primary"

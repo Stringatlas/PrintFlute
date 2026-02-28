@@ -1,0 +1,75 @@
+/* Badges, alerts, progress bars, and validation states */
+
+@layer components {
+	/* Badges */
+	.badge,
+	.badge-auto,
+	.badge-manual,
+	.badge-error,
+	.badge-warning,
+	.badge-success {
+		@apply text-xs px-2 py-0.5 rounded;
+	}
+
+	.badge-auto {
+		@apply bg-blue-900/30 text-blue-400;
+	}
+
+	.badge-manual {
+		@apply bg-amber-900/30 text-amber-400;
+	}
+
+	.badge-error {
+		@apply bg-red-900/30 text-red-400;
+	}
+
+	.badge-warning {
+		@apply bg-yellow-900/30 text-yellow-400;
+	}
+
+	.badge-success {
+		@apply bg-green-900/30 text-green-400;
+	}
+
+	/* Progress bar */
+	.progress-bar {
+		@apply h-2 bg-gray-700 rounded-full overflow-hidden;
+	}
+
+	.progress-bar-fill {
+		@apply h-full bg-secondary-500 transition-all duration-100;
+	}
+
+	/* Validation border states */
+	.border-valid {
+		@apply border-gray-700;
+	}
+
+	.border-warning {
+		@apply border-yellow-500;
+	}
+
+	.border-error {
+		@apply border-red-500;
+	}
+
+	/* Alert boxes */
+	.alert,
+	.alert-error,
+	.alert-warning,
+	.alert-info {
+		@apply px-4 py-3 rounded-lg flex items-start gap-3;
+	}
+
+	.alert-error {
+		@apply bg-red-900/30 border border-red-600;
+	}
+
+	.alert-warning {
+		@apply bg-yellow-900/30 border border-yellow-600;
+	}
+
+	.alert-info {
+		@apply bg-blue-900/30 border border-blue-600;
+	}
+}
