@@ -2,6 +2,4 @@ export { AudioAnalyzer, compareToPredicted, frequencyToNoteName } from './audioA
 export type { AudioAnalysisResult } from './audioAnalyzer';
 export { frequencyToNote, frequencyToNoteName as noteFromFrequency } from './musicTheory';
 export type { NoteInfo, TuningComparison } from './musicTheory';
-export { detectPitch } from './pitchDetection';
-export { detectHarmonics, calculateAmplitude, calculateClarity } from './harmonicAnalysis';
 export { AudioCapture, FFT_SIZE, MIN_DECIBELS, MAX_DECIBELS } from './audioCapture';

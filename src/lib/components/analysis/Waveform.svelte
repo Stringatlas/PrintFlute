@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 
-	export let timeData: Uint8Array | null = null;
+	export let timeData: Float32Array | null = null;
 
 	let canvas: HTMLCanvasElement;
 
@@ -9,7 +9,7 @@
 		drawWaveform(timeData);
 	}
 
-	function drawWaveform(data: Uint8Array) {
+	function drawWaveform(data: Float32Array) {
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 
@@ -27,8 +27,8 @@
 		let x = 0;
 
 		for (let i = 0; i < data.length; i++) {
-			const v = data[i] / 128.0;
-			const y = (v * height) / 2;
+			const v = (data[i] + 1) / 2;
+			const y = v * height;
 
 			if (i === 0) {
 				ctx.moveTo(x, y);

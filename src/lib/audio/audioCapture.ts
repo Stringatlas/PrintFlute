@@ -5,7 +5,7 @@ export const SMOOTHING_TIME_CONSTANT = 0.3;
 
 export interface AudioBuffers {
 	frequencyData: Float32Array;
-	timeData: Uint8Array;
+	timeData: Float32Array;
 }
 
 export class AudioCapture {
@@ -13,8 +13,8 @@ export class AudioCapture {
 	private analyser: AnalyserNode | null = null;
 	private microphone: MediaStreamAudioSourceNode | null = null;
 	private stream: MediaStream | null = null;
-	private frequencyData: Float32Array | null = null;
-	private timeData: Uint8Array | null = null;
+	private frequencyData: Float32Array<ArrayBuffer> | null = null;
+	private timeData: Float32Array<ArrayBuffer> | null = null;
 
 	async initialize(): Promise<void> {
 		if (this.audioContext) {
@@ -29,7 +29,7 @@ export class AudioCapture {
 		this.analyser.smoothingTimeConstant = SMOOTHING_TIME_CONSTANT;
 
 		this.frequencyData = new Float32Array(this.analyser.frequencyBinCount);
-		this.timeData = new Uint8Array(this.analyser.frequencyBinCount);
+		this.timeData = new Float32Array(this.analyser.fftSize);
 
 		// this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 		this.stream = await navigator.mediaDevices.getUserMedia({ 
@@ -48,14 +48,12 @@ export class AudioCapture {
 			return null;
 		}
 
-		// @ts-ignore
 		this.analyser.getFloatFrequencyData(this.frequencyData);
-		// @ts-ignore
-		this.analyser.getByteTimeDomainData(this.timeData);
+		this.analyser.getFloatTimeDomainData(this.timeData);
 
 		return {
 			frequencyData: new Float32Array(this.frequencyData),
-			timeData: new Uint8Array(this.timeData)
+			timeData: new Float32Array(this.timeData)
 		};
 	}
 
@@ -82,6 +80,14 @@ export class AudioCapture {
 		this.analyser = null;
 		this.frequencyData = null;
 		this.timeData = null;
+	}
+
+	getAudioContext(): AudioContext | null {
+		return this.audioContext;
+	}
+
+	getSourceNode(): MediaStreamAudioSourceNode | null {
+		return this.microphone;
 	}
 
 	isInitialized(): boolean {
