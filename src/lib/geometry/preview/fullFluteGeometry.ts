@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
 import type { FluteParameters, ToneHoleParameters } from '../../stores/fluteStore';
 import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
+import { createFluteMaterial } from './materials';
 
 interface FullFluteGeometryResult {
 	group: THREE.Group;
@@ -23,24 +24,7 @@ export function createFullFluteGeometry(
 	const fluteLength = fluteParams.fluteLength;
 	const embouchureDistance = fluteParams.embouchureDistance;
 	
-	// Create layer line texture simulating 3D printing layers
-	const canvas = document.createElement('canvas');
-	canvas.width = 256;
-	canvas.height = 256;
-	const ctx = canvas.getContext('2d')!;
-	
-	ctx.fillStyle = '#10b981';
-	ctx.fillRect(0, 0, 256, 256);
-	
-	const texture = new THREE.CanvasTexture(canvas);
-	texture.wrapS = THREE.RepeatWrapping;
-	texture.wrapT = THREE.RepeatWrapping;
-	
-	const material = new THREE.MeshStandardMaterial({
-		map: texture,
-		roughness: 0.4,
-		metalness: 0.3,
-	});
+	const { material, dispose: disposeMaterial } = createFluteMaterial();
 	
 	const evaluator = new Evaluator();
 	
@@ -168,8 +152,7 @@ export function createFullFluteGeometry(
 	
 	const dispose = () => {
 		geometries.forEach(geo => geo.dispose());
-		material.dispose();
-		texture.dispose();
+		disposeMaterial();
 	};
 	
 	return { group, dispose };

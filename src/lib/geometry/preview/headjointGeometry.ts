@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
 import type { FluteParameters } from '../../stores/fluteStore';
 import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
+import { createFluteMaterial } from './materials';
+import { addLabel } from './sceneAnnotations';
 
 const HEADJOINT_LENGTH_MM = 150;
 
@@ -10,7 +12,6 @@ interface HeadJointGeometryResult {
 	dispose: () => void;
 }
 
-// TODO: Add scene annotations
 export function createHeadJointGeometry(params: FluteParameters): HeadJointGeometryResult {
 	const group = new THREE.Group();
 	const geometries: THREE.BufferGeometry[] = [];
@@ -21,25 +22,7 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	const corkDistance = resolveComputedParameter('corkDistance', params);
 	const overhang = params.overhangLength;
 	
-	// Create layer line texture simulating 2mm 3D printing layers
-	const canvas = document.createElement('canvas');
-	canvas.width = 256;
-	canvas.height = 256;
-	const ctx = canvas.getContext('2d')!;
-	
-	// Base green
-	ctx.fillStyle = '#10b981';
-	ctx.fillRect(0, 0, 256, 256);
-	
-	const texture = new THREE.CanvasTexture(canvas);
-	texture.wrapS = THREE.RepeatWrapping;
-	texture.wrapT = THREE.RepeatWrapping;
-	
-	const material = new THREE.MeshStandardMaterial({
-		map: texture,
-		roughness: 0.4,
-		metalness: 0.3,
-	});
+	const { material, dispose: disposeMaterial } = createFluteMaterial();
 	
 	const evaluator = new Evaluator();
 	
@@ -109,11 +92,18 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	const bodyMesh = new THREE.Mesh(resultBrush.geometry, material);
 	group.add(bodyMesh);
 	
+	const titleLabel = addLabel(group, 'Headjoint Geometry', {
+		x: 0,
+		y: 0,
+		z: outerRadius + 20
+	}, { width: 50, height: 10 });
+	
 	geometries.push(outerGeometry, bore1Geometry, bore2Geometry, embouchureGeometry, resultBrush.geometry);
 	
 	const dispose = () => {
 		geometries.forEach(geo => geo.dispose());
-		material.dispose();
+		disposeMaterial();
+		titleLabel.dispose();
 	};
 	
 	return { group, dispose };

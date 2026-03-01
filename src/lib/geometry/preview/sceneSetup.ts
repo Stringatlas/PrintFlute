@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { SCENE_COLORS } from './materials';
 
 interface SceneSetupResult {
 	scene: THREE.Scene;
@@ -11,9 +12,9 @@ interface SceneSetupResult {
 
 export function createThreeScene(canvas: HTMLCanvasElement): SceneSetupResult {
 	const scene = new THREE.Scene();
-	scene.background = new THREE.Color(0x111827);
+	scene.background = new THREE.Color(SCENE_COLORS.background);
 	
-	const gridHelper = new THREE.GridHelper(500, 50, 0xb5501b, 0x543126);
+	const gridHelper = new THREE.GridHelper(500, 50, SCENE_COLORS.gridPrimary, SCENE_COLORS.gridSecondary);
 	scene.add(gridHelper);
 	
 	const camera = new THREE.PerspectiveCamera(
@@ -28,17 +29,27 @@ export function createThreeScene(canvas: HTMLCanvasElement): SceneSetupResult {
 	const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 	renderer.setSize(canvas.clientWidth, canvas.clientHeight);
 	renderer.setPixelRatio(window.devicePixelRatio);
+	renderer.toneMapping = THREE.ACESFilmicToneMapping;
+	renderer.toneMappingExposure = 1.2;
 	
 	const controls = new OrbitControls(camera, renderer.domElement);
 	controls.enableDamping = true;
 	controls.dampingFactor = 0.05;
 	
-	const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-	scene.add(ambientLight);
+	const hemisphereLight = new THREE.HemisphereLight(0xddeeff, 0x222233, 0.8);
+	scene.add(hemisphereLight);
 	
-	const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-	directionalLight.position.set(5, 5, 5);
-	scene.add(directionalLight);
+	const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+	keyLight.position.set(100, 150, 100);
+	scene.add(keyLight);
+	
+	const fillLight = new THREE.DirectionalLight(0xb0c4de, 0.6);
+	fillLight.position.set(-80, 50, -60);
+	scene.add(fillLight);
+	
+	const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
+	rimLight.position.set(0, -100, 80);
+	scene.add(rimLight);
 	
 	const dispose = () => {
 		controls.dispose();

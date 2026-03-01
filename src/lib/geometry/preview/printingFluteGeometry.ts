@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import type { FluteParameters, ToneHoleParameters } from '../../stores/fluteStore';
 import { createFullFluteGeometry } from './fullFluteGeometry';
-import { createLabelSprite } from './sceneAnnotations';
+import { addLabel } from './sceneAnnotations';
+import { createCutLineMaterial, createConnectorMaterial } from './materials';
 
 interface PrintingFluteGeometryResult {
 	group: THREE.Group;
@@ -17,20 +18,12 @@ export function createPrintingFluteGeometry(
 	
 	const geometries: THREE.BufferGeometry[] = [];
 	const materials: THREE.Material[] = [];
-	const textures: THREE.Texture[] = [];
+	const labelDisposers: (() => void)[] = [];
 	
-	const cutLineMaterial = new THREE.MeshBasicMaterial({ 
-		color: 0xff1a1a,
-		toneMapped: false
-	});
+	const cutLineMaterial = createCutLineMaterial();
 	materials.push(cutLineMaterial);
 	
-	const connectorMaterial = new THREE.MeshBasicMaterial({
-		color: 0xff1a1a,
-		transparent: true,
-		opacity: 0.3,
-		toneMapped: false
-	});
+	const connectorMaterial = createConnectorMaterial();
 	materials.push(connectorMaterial);
 	
 	const outerRadius = fluteParams.boreDiameter / 2 + fluteParams.wallThickness;
@@ -87,14 +80,12 @@ export function createPrintingFluteGeometry(
 			
 			const spriteWidth = 20;
 			const zOffset = outerRadius + spriteWidth / 2 + 5;
-			const { sprite, texture } = createLabelSprite(`Cut ${index + 1}`, {
+			const label = addLabel(group, `Cut ${index + 1}`, {
 				x: centerOffset + cutDistance,
 				y: 0,
 				z: zOffset
 			});
-			group.add(sprite);
-			textures.push(texture);
-			materials.push(sprite.material);
+			labelDisposers.push(label.dispose);
 		}
 	});
 	
@@ -102,7 +93,7 @@ export function createPrintingFluteGeometry(
 		result.dispose();
 		geometries.forEach(geom => geom.dispose());
 		materials.forEach(mat => mat.dispose());
-		textures.forEach(tex => tex.dispose());
+		labelDisposers.forEach(fn => fn());
 	};
 	
 	return { group, dispose };
