@@ -13,8 +13,11 @@
 		type ParameterTrigger 
 	} from './cameraAnimations';
 	import { createGeometryForStep } from './geometryManager';
+	import sectionCutIcon from '$lib/assets/section-cut.svg';
 
 	let sectionAnalysisEnabled = false;
+	let automaticSectionAnalysisEnabled = false;
+	let sectionAnalysisOverride: boolean | null = null;
 	let originalGeometryGroup: THREE.Group | null = null;
 
 	let canvas: HTMLCanvasElement;
@@ -34,6 +37,8 @@
 	let activeTrigger: ParameterTrigger | null = null;
 	let resizeObserver: ResizeObserver | null = null;
 
+	$: isSectionAnalysisOn = sectionAnalysisEnabled;
+
 	// Camera pose triggers from cameraAnimations.ts:
 	// [0] = Bore diameter & wall thickness -> side view
 	// [1] = Embouchure hole dimensions -> angled close-up
@@ -42,9 +47,29 @@
 	
 	const triggers = cameraPoseTriggers.map((trigger, index) => ({
 		...trigger,
-		onActivate: index === CORK_TRIGGER_INDEX ? enableSectionAnalysis : disableSectionAnalysis,
-		onDeactivate: index === CORK_TRIGGER_INDEX ? disableSectionAnalysis : undefined
+		onActivate: index === CORK_TRIGGER_INDEX
+			? () => setAutomaticSectionAnalysisState(true)
+			: () => setAutomaticSectionAnalysisState(false),
+		onDeactivate: index === CORK_TRIGGER_INDEX ? () => setAutomaticSectionAnalysisState(false) : undefined
 	}));
+
+	export function setSectionAnalysisOverride(enabled: boolean) {
+		sectionAnalysisOverride = enabled;
+		applyDesiredSectionAnalysisState();
+	}
+
+	export function clearSectionAnalysisOverride() {
+		sectionAnalysisOverride = null;
+		applyDesiredSectionAnalysisState();
+	}
+
+	export function getSectionAnalysisState() {
+		return sectionAnalysisEnabled;
+	}
+
+	function toggleSectionAnalysis() {
+		setSectionAnalysisOverride(!sectionAnalysisEnabled);
+	}
 
 	onMount(() => {
 		const sceneSetup = createThreeScene(canvas);
@@ -117,16 +142,39 @@
 		cameraAnimating = true;
 	}
 
+	$: if (scene && geometryGroup) {
+		applyDesiredSectionAnalysisState();
+	}
+
+	function setAutomaticSectionAnalysisState(enabled: boolean) {
+		automaticSectionAnalysisEnabled = enabled;
+		applyDesiredSectionAnalysisState();
+	}
+
+	function getDesiredSectionAnalysisState() {
+		return sectionAnalysisOverride ?? automaticSectionAnalysisEnabled;
+	}
+
+	function applyDesiredSectionAnalysisState() {
+		if (!scene || !geometryGroup) return;
+
+		if (getDesiredSectionAnalysisState()) {
+			enableSectionAnalysis();
+			return;
+		}
+
+		disableSectionAnalysis();
+	}
+
 	function enableSectionAnalysis() {
-		// Only enable section analysis on step 1 (Main Geometry)
-		if (!scene || sectionAnalysisEnabled || !geometryGroup || $currentDesignStep !== 1) return;
+		if (!scene || sectionAnalysisEnabled || !geometryGroup) return;
 		
 		sectionAnalysisEnabled = true;
 		originalGeometryGroup = geometryGroup.clone();
 
 		const outerDiameter = $fluteParams.boreDiameter + (2 * $fluteParams.wallThickness);
 		
-		const cutGroup = applySectionCut(geometryGroup, outerDiameter);
+		const cutGroup = applySectionCut(geometryGroup, outerDiameter, $fluteParams.fluteLength);
 		scene.remove(geometryGroup);
 		geometryGroup = cutGroup;
 		scene.add(geometryGroup);
@@ -144,6 +192,8 @@
 	function updateGeometry() {
 		if (!scene) return;
 
+		const shouldEnableSectionAnalysis = getDesiredSectionAnalysisState();
+
 		if (geometryGroup) scene.remove(geometryGroup);
 		if (disposeGeometry) disposeGeometry();
 
@@ -151,9 +201,11 @@
 		geometryGroup = result.group;
 		disposeGeometry = result.dispose;
 		scene.add(geometryGroup);
-		
-		if (sectionAnalysisEnabled) {
-			sectionAnalysisEnabled = false;
+
+		sectionAnalysisEnabled = false;
+		originalGeometryGroup = null;
+
+		if (shouldEnableSectionAnalysis) {
 			enableSectionAnalysis();
 		}
 	}
@@ -171,7 +223,22 @@
 	}
 </script>
 
-<canvas bind:this={canvas} class="w-full h-full"></canvas>
+<div class="relative w-full h-full">
+	<canvas bind:this={canvas} class="w-full h-full"></canvas>
+
+	<div class="absolute top-3 right-3 z-10">
+		<button
+			type="button"
+			on:click={toggleSectionAnalysis}
+			class={`btn ${isSectionAnalysisOn ? 'btn-primary' : 'btn-secondary'} text-sm px-3 py-2`}
+			aria-pressed={isSectionAnalysisOn}
+			aria-label={isSectionAnalysisOn ? 'Disable section analysis' : 'Enable section analysis'}
+		>
+			<img src={sectionCutIcon} alt="" class="w-4 h-4" aria-hidden="true" />
+			<span>{isSectionAnalysisOn ? 'Section On' : 'Section Off'}</span>
+		</button>
+	</div>
+</div>
 
 <style>
 	canvas {

@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
 
+const SECTION_CUT_DEFAULT_LENGTH_MM = 1000;
+const SECTION_CUT_BOX_SPAN_MM = 200;
+
 function createCrossSectionMaterial(): THREE.Material {
 	// Create canvas for diagonal hatching pattern
 	const canvas = document.createElement('canvas');
@@ -38,13 +41,18 @@ function createCrossSectionMaterial(): THREE.Material {
 	});
 }
 
-export function applySectionCut(geometryGroup: THREE.Group, outerDiameter: number): THREE.Group {
+export function applySectionCut(
+	geometryGroup: THREE.Group,
+	outerDiameter: number,
+	fluteLength: number
+): THREE.Group {
 	const cutGroup = geometryGroup.clone();
 	
-	// Use outer diameter to size the cutting box appropriately
-	const boxSize = Math.max(outerDiameter * 3, 200);
-	const boxGeometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize / 2);
-	boxGeometry.translate(0, 0, boxSize / 4);
+	const resolvedFluteLength = Math.min(fluteLength, SECTION_CUT_DEFAULT_LENGTH_MM);
+	const cutLength = Math.min(SECTION_CUT_DEFAULT_LENGTH_MM, resolvedFluteLength);
+	const boxSpan = Math.max(outerDiameter * 3, SECTION_CUT_BOX_SPAN_MM);
+	const boxGeometry = new THREE.BoxGeometry(cutLength, boxSpan, boxSpan / 2);
+	boxGeometry.translate(0, 0, boxSpan / 4);
 	
 	const boxBrush = new Brush(boxGeometry);
 	const evaluator = new Evaluator();
