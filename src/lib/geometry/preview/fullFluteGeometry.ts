@@ -3,11 +3,13 @@ import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
 import type { FluteParameters, ToneHoleParameters } from '../../stores/fluteStore';
 import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
 import { createFluteMaterial } from './materials';
+import { addLabel } from './sceneAnnotations';
 
 interface FullFluteGeometryResult {
 	group: THREE.Group;
 	dispose: () => void;
 }
+// TODO: Use tube helper function to simplify geometry creation
 
 export function createFullFluteGeometry(
 	fluteParams: FluteParameters,
@@ -24,6 +26,12 @@ export function createFullFluteGeometry(
 	const fluteLength = fluteParams.fluteLength;
 	const embouchureDistance = fluteParams.embouchureDistance;
 	
+    const titleLabel = addLabel(group, 'Full Flute Geometry', {
+        x: 0,
+        y: 0,
+        z: outerRadius + 20
+    }, { width: 50, height: 10 });
+        
 	const { material, dispose: disposeMaterial } = createFluteMaterial();
 	
 	const evaluator = new Evaluator();
@@ -153,6 +161,7 @@ export function createFullFluteGeometry(
 	const dispose = () => {
 		geometries.forEach(geo => geo.dispose());
 		disposeMaterial();
+        titleLabel.dispose();
 	};
 	
 	return { group, dispose };

@@ -95,6 +95,7 @@ class FluteCADBuilder {
 	}
 
 	private cutThumbHole(): void {
+        // FIXME: Thumb hole not cutting at all
 		const enableThumbHole = this.fluteParams.hasThumbHole && this.fluteParams.numberOfToneHoles >= 2;
 		if (!enableThumbHole) return;
 

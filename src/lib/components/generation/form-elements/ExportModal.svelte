@@ -1,5 +1,6 @@
 <script lang="ts">
 	// @ts-nocheck
+    // TODO: Comprehensive error handling and user feedback for export process (e.g. if mesh generation fails, if export fails, etc.)
 	import { onMount } from 'svelte';
 	import { wrap } from 'comlink';
 	import Modal from '$lib/components/Modal.svelte';

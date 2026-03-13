@@ -8,7 +8,7 @@
 	import { DIATONIC_SCALE_CENTS } from '$lib/audio/musicTheory';
 	import { calculatedFluteData, updateCalculatedValues } from '$lib/utils/fluteCalculationHelper';
 
-
+    // TODO: Create validation for fillet radius (must be less than half the smallest tone hole diameter or wall thickness)
     let exportModalOpen = false;
 	let exportModalRef: ExportModal;
 

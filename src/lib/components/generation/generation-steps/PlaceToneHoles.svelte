@@ -64,7 +64,7 @@
 				onChange={(v) => handleParameterChange('thumbHoleDiameter', v)}
 				info={PARAMETER_INFO.thumbHoleDiameter}
 			/>
-
+            // TODO: Allow custom values in between slider range
 			<ParameterControl
 				label="Thumb Hole Angle"
 				value={$fluteParams.thumbHoleAngle}

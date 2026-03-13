@@ -3,7 +3,9 @@ import type { FluteParameters, ToneHoleParameters } from '../../stores/fluteStor
 import { createFullFluteGeometry } from './fullFluteGeometry';
 import { addLabel } from './sceneAnnotations';
 import { createCutLineMaterial, createConnectorMaterial } from './materials';
+import { createTubeGeometry } from '../utils/createTubeGeometry';
 
+// TODO: Visualize fillet on three.js scene
 interface PrintingFluteGeometryResult {
 	group: THREE.Group;
 	dispose: () => void;
@@ -30,6 +32,7 @@ export function createPrintingFluteGeometry(
 	const centerOffset = -fluteParams.fluteLength / 2;
 	const tubeRadius = 0.5;
 	const connectorLength = fluteParams.connectorLength;
+	const connectorInnerRadius = fluteParams.boreDiameter / 2;
 	
 	fluteParams.cutDistances.forEach((cutDistance, index) => {
 		if (cutDistance > 0 && cutDistance < fluteParams.fluteLength) {
@@ -50,7 +53,7 @@ export function createPrintingFluteGeometry(
 			geometries.push(tubeGeometry);
 			
 			// Connector zones on either side of cut
-			const connectorRadius = outerRadius + 0.5;
+			const connectorRadius = outerRadius + 0.1;
 			
 			// Left connector zone
 			// const leftConnectorGeometry = new THREE.CylinderGeometry(
@@ -66,14 +69,13 @@ export function createPrintingFluteGeometry(
 			// geometries.push(leftConnectorGeometry);
 			
 			// Right connector zone
-			const rightConnectorGeometry = new THREE.CylinderGeometry(
-				connectorRadius,
-				connectorRadius,
-				connectorLength,
-				32
-			);
-			rightConnectorGeometry.rotateZ(Math.PI / 2);
-			rightConnectorGeometry.translate(centerOffset + cutDistance + connectorLength / 2, 0, 0);
+			const rightConnectorGeometry = createTubeGeometry({
+				outerRadius: connectorRadius,
+				innerRadius: outerRadius - 0.1,
+				length: connectorLength,
+				axis: 'x',
+				center: new THREE.Vector3(centerOffset + cutDistance + connectorLength / 2, 0, 0)
+			});
 			const rightConnectorMesh = new THREE.Mesh(rightConnectorGeometry, connectorMaterial);
 			group.add(rightConnectorMesh);
 			geometries.push(rightConnectorGeometry);
