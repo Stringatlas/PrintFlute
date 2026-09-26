@@ -1,0 +1,530 @@
+{
+  ".vscode/settings.json": {
+    "mtime": 1766458567.8490694,
+    "seen": 1787206134.843389,
+    "ast_hash": "f6a61adbbda715f20fd0cb09b0519676",
+    "semantic_hash": "f6a61adbbda715f20fd0cb09b0519676"
+  },
+  "package.json": {
+    "mtime": 1772312019.7669683,
+    "seen": 1787206134.843392,
+    "ast_hash": "5b0015cde1f95b4091d42aa534e7c698",
+    "semantic_hash": "5b0015cde1f95b4091d42aa534e7c698"
+  },
+  "src/app.d.ts": {
+    "mtime": 1772222507.0455892,
+    "seen": 1787206134.843394,
+    "ast_hash": "05acebaf24c8362fd66bfa36cfda8edf",
+    "semantic_hash": "05acebaf24c8362fd66bfa36cfda8edf"
+  },
+  "src/lib/acoustics/fluteCalculator.ts": {
+    "mtime": 1767984417.0487754,
+    "seen": 1787206134.843395,
+    "ast_hash": "dcdc235b202a4487fc5d8cc03c282487",
+    "semantic_hash": "dcdc235b202a4487fc5d8cc03c282487"
+  },
+  "src/lib/acoustics/flutomat.ts": {
+    "mtime": 1766459577.1586692,
+    "seen": 1787206134.843395,
+    "ast_hash": "a5c69340084e76d69452787b8fc9acd4",
+    "semantic_hash": "a5c69340084e76d69452787b8fc9acd4"
+  },
+  "src/lib/audio/audioAnalyzer.ts": {
+    "mtime": 1772313719.6438794,
+    "seen": 1787206134.8433962,
+    "ast_hash": "703bb4475f8027255d234a8ef02d6bc2",
+    "semantic_hash": "703bb4475f8027255d234a8ef02d6bc2"
+  },
+  "src/lib/audio/audioCapture.ts": {
+    "mtime": 1772312334.2891386,
+    "seen": 1787206134.8433971,
+    "ast_hash": "2a8833c1fe2b5700073f2a70cd60ac25",
+    "semantic_hash": "2a8833c1fe2b5700073f2a70cd60ac25"
+  },
+  "src/lib/audio/index.ts": {
+    "mtime": 1772313720.2307172,
+    "seen": 1787206134.8433971,
+    "ast_hash": "277b325f305bbace29e19e8c4b642a74",
+    "semantic_hash": "277b325f305bbace29e19e8c4b642a74"
+  },
+  "src/lib/audio/musicTheory.ts": {
+    "mtime": 1767737086.9248447,
+    "seen": 1787206134.8433979,
+    "ast_hash": "fdeb603c571d5b7a0b957d9e27cf542e",
+    "semantic_hash": "fdeb603c571d5b7a0b957d9e27cf542e"
+  },
+  "src/lib/components/Modal.svelte": {
+    "mtime": 1769804237.9295075,
+    "seen": 1787206134.8433979,
+    "ast_hash": "2c0f15e826317624cc03fe028a1193f7",
+    "semantic_hash": "2c0f15e826317624cc03fe028a1193f7"
+  },
+  "src/lib/components/SideNav.svelte": {
+    "mtime": 1772050763.6610997,
+    "seen": 1787206134.8433988,
+    "ast_hash": "ff9ea10c53b6b1d1129be891b2ee34a8",
+    "semantic_hash": "ff9ea10c53b6b1d1129be891b2ee34a8"
+  },
+  "src/lib/components/analysis/ChromaticTuner.svelte": {
+    "mtime": 1772230445.4582112,
+    "seen": 1787206134.8433988,
+    "ast_hash": "12831954b9f6fbc65f0a3fbb26453344",
+    "semantic_hash": "12831954b9f6fbc65f0a3fbb26453344"
+  },
+  "src/lib/components/analysis/DetectionMetrics.svelte": {
+    "mtime": 1772230448.066947,
+    "seen": 1787206134.8434,
+    "ast_hash": "cf853ace98e3e5df44721ea9ca87326b",
+    "semantic_hash": "cf853ace98e3e5df44721ea9ca87326b"
+  },
+  "src/lib/components/analysis/HarmonicsChart.svelte": {
+    "mtime": 1772230446.879832,
+    "seen": 1787206134.8434,
+    "ast_hash": "bbdd015941932bfb7444ff75d52b186f",
+    "semantic_hash": "bbdd015941932bfb7444ff75d52b186f"
+  },
+  "src/lib/components/analysis/HarmonicsList.svelte": {
+    "mtime": 1772230447.4415534,
+    "seen": 1787206134.843401,
+    "ast_hash": "8a59856373c43a2ccd27bc798c484947",
+    "semantic_hash": "8a59856373c43a2ccd27bc798c484947"
+  },
+  "src/lib/components/analysis/QualityMetrics.svelte": {
+    "mtime": 1772230448.72468,
+    "seen": 1787206134.843401,
+    "ast_hash": "b6aff1b53da28456325780d6af54cdee",
+    "semantic_hash": "b6aff1b53da28456325780d6af54cdee"
+  },
+  "src/lib/components/analysis/Spectrogram.svelte": {
+    "mtime": 1772230445.8728256,
+    "seen": 1787206134.843402,
+    "ast_hash": "e670bb41f04467cbbd0fa657b968eb5c",
+    "semantic_hash": "e670bb41f04467cbbd0fa657b968eb5c"
+  },
+  "src/lib/components/analysis/TimbreMetrics.svelte": {
+    "mtime": 1772314279.5752387,
+    "seen": 1787206134.843402,
+    "ast_hash": "edfd69a905c2a0dbd195331a925a0a72",
+    "semantic_hash": "edfd69a905c2a0dbd195331a925a0a72"
+  },
+  "src/lib/components/analysis/Waveform.svelte": {
+    "mtime": 1772312182.8445294,
+    "seen": 1787206134.843403,
+    "ast_hash": "ff871633353fc66e747f2c80cb9b50d3",
+    "semantic_hash": "ff871633353fc66e747f2c80cb9b50d3"
+  },
+  "src/lib/components/generation/Preview3D.svelte": {
+    "mtime": 1773429661.9022534,
+    "seen": 1787206134.843403,
+    "ast_hash": "8c4f72f732b28a0c96aa85a4c2d32bcd",
+    "semantic_hash": "8c4f72f732b28a0c96aa85a4c2d32bcd"
+  },
+  "src/lib/components/generation/cameraAnimations.ts": {
+    "mtime": 1768591918.1360793,
+    "seen": 1787206134.843404,
+    "ast_hash": "aa8befbb83c05e1901a8eae5c3761660",
+    "semantic_hash": "aa8befbb83c05e1901a8eae5c3761660"
+  },
+  "src/lib/components/generation/form-elements/ExportModal.svelte": {
+    "mtime": 1772323512.7473283,
+    "seen": 1787206134.843404,
+    "ast_hash": "e6af0e5e2bf8df4dec517024e4b65122",
+    "semantic_hash": "e6af0e5e2bf8df4dec517024e4b65122"
+  },
+  "src/lib/components/generation/form-elements/FrequencySelector.svelte": {
+    "mtime": 1772230464.3982189,
+    "seen": 1787206134.843405,
+    "ast_hash": "267cd8ff6dc66835c73e6ff30d8ed6dc",
+    "semantic_hash": "267cd8ff6dc66835c73e6ff30d8ed6dc"
+  },
+  "src/lib/components/generation/form-elements/ParameterControl.svelte": {
+    "mtime": 1772230463.4874096,
+    "seen": 1787206134.843406,
+    "ast_hash": "97661689af78974d51f048f863070de5",
+    "semantic_hash": "97661689af78974d51f048f863070de5"
+  },
+  "src/lib/components/generation/form-elements/ToneHoleTable.svelte": {
+    "mtime": 1772230449.287571,
+    "seen": 1787206134.843406,
+    "ast_hash": "05140502e14758f4134ae957292df893",
+    "semantic_hash": "05140502e14758f4134ae957292df893"
+  },
+  "src/lib/components/generation/form-elements/Tooltip.svelte": {
+    "mtime": 1768349620.8409104,
+    "seen": 1787206134.8434072,
+    "ast_hash": "104ddd32a9e7e25840fc42c9b658b229",
+    "semantic_hash": "104ddd32a9e7e25840fc42c9b658b229"
+  },
+  "src/lib/components/generation/generation-steps/MainGeometry.svelte": {
+    "mtime": 1772230444.388414,
+    "seen": 1787206134.8434072,
+    "ast_hash": "7c2c86a355de7330e4aefbe38013fe54",
+    "semantic_hash": "7c2c86a355de7330e4aefbe38013fe54"
+  },
+  "src/lib/components/generation/generation-steps/PlaceToneHoles.svelte": {
+    "mtime": 1772323420.9963934,
+    "seen": 1787206134.8434079,
+    "ast_hash": "217aabc41c8d0ec362ab31c24ee711fa",
+    "semantic_hash": "217aabc41c8d0ec362ab31c24ee711fa"
+  },
+  "src/lib/components/generation/generation-steps/ProcessForPrinting.svelte": {
+    "mtime": 1772323372.3294947,
+    "seen": 1787206134.8434079,
+    "ast_hash": "3d9ff555589ea72ed72d53dadc0988a4",
+    "semantic_hash": "3d9ff555589ea72ed72d53dadc0988a4"
+  },
+  "src/lib/components/generation/generation-steps/designParametersDefault.ts": {
+    "mtime": 1768419868.9377992,
+    "seen": 1787206134.8434088,
+    "ast_hash": "bd981870c85a9eeb313bc0adcda3f1be",
+    "semantic_hash": "bd981870c85a9eeb313bc0adcda3f1be"
+  },
+  "src/lib/components/generation/generation-steps/designParametersInfo.ts": {
+    "mtime": 1770315036.0543835,
+    "seen": 1787206134.8434088,
+    "ast_hash": "4470f82c205b6858c87c50a918cd0b9c",
+    "semantic_hash": "4470f82c205b6858c87c50a918cd0b9c"
+  },
+  "src/lib/components/generation/generation-steps/designParametersValidation.ts": {
+    "mtime": 1768592915.9804263,
+    "seen": 1787206134.84341,
+    "ast_hash": "55d8ea54b5e9fa23a690385808473131",
+    "semantic_hash": "55d8ea54b5e9fa23a690385808473131"
+  },
+  "src/lib/components/generation/geometryManager.ts": {
+    "mtime": 1770398066.0302982,
+    "seen": 1787206134.84341,
+    "ast_hash": "9f784e6fce277c43dced66bc2d961e45",
+    "semantic_hash": "9f784e6fce277c43dced66bc2d961e45"
+  },
+  "src/lib/components/generation/sectionAnalysis.ts": {
+    "mtime": 1773430020.8978536,
+    "seen": 1787206134.843411,
+    "ast_hash": "0125372c39d8a048f5d4752b9703cd71",
+    "semantic_hash": "0125372c39d8a048f5d4752b9703cd71"
+  },
+  "src/lib/components/library/DeletePresetModal.svelte": {
+    "mtime": 1772145458.0088644,
+    "seen": 1787206134.843411,
+    "ast_hash": "3702a23ee9b7fdd1f3fa0141a014c5b5",
+    "semantic_hash": "3702a23ee9b7fdd1f3fa0141a014c5b5"
+  },
+  "src/lib/components/library/EditPresetModal.svelte": {
+    "mtime": 1772145457.5195572,
+    "seen": 1787206134.843412,
+    "ast_hash": "bbdc19a8e27797542d617c577213a94e",
+    "semantic_hash": "bbdc19a8e27797542d617c577213a94e"
+  },
+  "src/lib/components/library/PresetCard.svelte": {
+    "mtime": 1772230466.2106943,
+    "seen": 1787206134.843412,
+    "ast_hash": "6ab075f1301ac886a416e66565c6b596",
+    "semantic_hash": "6ab075f1301ac886a416e66565c6b596"
+  },
+  "src/lib/components/library/SavePresetModal.svelte": {
+    "mtime": 1772145456.9810596,
+    "seen": 1787206134.8434129,
+    "ast_hash": "7230b85d378380126da786ea5e80238e",
+    "semantic_hash": "7230b85d378380126da786ea5e80238e"
+  },
+  "src/lib/components/tabs/DesignerTab.svelte": {
+    "mtime": 1772230442.7209742,
+    "seen": 1787206134.8434129,
+    "ast_hash": "891f031995e53a7116f32442180c3582",
+    "semantic_hash": "891f031995e53a7116f32442180c3582"
+  },
+  "src/lib/components/tabs/LibraryTab.svelte": {
+    "mtime": 1772230443.6117482,
+    "seen": 1787206134.843414,
+    "ast_hash": "723dc895bc74502502512495c017a52d",
+    "semantic_hash": "723dc895bc74502502512495c017a52d"
+  },
+  "src/lib/components/tabs/TimbreAnalysisTab.svelte": {
+    "mtime": 1772313928.6672392,
+    "seen": 1787206134.843414,
+    "ast_hash": "b015e7293e079b059c994e48b42aade8",
+    "semantic_hash": "b015e7293e079b059c994e48b42aade8"
+  },
+  "src/lib/components/tabs/TunerTab.svelte": {
+    "mtime": 1771230271.215283,
+    "seen": 1787206134.843415,
+    "ast_hash": "eb53b6a0427d8c8e7500b1f21a5985da",
+    "semantic_hash": "eb53b6a0427d8c8e7500b1f21a5985da"
+  },
+  "src/lib/components/welcome/WelcomeDialog.svelte": {
+    "mtime": 1772316428.853731,
+    "seen": 1787206134.843415,
+    "ast_hash": "23c128a1c3260fe77e899886293f071c",
+    "semantic_hash": "23c128a1c3260fe77e899886293f071c"
+  },
+  "src/lib/components/welcome/pages/WelcomeAnalysis.svelte": {
+    "mtime": 1772316349.9342837,
+    "seen": 1787206134.843416,
+    "ast_hash": "33ded6c17e05d6495fe65ffd913f54cf",
+    "semantic_hash": "33ded6c17e05d6495fe65ffd913f54cf"
+  },
+  "src/lib/components/welcome/pages/WelcomeDesigner.svelte": {
+    "mtime": 1772316349.5758064,
+    "seen": 1787206134.843416,
+    "ast_hash": "2803fb3a04b6dd036126ed4918f543dd",
+    "semantic_hash": "2803fb3a04b6dd036126ed4918f543dd"
+  },
+  "src/lib/components/welcome/pages/WelcomeIntro.svelte": {
+    "mtime": 1772316348.550432,
+    "seen": 1787206134.8434172,
+    "ast_hash": "5bb39f9e98e8d33a3770b5424805a83c",
+    "semantic_hash": "5bb39f9e98e8d33a3770b5424805a83c"
+  },
+  "src/lib/constants/tuning.ts": {
+    "mtime": 1767181703.0707326,
+    "seen": 1787206134.8434172,
+    "ast_hash": "1c1f19c8bd75d141cbf43d78ccea8c7f",
+    "semantic_hash": "1c1f19c8bd75d141cbf43d78ccea8c7f"
+  },
+  "src/lib/geometry/preview/fullFluteGeometry.ts": {
+    "mtime": 1773430667.2110918,
+    "seen": 1787206134.8434181,
+    "ast_hash": "d57658840b56e1673a02ea93dcc417d2",
+    "semantic_hash": "d57658840b56e1673a02ea93dcc417d2"
+  },
+  "src/lib/geometry/preview/headjointGeometry.ts": {
+    "mtime": 1779143279.1876104,
+    "seen": 1787206134.8434181,
+    "ast_hash": "dda9fc34633ccb3257671f98d53df888",
+    "semantic_hash": "dda9fc34633ccb3257671f98d53df888"
+  },
+  "src/lib/geometry/preview/materials.ts": {
+    "mtime": 1772322864.5005293,
+    "seen": 1787206134.8434188,
+    "ast_hash": "1fe3a2889cda8c4b00c29105c8f01baf",
+    "semantic_hash": "1fe3a2889cda8c4b00c29105c8f01baf"
+  },
+  "src/lib/geometry/preview/printingFluteGeometry.ts": {
+    "mtime": 1773430510.0035384,
+    "seen": 1787206134.8434188,
+    "ast_hash": "1cf2751a7e8be1a7735ea18704673624",
+    "semantic_hash": "1cf2751a7e8be1a7735ea18704673624"
+  },
+  "src/lib/geometry/preview/sceneAnnotations.ts": {
+    "mtime": 1772323219.9912984,
+    "seen": 1787206134.8434198,
+    "ast_hash": "026b9365bdb0a348a2783f07ebb81d2d",
+    "semantic_hash": "026b9365bdb0a348a2783f07ebb81d2d"
+  },
+  "src/lib/geometry/preview/sceneSetup.ts": {
+    "mtime": 1772322865.184737,
+    "seen": 1787206134.8434198,
+    "ast_hash": "22c02d6aed7c89e39a36f2485a2f447f",
+    "semantic_hash": "22c02d6aed7c89e39a36f2485a2f447f"
+  },
+  "src/lib/geometry/replicad/ReplicadViewer.svelte": {
+    "mtime": 1771883461.5565543,
+    "seen": 1787206134.843421,
+    "ast_hash": "c8f0982a12c0ada02fccf477d78f4ae0",
+    "semantic_hash": "c8f0982a12c0ada02fccf477d78f4ae0"
+  },
+  "src/lib/geometry/replicad/fluteCAD.ts": {
+    "mtime": 1772323482.6338418,
+    "seen": 1787206134.843421,
+    "ast_hash": "4010768d51f3cecd1c5bee7a96d317a8",
+    "semantic_hash": "4010768d51f3cecd1c5bee7a96d317a8"
+  },
+  "src/lib/geometry/replicad/worker.ts": {
+    "mtime": 1770834169.3837628,
+    "seen": 1787206134.843422,
+    "ast_hash": "01eecbfa7e2dd58ae91ab8674cd87b72",
+    "semantic_hash": "01eecbfa7e2dd58ae91ab8674cd87b72"
+  },
+  "src/lib/geometry/utils/createTubeGeometry.ts": {
+    "mtime": 1773430329.3901083,
+    "seen": 1787206134.843422,
+    "ast_hash": "c59903b1ec6791a5520f8c4aa291c625",
+    "semantic_hash": "c59903b1ec6791a5520f8c4aa291c625"
+  },
+  "src/lib/stores/audioStore.ts": {
+    "mtime": 1766630880.7160225,
+    "seen": 1787206134.843423,
+    "ast_hash": "d37aaf51cda5bd387011ce69c682cfc0",
+    "semantic_hash": "d37aaf51cda5bd387011ce69c682cfc0"
+  },
+  "src/lib/stores/fluteStore.ts": {
+    "mtime": 1772059309.144216,
+    "seen": 1787206134.843423,
+    "ast_hash": "e6cef00edb17554396c8c0550b8e6653",
+    "semantic_hash": "e6cef00edb17554396c8c0550b8e6653"
+  },
+  "src/lib/stores/libraryStore.ts": {
+    "mtime": 1772140691.044221,
+    "seen": 1787206134.843424,
+    "ast_hash": "90c53c0dde4b70dac378f25f4b1aff5f",
+    "semantic_hash": "90c53c0dde4b70dac378f25f4b1aff5f"
+  },
+  "src/lib/stores/meshStore.ts": {
+    "mtime": 1771230296.0142932,
+    "seen": 1787206134.843424,
+    "ast_hash": "5d896a07ce955e23d85011b2f6a71278",
+    "semantic_hash": "5d896a07ce955e23d85011b2f6a71278"
+  },
+  "src/lib/stores/onboardingStore.ts": {
+    "mtime": 1772316345.7768266,
+    "seen": 1787206134.843425,
+    "ast_hash": "def10e9f63dbc01d0a99a9616830139a",
+    "semantic_hash": "def10e9f63dbc01d0a99a9616830139a"
+  },
+  "src/lib/stores/uiStore.ts": {
+    "mtime": 1770839660.9294007,
+    "seen": 1787206134.843425,
+    "ast_hash": "b8681e378423652f8e36eb0ed06450d9",
+    "semantic_hash": "b8681e378423652f8e36eb0ed06450d9"
+  },
+  "src/lib/utils/fluteCalculationHelper.ts": {
+    "mtime": 1768350811.596446,
+    "seen": 1787206134.843426,
+    "ast_hash": "f4635b573f227745971fd0592708f229",
+    "semantic_hash": "f4635b573f227745971fd0592708f229"
+  },
+  "src/lib/utils/localStorageStore.ts": {
+    "mtime": 1770839659.8858545,
+    "seen": 1787206134.843426,
+    "ast_hash": "cdd17caf46829de4b4f1be4f9a4328d2",
+    "semantic_hash": "cdd17caf46829de4b4f1be4f9a4328d2"
+  },
+  "src/lib/utils/spectrogramRenderer.ts": {
+    "mtime": 1772312591.6141691,
+    "seen": 1787206134.8434272,
+    "ast_hash": "25490f48980246ea02356806e00f3455",
+    "semantic_hash": "25490f48980246ea02356806e00f3455"
+  },
+  "src/routes/+layout.svelte": {
+    "mtime": 1772222509.196125,
+    "seen": 1787206134.8434272,
+    "ast_hash": "4e30aca02bbd39c0d3a055091387798c",
+    "semantic_hash": "4e30aca02bbd39c0d3a055091387798c"
+  },
+  "src/routes/+page.svelte": {
+    "mtime": 1772316344.719954,
+    "seen": 1787206134.8434281,
+    "ast_hash": "dbb0d50b3ce2110bd312f1a0a0b3b666",
+    "semantic_hash": "dbb0d50b3ce2110bd312f1a0a0b3b666"
+  },
+  "svelte.config.js": {
+    "mtime": 1772222434.0007145,
+    "seen": 1787206134.8434281,
+    "ast_hash": "69c8e36640697bdc22803aa72bce1054",
+    "semantic_hash": "69c8e36640697bdc22803aa72bce1054"
+  },
+  "tsconfig.json": {
+    "mtime": 1766391342.8171735,
+    "seen": 1787206134.843429,
+    "ast_hash": "c610e6d5aeb2c3bcf0b9f1b90599250e",
+    "semantic_hash": "c610e6d5aeb2c3bcf0b9f1b90599250e"
+  },
+  "vite.config.ts": {
+    "mtime": 1772222508.2579799,
+    "seen": 1787206134.843429,
+    "ast_hash": "2e0dd1effe655744424cd482de732d4c",
+    "semantic_hash": "2e0dd1effe655744424cd482de732d4c"
+  },
+  ".pi/agent/skills/graphify/SKILL.md": {
+    "mtime": 1787205977.3571362,
+    "seen": 1787206134.8434298,
+    "ast_hash": "1656a8a8e4a05bbe69f32cd15de81e87",
+    "semantic_hash": "1656a8a8e4a05bbe69f32cd15de81e87"
+  },
+  ".pi/agent/skills/graphify/references/add-watch.md": {
+    "mtime": 1787205862.151594,
+    "seen": 1787206134.8434298,
+    "ast_hash": "d59d027fe449f06aa03905a01184e779",
+    "semantic_hash": "d59d027fe449f06aa03905a01184e779"
+  },
+  ".pi/agent/skills/graphify/references/exports.md": {
+    "mtime": 1787205862.1517215,
+    "seen": 1787206134.843431,
+    "ast_hash": "9da2a2152e60a22f07f05fed5158f287",
+    "semantic_hash": "9da2a2152e60a22f07f05fed5158f287"
+  },
+  ".pi/agent/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1787205862.1519368,
+    "seen": 1787206134.843431,
+    "ast_hash": "bf895ec4d4e40f5f66f7d31c2a9bd4a7",
+    "semantic_hash": "bf895ec4d4e40f5f66f7d31c2a9bd4a7"
+  },
+  ".pi/agent/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1787205862.1521409,
+    "seen": 1787206134.843432,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": "cde13df085e4c492aeb7ba298a996d0d"
+  },
+  ".pi/agent/skills/graphify/references/hooks.md": {
+    "mtime": 1787205862.1522338,
+    "seen": 1787206134.843432,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": "3f545db6ce646650bb9de588f5512a27"
+  },
+  ".pi/agent/skills/graphify/references/query.md": {
+    "mtime": 1787205862.1525087,
+    "seen": 1787206134.843433,
+    "ast_hash": "3c46f8ad006874260614ed8657d02307",
+    "semantic_hash": "3c46f8ad006874260614ed8657d02307"
+  },
+  ".pi/agent/skills/graphify/references/transcribe.md": {
+    "mtime": 1787205862.152704,
+    "seen": 1787206134.843433,
+    "ast_hash": "67b6a5fa6c0974e18f60db9f8932fbd8",
+    "semantic_hash": "67b6a5fa6c0974e18f60db9f8932fbd8"
+  },
+  ".pi/agent/skills/graphify/references/update.md": {
+    "mtime": 1787205862.152861,
+    "seen": 1787206134.843434,
+    "ast_hash": "9378bd03d56baaf78bd738ab3848f142",
+    "semantic_hash": "9378bd03d56baaf78bd738ab3848f142"
+  },
+  "README.md": {
+    "mtime": 1768376378.1792285,
+    "seen": 1787206134.843434,
+    "ast_hash": "dd92a1a82f743e2c53fa77b65e7f197f",
+    "semantic_hash": "dd92a1a82f743e2c53fa77b65e7f197f"
+  },
+  "src/app.html": {
+    "mtime": 1772222122.7595947,
+    "seen": 1787206134.843435,
+    "ast_hash": "0a80cf7b52095d9f1cbb5dcdbe105ce2",
+    "semantic_hash": "0a80cf7b52095d9f1cbb5dcdbe105ce2"
+  },
+  "static/robots.txt": {
+    "mtime": 1766391342.8141801,
+    "seen": 1787206134.843435,
+    "ast_hash": "d2ab914a1820906bd49451cb0a108119",
+    "semantic_hash": "d2ab914a1820906bd49451cb0a108119"
+  },
+  "src/lib/assets/favicon.png": {
+    "mtime": 1766632107.8830454,
+    "seen": 1787206134.843436,
+    "ast_hash": "d3cbc9a5d1cb5f512bc5e202ec52e754",
+    "semantic_hash": "d3cbc9a5d1cb5f512bc5e202ec52e754"
+  },
+  "src/lib/assets/favicon2.png": {
+    "mtime": 1766631234.7751522,
+    "seen": 1787206134.843436,
+    "ast_hash": "5d22e8cd4fe006a85a43d00383a25ebd",
+    "semantic_hash": "5d22e8cd4fe006a85a43d00383a25ebd"
+  },
+  "src/lib/assets/section-cut.svg": {
+    "mtime": 1773428678.0050938,
+    "seen": 1787206134.843437,
+    "ast_hash": "f3ed43589cbba089cf6733347676d491",
+    "semantic_hash": "f3ed43589cbba089cf6733347676d491"
+  },
+  "static/pwa-192x192.png": {
+    "mtime": 1772222038.696717,
+    "seen": 1787206134.8434381,
+    "ast_hash": "7d44e3b69ef120e72109abae764dd0ed",
+    "semantic_hash": "7d44e3b69ef120e72109abae764dd0ed"
+  },
+  "static/pwa-512x512.png": {
+    "mtime": 1772222038.7407215,
+    "seen": 1787206134.843443,
+    "ast_hash": "3e857e123006f3c6ce38563d365af915",
+    "semantic_hash": "3e857e123006f3c6ce38563d365af915"
+  }
+}

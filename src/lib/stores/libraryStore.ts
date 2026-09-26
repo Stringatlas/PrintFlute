@@ -1,11 +1,7 @@
 import { get } from 'svelte/store';
 import { localStorageStore } from '$lib/utils/localStorageStore';
-import {
-	fluteParams,
-	toneHoleParams,
-	type FluteParameters,
-	type ToneHoleParameters
-} from './fluteStore';
+import type { FluteParameters, ToneHoleParameters } from '$lib/domain/fluteTypes';
+import { fluteParams, toneHoleParams } from './fluteStore';
 
 export interface FlutePreset {
 	id: string;

@@ -1,22 +1,17 @@
 import * as THREE from 'three';
-import type { FluteParameters, ToneHoleParameters } from '../../stores/fluteStore';
+import type { ResolvedDesignSnapshot, ThreePreviewResult } from '$lib/api/generation';
 import { createFullFluteGeometry } from './fullFluteGeometry';
 import { addLabel } from './sceneAnnotations';
 import { createCutLineMaterial, createConnectorMaterial } from './materials';
 import { createTubeGeometry } from '../utils/createTubeGeometry';
+import { getPreviewBodySemantics } from './bodySemantics';
 
 // TODO: Visualize fillet on three.js scene
-interface PrintingFluteGeometryResult {
-	group: THREE.Group;
-	dispose: () => void;
-}
-
-export function createPrintingFluteGeometry(
-	fluteParams: FluteParameters,
-	toneHoleParams: ToneHoleParameters
-): PrintingFluteGeometryResult {
-	const result = createFullFluteGeometry(fluteParams, toneHoleParams);
-	const group = result.group;
+export function createPrintingFluteGeometry(snapshot: ResolvedDesignSnapshot): ThreePreviewResult {
+	const fluteParams = snapshot.design.flute;
+	const semantics = getPreviewBodySemantics(snapshot);
+	const result = createFullFluteGeometry(snapshot);
+	const group = result.root as THREE.Group;
 	
 	const geometries: THREE.BufferGeometry[] = [];
 	const materials: THREE.Material[] = [];
@@ -29,18 +24,18 @@ export function createPrintingFluteGeometry(
 	materials.push(connectorMaterial);
 	
 	const outerRadius = fluteParams.boreDiameter / 2 + fluteParams.wallThickness;
-	const centerOffset = -fluteParams.fluteLength / 2;
 	const tubeRadius = 0.5;
 	const connectorLength = fluteParams.connectorLength;
 	const connectorInnerRadius = fluteParams.boreDiameter / 2;
 	
-	fluteParams.cutDistances.forEach((cutDistance, index) => {
+	semantics.cuts.forEach((cut, index) => {
+		const cutDistance = cut.bodyDistance;
 		if (cutDistance > 0 && cutDistance < fluteParams.fluteLength) {
 			const circlePoints: THREE.Vector3[] = [];
 			for (let i = 0; i <= 64; i++) {
 				const angle = (i / 64) * Math.PI * 2;
 				circlePoints.push(new THREE.Vector3(
-					centerOffset + cutDistance,
+					cut.previewX,
 					outerRadius * Math.cos(angle),
 					outerRadius * Math.sin(angle)
 				));
@@ -74,7 +69,7 @@ export function createPrintingFluteGeometry(
 				innerRadius: outerRadius - 0.1,
 				length: connectorLength,
 				axis: 'x',
-				center: new THREE.Vector3(centerOffset + cutDistance + connectorLength / 2, 0, 0)
+				center: new THREE.Vector3(cut.previewX + connectorLength / 2, 0, 0)
 			});
 			const rightConnectorMesh = new THREE.Mesh(rightConnectorGeometry, connectorMaterial);
 			group.add(rightConnectorMesh);
@@ -83,7 +78,7 @@ export function createPrintingFluteGeometry(
 			const spriteWidth = 20;
 			const zOffset = outerRadius + spriteWidth / 2 + 5;
 			const label = addLabel(group, `Cut ${index + 1}`, {
-				x: centerOffset + cutDistance,
+				x: cut.previewX,
 				y: 0,
 				z: zOffset
 			});
@@ -91,12 +86,15 @@ export function createPrintingFluteGeometry(
 		}
 	});
 	
+	let disposed = false;
 	const dispose = () => {
+		if (disposed) return;
+		disposed = true;
 		result.dispose();
 		geometries.forEach(geom => geom.dispose());
 		materials.forEach(mat => mat.dispose());
 		labelDisposers.forEach(fn => fn());
 	};
 	
-	return { group, dispose };
+	return { root: group, dispose };
 }

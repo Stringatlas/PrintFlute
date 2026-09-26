@@ -1,29 +1,24 @@
 <script lang="ts">
 	import { viewMode } from '$lib/stores/uiStore';
+	import type { ParameterFieldSchema } from '$lib/domain/designSchema';
 	import Tooltip from './Tooltip.svelte';
 
-	export let label: string;
+	export let field: ParameterFieldSchema;
+	export let label: string | undefined = undefined;
 	export let value: number | boolean;
-	export let min: number | undefined = undefined;
-	export let max: number | undefined = undefined;
-	export let step: number = 1;
-	export let unit: string = '';
-	export let inputType: 'slider' | 'number' | 'checkbox' = 'number';
 
-	const inputId = `param-${label.replace(/\s+/g, '-').toLowerCase()}`;
-	export let visibility: 'always' | 'basic' | 'advanced' = 'always';
 	export let validate: ((value: number) => { status: 'success' | 'warning' | 'error'; message?: string }) | undefined = undefined;
 	export let getDefault: () => number | boolean;
 	export let onChange: (value: number | boolean) => void;
-	export let info: string | undefined = undefined;
 
 	// Computed parameter props
-	export let isComputed: boolean = false;
 	export let computedMode: 'auto' | 'manual' | undefined = undefined;
 	export let onResetComputed: (() => void) | undefined = undefined;
 
 	import { browser } from '$app/environment';
 
+	$: displayLabel = label ?? field.label;
+	$: inputId = `param-${field.path.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`;
 	let localValue = String(value);
 	$: if (!browser || document.activeElement?.id !== inputId) {
 		localValue = String(value);
@@ -63,9 +58,13 @@
 	}
 
 	$: isDefault = value === getDefault();
+	$: isComputed = field.autoManual === true;
 	$: isAutoMode = isComputed && computedMode === 'auto';
-	$: validationResult = validate && typeof value === 'number' ? validate(value) : { status: 'success' as const };
-	$: isVisible = visibility === 'always' || $viewMode === visibility;
+	$: fieldValidator = validate ?? field.validate;
+	$: validationResult = fieldValidator && typeof value === 'number'
+		? fieldValidator(value)
+		: { status: 'success' as const };
+	$: isVisible = field.visibility === 'always' || $viewMode === field.visibility;
 	$: borderColor = validationResult.status === 'error' 
 		? 'border-red-500' 
 		: validationResult.status === 'warning' 
@@ -77,9 +76,9 @@
 	<div class="flex flex-col gap-2">
 		<div class="flex items-center justify-between">
 			<div class="flex items-center gap-2">
-				<label for={inputId} class="label">{label}</label>
-				{#if info && validationResult.status === 'success'}
-					<Tooltip text={info} type="info" />
+				<label for={inputId} class="label">{displayLabel}</label>
+				{#if field.tooltip && validationResult.status === 'success'}
+					<Tooltip text={field.tooltip} type="info" />
 				{:else if validationResult.status !== 'success' && validationResult.message}
 					<Tooltip text={validationResult.message} type={validationResult.status} />
 				{/if}
@@ -99,7 +98,7 @@
 						</button>
 					{/if}
 				</div>
-			{:else}
+			{:else if !field.readOnly}
 				<button
 					on:click={resetToDefault}
 					disabled={isDefault}
@@ -111,19 +110,22 @@
 			{/if}
 		</div>
 		<div class="flex items-center gap-2">
-			{#if inputType === 'slider'}
+			{#if field.readOnly}
+				<span class="input-number {borderColor}" aria-readonly="true">{value}</span>
+				<span class="text-muted min-w-15">{field.unit}</span>
+			{:else if field.input === 'slider'}
 				<input
 					id={inputId}
 					type="range"
-					{min}
-					{max}
-					{step}
+					min={field.bounds?.min}
+					max={field.bounds?.max}
+					step={field.step ?? 1}
 					{value}
 					on:input={handleSliderInput}
 					class="input-slider"
 				/>
-				<span class="text-muted min-w-15 text-right">{value}{unit}</span>
-			{:else if inputType === 'checkbox'}
+				<span class="text-muted min-w-15 text-right">{value}{field.unit}</span>
+			{:else if field.input === 'checkbox'}
 				<input
 					id={inputId}
 					type="checkbox"
@@ -135,15 +137,15 @@
 				<input
 					id={inputId}
 					type="number"
-					{min}
-					{max}
-					{step}
+					min={field.bounds?.min}
+					max={field.bounds?.max}
+					step={field.step ?? 1}
 					bind:value={localValue}
 					on:blur={handleNumberCommit}
 					on:keydown={handleNumberKeydown}
 					class="input-number {borderColor}"
 				/>
-				<span class="text-muted min-w-15">{unit}</span>
+				<span class="text-muted min-w-15">{field.unit}</span>
 			{/if}
 		</div>
 	</div>

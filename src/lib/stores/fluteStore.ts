@@ -1,150 +1,98 @@
-import { writable, get } from 'svelte/store';
+import { derived, get, type Readable } from 'svelte/store';
+import { localGenerationApi } from '$lib/api/generation/local';
+import type { ComputedParameter, FluteParameters, ToneHoleParameters } from '$lib/domain/fluteTypes';
+import { DesignController } from '$lib/services/designController';
+import {
+	DEFAULT_FLUTE_PARAMETERS,
+	DEFAULT_TONE_HOLE_PARAMETERS,
+	normalizeFluteParameters,
+	normalizeToneHoleParameters
+} from '$lib/services/designNormalization';
 import { localStorageStore } from '$lib/utils/localStorageStore';
+import { validateDesign, type ValidationIssue } from '$lib/validation/designParameters';
 
-export type ComputedParameter<T> = {
-	mode: 'auto' | 'manual';
-	value?: T;
-};
+// Compatibility exports; new code should import domain types from $lib/domain/fluteTypes.
+export type { ComputedParameter, FluteParameters, ToneHoleParameters } from '$lib/domain/fluteTypes';
 
-export interface FluteParameters {
-	// Physical Parameters
-	boreDiameter: number;
-	wallThickness: number;
-	hasThumbHole: boolean;
-	thumbHoleDiameter: number;
-	thumbHoleAngle: number;
-	overhangLength: number;
-	corkDistance: ComputedParameter<number>;
-	corkThickness: ComputedParameter<number>;
-	
-	// Embouchure Hole Parameters
-	embouchureHoleLength: number;
-	embouchureHoleWidth: number;
-	lipCoveragePercent: number;
-	embouchureDistance: number;
-	fluteLength: number;
-	
-	// Tuning Parameters
-	numberOfToneHoles: number;
-	fundamentalFrequency: number;
-	
-	// Printing Parameters
-	toneHoleFilletRadius: number;
-	connectorLength: number;
-	numberOfCuts: number;
-	cutDistances: number[];
-}
+export const DEFAULT_PARAMETERS = DEFAULT_FLUTE_PARAMETERS;
+export const DEFAULT_TONEHOLE_PARAMETERS = DEFAULT_TONE_HOLE_PARAMETERS;
+export { normalizeFluteParameters, normalizeToneHoleParameters };
 
-export const DEFAULT_PARAMETERS: FluteParameters = {
-	boreDiameter: 14.3,
-	wallThickness: 2.5,
-	hasThumbHole: true,
-	thumbHoleDiameter: 6,
-	thumbHoleAngle: 0,
-	overhangLength: 20,
-	corkDistance: { mode: 'auto' },
-	corkThickness: { mode: 'auto' },
-	embouchureHoleLength: 9.5,
-	embouchureHoleWidth: 9.5,
-	lipCoveragePercent: 5,
-	embouchureDistance: 0,
-	fluteLength: 0,
-	numberOfToneHoles: 6,
-	fundamentalFrequency: 587.33,
-	toneHoleFilletRadius: 1.5,
-	connectorLength: 15,
-	numberOfCuts: 1,
-	cutDistances: [180],
-};
+const persistedFluteParams = localStorageStore(
+	'flute-generator-parameters',
+	DEFAULT_PARAMETERS,
+	{ normalize: normalizeFluteParameters }
+);
+const persistedToneHoleParams = localStorageStore(
+	'flute-generator-tone-holes',
+	DEFAULT_TONEHOLE_PARAMETERS,
+	{ normalize: normalizeToneHoleParameters }
+);
+
+export const designController = new DesignController(localGenerationApi, {
+	flute: get(persistedFluteParams),
+	toneHoles: get(persistedToneHoleParams)
+});
+
+designController.design.subscribe((design) => {
+	persistedFluteParams.set(design.flute);
+	persistedToneHoleParams.set(design.toneHoles);
+});
 
 function createFluteStore() {
-	const { subscribe, set, update } = localStorageStore<FluteParameters>('flute-generator-parameters', { ...DEFAULT_PARAMETERS });
-
+	const store = derived(designController.design, (design) => design.flute);
 	return {
-		subscribe,
-		updateParameter: <K extends keyof FluteParameters>(key: K, value: FluteParameters[K]) => {
-			update(params => ({ ...params, [key]: value }));
+		subscribe: store.subscribe,
+		updateParameter: <K extends keyof FluteParameters>(key: K, value: FluteParameters[K]) =>
+			designController.set(`flute.${key}`, value),
+		resetParameter: <K extends keyof FluteParameters>(key: K) =>
+			designController.set(`flute.${key}`, DEFAULT_PARAMETERS[key]),
+		setComputedOverride: (key: 'corkDistance' | 'corkThickness', value: number) =>
+			designController.set(`flute.${key}`, { mode: 'manual', value }),
+		resetComputedToAuto: (key: 'corkDistance' | 'corkThickness') =>
+			designController.set(`flute.${key}`, { mode: 'auto' }),
+		resetAll: () =>
+			designController.replace({
+				flute: DEFAULT_PARAMETERS,
+				toneHoles: get(designController.design).toneHoles
+			})
+	};
+}
+
+function createToneHoleStore() {
+	const store = derived(designController.design, (design) => design.toneHoles);
+	const updateArray = (key: keyof ToneHoleParameters, index: number, value: number) =>
+		designController.set(`toneHoles.${key}.${index}`, value);
+	return {
+		subscribe: store.subscribe,
+		updateHoleDiameter: (index: number, value: number) => updateArray('holeDiameters', index, value),
+		updateHoleCents: (index: number, value: number) => updateArray('holeCents', index, value),
+		updateHoleDistance: (index: number, value: number) => updateArray('holeDistances', index, value),
+		updateCutoffRatio: (index: number, value: number) => updateArray('cutoffRatios', index, value),
+		updateToneHoleParams: (params: Partial<ToneHoleParameters>) => {
+			const design = get(designController.design);
+			return designController.replace({
+				flute: design.flute,
+				toneHoles: { ...design.toneHoles, ...params }
+			});
 		},
-		resetParameter: <K extends keyof FluteParameters>(key: K) => {
-			update(params => ({ ...params, [key]: DEFAULT_PARAMETERS[key] }));
-		},
-		setComputedOverride: (key: 'corkDistance' | 'corkThickness', value: number) => {
-			update(params => ({
-				...params,
-				[key]: { mode: 'manual' as const, value }
-			}));
-		},
-		resetComputedToAuto: (key: 'corkDistance' | 'corkThickness') => {
-			update(params => ({
-				...params,
-				[key]: { mode: 'auto' as const }
-			}));
-		},
-		resetAll: () => {
-			set({ ...DEFAULT_PARAMETERS });
-		},
+		resetAll: () =>
+			designController.replace({
+				flute: get(designController.design).flute,
+				toneHoles: DEFAULT_TONEHOLE_PARAMETERS
+			})
 	};
 }
 
 export const fluteParams = createFluteStore();
-
-export interface ToneHoleParameters {
-	holeDiameters: number[];
-	holeCents: number[];
-	holeDistances: number[];
-	cutoffRatios: number[];
-}
-
-export const DEFAULT_TONEHOLE_PARAMETERS: ToneHoleParameters = {
-	holeDiameters: [7.5, 8, 5, 6, 6.5, 5.5],
-	holeCents: [200, 400, 500, 700, 900, 1100, 1200, 1400],
-	holeDistances: [0, 0, 0, 0, 0, 0],
-	cutoffRatios: [0, 0, 0, 0, 0, 0],
-};
-
-function createToneHoleStore() {
-	const { subscribe, set, update } = localStorageStore<ToneHoleParameters>('flute-generator-tone-holes', { ...DEFAULT_TONEHOLE_PARAMETERS });
-
-	return {
-		subscribe,
-		updateHoleDiameter: (index: number, value: number) => {
-			update(params => {
-				const newDiameters = [...params.holeDiameters];
-				newDiameters[index] = value;
-				return { ...params, holeDiameters: newDiameters };
-			});
-		},
-		updateHoleCents: (index: number, value: number) => {
-			update(params => {
-				const newCents = [...params.holeCents];
-				newCents[index] = value;
-				return { ...params, holeCents: newCents };
-			});
-		},
-		updateHoleDistance: (index: number, value: number) => {
-			update(params => {
-				const newDistances = [...params.holeDistances];
-				newDistances[index] = value;
-				return { ...params, holeDistances: newDistances };
-			});
-		},
-		updateCutoffRatio: (index: number, value: number) => {
-			update(params => {
-				const newRatios = [...params.cutoffRatios];
-				newRatios[index] = value;
-				return { ...params, cutoffRatios: newRatios };
-			});
-		},
-		updateToneHoleParams: (params: Partial<ToneHoleParameters>) => {
-			update(current => ({
-				...current,
-				...params
-			}));
-		},
-		resetAll: () => {
-			set({ ...DEFAULT_TONEHOLE_PARAMETERS });
-		},
-	};
-}
-
 export const toneHoleParams = createToneHoleStore();
+export const resolvedDesignSnapshot = designController.snapshot;
+export const generationPending = designController.pending;
+export const generationError = designController.error;
+export const designRevision = designController.revision;
+
+/** A single source of truth for form summaries and future step/export guards. */
+export const designValidation: Readable<ValidationIssue[]> = derived(
+	[fluteParams, toneHoleParams],
+	([$fluteParams, $toneHoleParams]) => validateDesign($fluteParams, $toneHoleParams)
+);

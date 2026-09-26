@@ -1,52 +1,11 @@
 <script lang="ts">
 	import { toneHoleParams } from '$lib/stores/fluteStore';
     import { viewMode } from '$lib/stores/uiStore';
-	import { DIATONIC_SCALE_CENTS } from '$lib/audio/musicTheory';
-    import { validateDiameter } from '$lib/components/generation/generation-steps/designParametersValidation';
-	import { calculatedFluteData, calculationError, updateCalculatedValues } from '$lib/utils/fluteCalculationHelper';
+	import { calculationError } from '$lib/utils/fluteCalculationHelper';
+	import { TONE_HOLE_COLUMNS, TONE_HOLE_FIELDS } from '$lib/domain/designSchema';
 	import Tooltip from './Tooltip.svelte';
 
 	export let numberOfHoles: number;
-
-	interface ColumnInfo {
-		key: string;
-		label: string;
-		info: string;
-		visibility: 'always' | 'advanced';
-	}
-
-	const columns: ColumnInfo[] = [
-		{
-			key: 'number',
-			label: 'Hole',
-			info: 'Hole number counting from the first tone hole (closest to embouchure)',
-			visibility: 'always'
-		},
-		{
-			key: 'diameter',
-			label: 'Diameter (mm)',
-			info: 'The diameter of the tone hole. Larger holes produce louder sound and affect tuning',
-			visibility: 'always'
-		},
-		{
-			key: 'pitch',
-			label: 'Pitch (cents)',
-			info: 'Number of cents above the fundamental frequency when this hole is open (diatonic scale)',
-			visibility: 'advanced'
-		},
-		{
-			key: 'distance',
-			label: 'Distance (mm)',
-			info: 'Distance from the base of the flute to the center of this tone hole',
-			visibility: 'always'
-		},
-		{
-			key: 'cutoff',
-			label: 'Cutoff Ratio',
-			info: 'Ratio of cutoff frequency to the note frequency. Affects tone quality and response',
-			visibility: 'advanced'
-		}
-	];
 
 	function handleDiameterInput(index: number, event: Event) {
 		const target = event.target as HTMLInputElement;
@@ -64,30 +23,18 @@
 		}
 	}
 
-	$: visibleColumns = columns.filter(col => 
+	$: visibleColumns = TONE_HOLE_COLUMNS.filter(col =>
 		col.visibility === 'always' || $viewMode === 'advanced'
 	);
-
-	$: {
-		for (let i = 0; i < numberOfHoles; i++) {
-			if ($toneHoleParams.holeCents[i] === undefined || $toneHoleParams.holeCents[i] === 0) {
-				if (i + 1 < DIATONIC_SCALE_CENTS.length) {
-					toneHoleParams.updateHoleCents(i, DIATONIC_SCALE_CENTS[i + 1]);
-				}
-			}
-		}
-	}
-
-	$: {
-		updateCalculatedValues($calculatedFluteData, numberOfHoles);
-	}
 
 	let validationResults: Record<number, { status: 'success' | 'warning' | 'error'; message?: string }> = {};
 
 	$: {
 		validationResults = {};
 		for (let i = 0; i < numberOfHoles; i++) {
-			validationResults[i] = validateDiameter($toneHoleParams.holeDiameters[i] || 8);
+			validationResults[i] = TONE_HOLE_FIELDS.holeDiameters.validate?.(
+				$toneHoleParams.holeDiameters[i] ?? 8
+			) ?? { status: 'success' };
 		}
 	}
 </script>
@@ -113,9 +60,9 @@
 				{#each visibleColumns as column}
 					<th class="table-header-cell">
 						<div class="flex items-center gap-2">
-							<span>{column.label}</span>
+							<span>{column.label}{column.unit ? ` (${column.unit})` : ''}</span>
 							<div class="font-normal">
-								<Tooltip text={column.info} type="info" />
+								<Tooltip text={column.tooltip} type="info" />
 							</div>
 						</div>
 					</th>
@@ -133,10 +80,10 @@
 								<div class="flex items-center gap-2">
 									<input
 										type="number"
-										value={$toneHoleParams.holeDiameters[index] || 8}
-										min={3}
-										max={15}
-										step={0.5}
+										value={$toneHoleParams.holeDiameters[index] ?? 8}
+										min={TONE_HOLE_FIELDS.holeDiameters.bounds?.min}
+										max={TONE_HOLE_FIELDS.holeDiameters.bounds?.max}
+										step={TONE_HOLE_FIELDS.holeDiameters.step}
 										on:input={(e) => handleDiameterInput(index, e)}
 										class="w-20 px-2 py-1 bg-gray-800 border {validationResults[index]?.status === 'error' 
 											? 'border-red-500' 
@@ -152,9 +99,9 @@
 								<input
 									type="number"
 									value={$toneHoleParams.holeCents[index]}
-									min={0}
-									max={2400}
-									step={1}
+									min={TONE_HOLE_FIELDS.holeCents.bounds?.min}
+									max={TONE_HOLE_FIELDS.holeCents.bounds?.max}
+									step={TONE_HOLE_FIELDS.holeCents.step}
 									on:input={(e) => handleCentsInput(index, e)}
 									class="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-200 focus:outline-none focus:border-primary-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 								/>

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { FluteParameters } from '$lib/stores/fluteStore';
+import type { FluteParameters } from '$lib/domain/fluteTypes';
 
 export interface CameraPose {
 	position: THREE.Vector3;

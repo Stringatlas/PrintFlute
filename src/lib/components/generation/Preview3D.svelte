@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
-    import { currentDesignStep } from '$lib/stores/uiStore';
-	import { fluteParams, toneHoleParams, type FluteParameters } from '$lib/stores/fluteStore';
+	import { currentDesignStep } from '$lib/stores/uiStore';
+	import type { ResolvedDesignSnapshot } from '$lib/api/generation';
+	import type { FluteParameters } from '$lib/domain/fluteTypes';
+	import { fluteParams, toneHoleParams } from '$lib/stores/fluteStore';
 	import { createThreeScene, handleCanvasResize } from '$lib/geometry/preview/sceneSetup';
 	import { applySectionCut, restoreOriginalGeometry } from './sectionAnalysis';
 	import { 
@@ -12,9 +14,17 @@
 		BIRDS_EYE_VIEW_POSE,
 		type ParameterTrigger 
 	} from './cameraAnimations';
-	import { createGeometryForStep } from './geometryManager';
+	import {
+		createLegacyPreviewSnapshot,
+		previewKindForStep,
+		threePreviewService
+	} from './geometryManager';
 	import sectionCutIcon from '$lib/assets/section-cut.svg';
 
+	/** Prefer the central evaluator snapshot; omitted while legacy route wiring remains. */
+	export let snapshot: ResolvedDesignSnapshot | null = null;
+
+	const GEOMETRY_DEBOUNCE_MS = 60;
 	let sectionAnalysisEnabled = false;
 	let automaticSectionAnalysisEnabled = false;
 	let sectionAnalysisOverride: boolean | null = null;
@@ -27,8 +37,15 @@
 	let controls: import('three/addons/controls/OrbitControls.js').OrbitControls;
 	let animationId: number;
 	let geometryGroup: THREE.Group | null = null;
+	let previewRoot: THREE.Group | null = null;
+	let renderedSnapshot: ResolvedDesignSnapshot | null = null;
 	let disposeGeometry: (() => void) | null = null;
 	let disposeScene: (() => void) | null = null;
+	let geometryTimer: ReturnType<typeof setTimeout> | null = null;
+	let geometryRequest = 0;
+	let mounted = false;
+	let activeSnapshot: ResolvedDesignSnapshot;
+	let activeFluteParams: FluteParameters;
 	
 	let previousParams: FluteParameters;
 	let targetCameraPosition: THREE.Vector3 | null = null;
@@ -72,6 +89,7 @@
 	}
 
 	onMount(() => {
+		mounted = true;
 		const sceneSetup = createThreeScene(canvas);
 		scene = sceneSetup.scene;
 		camera = sceneSetup.camera;
@@ -81,9 +99,9 @@
 		controls = sceneSetup.controls;
 		disposeScene = sceneSetup.dispose;
 		
-		updateGeometry();
+		scheduleGeometryUpdate();
 		animate();
-		previousParams = { ...$fluteParams };
+		previousParams = { ...activeFluteParams };
 
 		resizeObserver = new ResizeObserver((entries) => {
 			const entry = entries[0];
@@ -95,15 +113,18 @@
 		resizeObserver.observe(canvas);
 
 		return () => {
+			mounted = false;
+			geometryRequest++;
+			if (geometryTimer) clearTimeout(geometryTimer);
 			if (animationId) cancelAnimationFrame(animationId);
-			if (disposeGeometry) disposeGeometry();
+			disposeCurrentGeometry();
 			if (disposeScene) disposeScene();
 			if (resizeObserver) resizeObserver.disconnect();
 		};
 	});
 
 	function handleParameterChange() {
-		const changedKeys = detectChangedParameters($fluteParams, previousParams);
+		const changedKeys = detectChangedParameters(activeFluteParams, previousParams);
 		
 		if (changedKeys.length > 0) {
 			const matchingTrigger = triggers.find(trigger =>
@@ -126,14 +147,20 @@
 				activeTrigger = matchingTrigger;
 			}
 			
-			previousParams = { ...$fluteParams };
+			previousParams = { ...activeFluteParams };
 		}
-		
-		updateGeometry();
 	}
 
-	$: if (scene && ($fluteParams || $currentDesignStep)) {
+	$: activeSnapshot =
+		snapshot ?? createLegacyPreviewSnapshot($fluteParams, $toneHoleParams);
+	$: activeFluteParams = activeSnapshot.design.flute;
+
+	$: if (scene && activeFluteParams) {
 		handleParameterChange();
+	}
+
+	$: if (scene && activeSnapshot && $currentDesignStep) {
+		scheduleGeometryUpdate();
 	}
 	
 	$: if (scene && camera && $currentDesignStep === 3) {
@@ -172,9 +199,10 @@
 		sectionAnalysisEnabled = true;
 		originalGeometryGroup = geometryGroup.clone();
 
-		const outerDiameter = $fluteParams.boreDiameter + (2 * $fluteParams.wallThickness);
+		const params = renderedSnapshot?.design.flute ?? activeFluteParams;
+		const outerDiameter = params.boreDiameter + (2 * params.wallThickness);
 		
-		const cutGroup = applySectionCut(geometryGroup, outerDiameter, $fluteParams.fluteLength);
+		const cutGroup = applySectionCut(geometryGroup, outerDiameter, params.fluteLength);
 		scene.remove(geometryGroup);
 		geometryGroup = cutGroup;
 		scene.add(geometryGroup);
@@ -189,25 +217,82 @@
 		originalGeometryGroup = null;
 	}
 
-	function updateGeometry() {
+	function disposeCurrentGeometry() {
+		if (geometryGroup) {
+			scene.remove(geometryGroup);
+			if (geometryGroup !== previewRoot) {
+				geometryGroup.traverse((child) => {
+					if (child instanceof THREE.Mesh) child.geometry.dispose();
+				});
+			}
+		}
+		disposeGeometry?.();
+		geometryGroup = null;
+		previewRoot = null;
+		disposeGeometry = null;
+		renderedSnapshot = null;
+		sectionAnalysisEnabled = false;
+		originalGeometryGroup = null;
+	}
+
+	function scheduleGeometryUpdate() {
 		if (!scene) return;
+		if (geometryTimer) clearTimeout(geometryTimer);
+
+		const requestedSnapshot = activeSnapshot;
+		const requestedKind = previewKindForStep($currentDesignStep);
+		const request = ++geometryRequest;
+		geometryTimer = setTimeout(() => {
+			geometryTimer = null;
+			void updateGeometry(requestedSnapshot, requestedKind, request);
+		}, GEOMETRY_DEBOUNCE_MS);
+	}
+
+	async function updateGeometry(
+		requestedSnapshot: ResolvedDesignSnapshot,
+		requestedKind: ReturnType<typeof previewKindForStep>,
+		request: number
+	) {
+		const result = await threePreviewService.build({
+			snapshot: requestedSnapshot,
+			previewKind: requestedKind
+		});
+		if (!result.ok) {
+			console.error('Failed to build Three.js preview', result.error);
+			return;
+		}
+
+		const currentKind = previewKindForStep($currentDesignStep);
+		const stale =
+			!mounted ||
+			request !== geometryRequest ||
+			requestedSnapshot.revision !== activeSnapshot.revision ||
+			requestedSnapshot.fingerprint !== activeSnapshot.fingerprint ||
+			requestedKind !== currentKind;
+		if (stale) {
+			result.value.dispose();
+			return;
+		}
+
+		if (!(result.value.root instanceof THREE.Group)) {
+			result.value.dispose();
+			console.error('Three.js preview root must be a Group');
+			return;
+		}
 
 		const shouldEnableSectionAnalysis = getDesiredSectionAnalysisState();
+		disposeCurrentGeometry();
 
-		if (geometryGroup) scene.remove(geometryGroup);
-		if (disposeGeometry) disposeGeometry();
-
-		const result = createGeometryForStep($currentDesignStep, $fluteParams, $toneHoleParams);
-		geometryGroup = result.group;
-		disposeGeometry = result.dispose;
+		geometryGroup = result.value.root;
+		previewRoot = result.value.root;
+		disposeGeometry = result.value.dispose;
+		renderedSnapshot = requestedSnapshot;
 		scene.add(geometryGroup);
 
 		sectionAnalysisEnabled = false;
 		originalGeometryGroup = null;
 
-		if (shouldEnableSectionAnalysis) {
-			enableSectionAnalysis();
-		}
+		if (shouldEnableSectionAnalysis) enableSectionAnalysis();
 	}
 
 	function animate() {

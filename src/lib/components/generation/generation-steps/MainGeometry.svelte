@@ -2,17 +2,12 @@
 	import ParameterControl from '$lib/components/generation/form-elements/ParameterControl.svelte';
 	import FrequencySelector from '$lib/components/generation/form-elements/FrequencySelector.svelte';
 	import { fluteParams, DEFAULT_PARAMETERS } from '$lib/stores/fluteStore';
-    import { viewMode } from '$lib/stores/uiStore';
+	import { FLUTE_FIELDS } from '$lib/domain/designSchema';
 	import {
-		validateBoreDiameter,
-		validateWallThickness
-	} from '$lib/components/generation/generation-steps/designParametersValidation';
-	import { PARAMETER_INFO } from '$lib/components/generation/generation-steps/designParametersInfo';
-	import { 
-		getDefaultCorkDistance, 
+		getDefaultCorkDistance,
 		getDefaultCorkThickness,
-		resolveComputedParameter 
-	} from '$lib/components/generation/generation-steps/designParametersDefault';
+		resolveComputedParameter
+	} from '$lib/domain/computedParameters';
 
 	function handleParameterChange<K extends keyof typeof $fluteParams>(
 		key: K,
@@ -44,129 +39,66 @@
 	<div class="space-y-4">
 		<h3 class="heading-section">Physical Parameters</h3>
 		<ParameterControl
-			label="Bore Diameter"
+			field={FLUTE_FIELDS.boreDiameter}
 			value={$fluteParams.boreDiameter}
-			min={10}
-			max={30}
-			step={0.5}
-			unit="mm"
-			inputType="number"
-			visibility="always"
-			validate={validateBoreDiameter}
 			getDefault={() => DEFAULT_PARAMETERS.boreDiameter}
 			onChange={(v) => handleParameterChange('boreDiameter', v)}
-			info={PARAMETER_INFO.boreDiameter}
 		/>
 		<ParameterControl
-			label="Wall Thickness"
+			field={FLUTE_FIELDS.wallThickness}
 			value={$fluteParams.wallThickness}
-			min={1}
-			max={5}
-			step={0.1}
-			unit="mm"
-			inputType="number"
-			visibility="always"
-			validate={validateWallThickness}
 			getDefault={() => DEFAULT_PARAMETERS.wallThickness}
 			onChange={(v) => handleParameterChange('wallThickness', v)}
-			info={PARAMETER_INFO.wallThickness}
 		/>
 		<ParameterControl
-			label="Thumb Hole"
+			field={FLUTE_FIELDS.hasThumbHole}
 			value={$fluteParams.hasThumbHole}
-			inputType="checkbox"
-			visibility="always"
 			getDefault={() => DEFAULT_PARAMETERS.hasThumbHole}
 			onChange={(v) => handleParameterChange('hasThumbHole', v)}
-			info={PARAMETER_INFO.hasThumbHole}
 		/>
 		<ParameterControl
-			label="Overhang Length"
+			field={FLUTE_FIELDS.overhangLength}
 			value={$fluteParams.overhangLength}
-			min={0}
-			max={50}
-			step={1}
-			unit="mm"
-			inputType="number"
-			visibility="advanced"
 			getDefault={() => DEFAULT_PARAMETERS.overhangLength}
 			onChange={(v) => handleParameterChange('overhangLength', v)}
-			info={PARAMETER_INFO.overhangLength}
 		/>
 		<ParameterControl
-			label="Cork Distance"
+			field={FLUTE_FIELDS.corkDistance}
 			value={resolvedCorkDistance}
-			min={5}
-			max={30}
-			step={0.5}
-			unit="mm"
-			inputType="number"
-			visibility="advanced"
-			isComputed={true}
 			computedMode={$fluteParams.corkDistance.mode}
 			getDefault={() => getDefaultCorkDistance($fluteParams)}
 			onChange={(v) => handleComputedParameterChange('corkDistance', v as number)}
 			onResetComputed={() => handleComputedParameterReset('corkDistance')}
-			info={PARAMETER_INFO.corkDistance}
 		/>
 		<ParameterControl
-			label="Cork Thickness"
+			field={FLUTE_FIELDS.corkThickness}
 			value={resolvedCorkThickness}
-			min={1}
-			max={5}
-			step={0.1}
-			unit="mm"
-			inputType="number"
-			visibility="advanced"
-			isComputed={true}
 			computedMode={$fluteParams.corkThickness.mode}
 			getDefault={() => getDefaultCorkThickness($fluteParams)}
 			onChange={(v) => handleComputedParameterChange('corkThickness', v as number)}
 			onResetComputed={() => handleComputedParameterReset('corkThickness')}
-			info={PARAMETER_INFO.corkThickness}
 		/>
 	</div>
 
 	<div class="space-y-4 mt-8">
 		<h3 class="heading-section">Embouchure Hole Parameters</h3>
 		<ParameterControl
-			label="Hole Length"
+			field={FLUTE_FIELDS.embouchureHoleLength}
 			value={$fluteParams.embouchureHoleLength}
-			min={5}
-			max={20}
-			step={0.5}
-			unit="mm"
-			inputType="number"
-			visibility="always"
 			getDefault={() => DEFAULT_PARAMETERS.embouchureHoleLength}
 			onChange={(v) => handleParameterChange('embouchureHoleLength', v)}
-			info={PARAMETER_INFO.embouchureHoleLength}
 		/>
 		<ParameterControl
-			label="Hole Width"
+			field={FLUTE_FIELDS.embouchureHoleWidth}
 			value={$fluteParams.embouchureHoleWidth}
-			min={5}
-			max={15}
-			step={0.5}
-			unit="mm"
-			inputType="number"
-			visibility="always"
 			getDefault={() => DEFAULT_PARAMETERS.embouchureHoleWidth}
 			onChange={(v) => handleParameterChange('embouchureHoleWidth', v)}
-			info={PARAMETER_INFO.embouchureHoleWidth}
 		/>
 		<ParameterControl
-			label="Lip Coverage"
+			field={FLUTE_FIELDS.lipCoveragePercent}
 			value={$fluteParams.lipCoveragePercent}
-			min={0}
-			max={100}
-			step={1}
-			unit="%"
-			inputType="number"
-			visibility="advanced"
 			getDefault={() => DEFAULT_PARAMETERS.lipCoveragePercent}
 			onChange={(v) => handleParameterChange('lipCoveragePercent', v)}
-			info={PARAMETER_INFO.lipCoveragePercent}
 		/>
 	</div>
 
@@ -179,16 +111,10 @@
 			onChange={(v) => handleParameterChange('fundamentalFrequency', v)}
 		/>
         <ParameterControl
-			label="Number of Tone Holes"
+			field={FLUTE_FIELDS.numberOfToneHoles}
 			value={$fluteParams.numberOfToneHoles}
-			min={3}
-			max={8}
-			unit=" holes"
-			inputType="slider"
-			visibility="always"
 			getDefault={() => DEFAULT_PARAMETERS.numberOfToneHoles}
 			onChange={(v) => handleParameterChange('numberOfToneHoles', v)}
-			info={PARAMETER_INFO.numberOfToneHoles}
 		/>
 	</div>
 

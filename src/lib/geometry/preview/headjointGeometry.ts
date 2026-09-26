@@ -1,60 +1,59 @@
 import * as THREE from 'three';
 import { Brush, Evaluator, SUBTRACTION } from 'three-bvh-csg';
-import type { FluteParameters } from '../../stores/fluteStore';
-import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
+import type { ResolvedDesignSnapshot, ThreePreviewResult } from '$lib/api/generation';
 import { createFluteMaterial } from './materials';
 import { addLabel } from './sceneAnnotations';
+import { getPreviewBodySemantics } from './bodySemantics';
 
+// TODO: Use tube helper function to simplify geometry creation
 const HEADJOINT_LENGTH_MM = 150;
 
-interface HeadJointGeometryResult {
-	group: THREE.Group;
-	dispose: () => void;
-}
-
-export function createHeadJointGeometry(params: FluteParameters): HeadJointGeometryResult {
+export function createHeadJointGeometry(snapshot: ResolvedDesignSnapshot): ThreePreviewResult {
+	const params = snapshot.design.flute;
+	const semantics = getPreviewBodySemantics(snapshot);
 	const group = new THREE.Group();
 	const geometries: THREE.BufferGeometry[] = [];
 	
 	const innerRadius = params.boreDiameter / 2;
 	const outerRadius = innerRadius + params.wallThickness;
-	const corkThickness = resolveComputedParameter('corkThickness', params);
-	const corkDistance = resolveComputedParameter('corkDistance', params);
-	const overhang = params.overhangLength;
+	const headjointEnd = semantics.body.end.bodyDistance;
+	const headjointStart = Math.max(0, headjointEnd - HEADJOINT_LENGTH_MM);
+	const headjointLength = headjointEnd - headjointStart;
+	const startX = semantics.body.start.previewX + headjointStart;
+	const endX = semantics.body.end.previewX;
 	
 	const { material, dispose: disposeMaterial } = createFluteMaterial();
 	
 	const evaluator = new Evaluator();
 	
-	// Start at the top of headjoint
-	const startPos = -HEADJOINT_LENGTH_MM / 2;
-	const overhangEnd = startPos + overhang;
-	const corkEnd = overhangEnd + corkThickness;
-	const embouchurePos = corkEnd + corkDistance;
-	
 	// Create outer cylinder brush
 	const outerGeometry = new THREE.CylinderGeometry(
 		outerRadius,
 		outerRadius,
-		HEADJOINT_LENGTH_MM,
+		headjointLength,
 		32
 	);
 	outerGeometry.rotateZ(Math.PI / 2);
+	outerGeometry.translate((startX + endX) / 2, 0, 0);
 	const outerBrush = new Brush(outerGeometry);
 	
-	// Overhang cut
+	// Overshoot the open (body-side) face so CSG punches through the end cap.
+	const boreCutOvershoot = Math.max(2, params.wallThickness);
+	const mainBoreStartX = startX - boreCutOvershoot;
+	const mainBoreEndX = semantics.mainBore.end.previewX;
+	const mainBoreLength = mainBoreEndX - mainBoreStartX;
 	const bore1Geometry = new THREE.CylinderGeometry(
 		innerRadius,
 		innerRadius,
-		overhang,
+		mainBoreLength,
 		32
 	);
 	bore1Geometry.rotateZ(Math.PI / 2);
-	bore1Geometry.translate(startPos + overhang / 2, 0, 0);
+	bore1Geometry.translate((mainBoreStartX + mainBoreEndX) / 2, 0, 0);
 	const bore1Brush = new Brush(bore1Geometry);
 	
-	// Main bore cut
-	const bore2Length = HEADJOINT_LENGTH_MM / 2 - corkEnd;
+	// Bore from the far side of the cork to the tip of the overhang.
+	const bore2Length = semantics.overhang.length;
 	const bore2Geometry = new THREE.CylinderGeometry(
 		innerRadius,
 		innerRadius,
@@ -62,7 +61,11 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 		32
 	);
 	bore2Geometry.rotateZ(Math.PI / 2);
-	bore2Geometry.translate(corkEnd + bore2Length / 2, 0, 0);
+	bore2Geometry.translate(
+		(semantics.overhang.start.previewX + semantics.overhang.end.previewX) / 2,
+		0,
+		0
+	);
 	const bore2Brush = new Brush(bore2Geometry);
 	
 	// Subtract both bore sections
@@ -83,7 +86,7 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 		1,
 		params.embouchureHoleWidth / (embouchureRadius * 2)
 	);
-	embouchureGeometry.translate(embouchurePos, outerRadius, 0);
+	embouchureGeometry.translate(semantics.embouchure.previewX, outerRadius, 0);
 	const embouchureBrush = new Brush(embouchureGeometry);
 	
 	// Subtract embouchure hole
@@ -93,18 +96,21 @@ export function createHeadJointGeometry(params: FluteParameters): HeadJointGeome
 	group.add(bodyMesh);
 	
 	const titleLabel = addLabel(group, 'Headjoint Geometry', {
-		x: 0,
+		x: (startX + endX) / 2,
 		y: 0,
 		z: outerRadius + 20
 	}, { width: 50, height: 10 });
 	
 	geometries.push(outerGeometry, bore1Geometry, bore2Geometry, embouchureGeometry, resultBrush.geometry);
 	
+	let disposed = false;
 	const dispose = () => {
+		if (disposed) return;
+		disposed = true;
 		geometries.forEach(geo => geo.dispose());
 		disposeMaterial();
 		titleLabel.dispose();
 	};
 	
-	return { group, dispose };
+	return { root: group, dispose };
 }

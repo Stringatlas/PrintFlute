@@ -2,7 +2,7 @@
 	import ParameterControl from '$lib/components/generation/form-elements/ParameterControl.svelte';
 	import ToneHoleTable from '$lib/components/generation/form-elements/ToneHoleTable.svelte';
 	import { fluteParams, DEFAULT_PARAMETERS } from '$lib/stores/fluteStore';
-	import { PARAMETER_INFO } from '$lib/components/generation/generation-steps/designParametersInfo';
+	import { FLUTE_FIELDS } from '$lib/domain/designSchema';
 
 	function handleParameterChange<K extends keyof typeof $fluteParams>(
 		key: K,
@@ -20,16 +20,10 @@
 		<h3 class="heading-section">Tone Hole Placement</h3>
 		
 		<ParameterControl
-			label="Number of Tone Holes"
+			field={FLUTE_FIELDS.numberOfToneHoles}
 			value={$fluteParams.numberOfToneHoles}
-			min={3}
-			max={8}
-			unit=" holes"
-			inputType="slider"
-			visibility="always"
 			getDefault={() => DEFAULT_PARAMETERS.numberOfToneHoles}
 			onChange={(v) => handleParameterChange('numberOfToneHoles', v)}
-			info={PARAMETER_INFO.numberOfToneHoles}
 		/>
 	</div>
 
@@ -41,42 +35,25 @@
 		<h3 class="heading-section">Thumb Hole</h3>
 		
 		<ParameterControl
+			field={FLUTE_FIELDS.hasThumbHole}
 			label="Enable Thumb Hole"
 			value={$fluteParams.hasThumbHole}
-			inputType="checkbox"
-			visibility="always"
 			getDefault={() => DEFAULT_PARAMETERS.hasThumbHole}
 			onChange={(v) => handleParameterChange('hasThumbHole', v)}
-			info={PARAMETER_INFO.hasThumbHole}
 		/>
 
 		{#if $fluteParams.hasThumbHole}
 			<ParameterControl
-				label="Thumb Hole Diameter"
+				field={FLUTE_FIELDS.thumbHoleDiameter}
 				value={$fluteParams.thumbHoleDiameter}
-				min={3}
-				max={12}
-				step={0.5}
-				unit="mm"
-				inputType="number"
-				visibility="always"
 				getDefault={() => DEFAULT_PARAMETERS.thumbHoleDiameter}
 				onChange={(v) => handleParameterChange('thumbHoleDiameter', v)}
-				info={PARAMETER_INFO.thumbHoleDiameter}
 			/>
-            // TODO: Allow custom values in between slider range
 			<ParameterControl
-				label="Thumb Hole Angle"
+				field={FLUTE_FIELDS.thumbHoleAngle}
 				value={$fluteParams.thumbHoleAngle}
-				min={0}
-				max={90}
-				step={5}
-				unit="deg"
-				inputType="slider"
-				visibility="always"
 				getDefault={() => DEFAULT_PARAMETERS.thumbHoleAngle}
 				onChange={(v) => handleParameterChange('thumbHoleAngle', v)}
-				info={PARAMETER_INFO.thumbHoleAngle}
 			/>
 		{/if}
 	</div>

@@ -5,7 +5,7 @@
 	import Tooltip from '$lib/components/generation/form-elements/Tooltip.svelte';
     import { fluteParams, toneHoleParams } from '$lib/stores/fluteStore';
     import { viewMode, currentDesignStep } from '$lib/stores/uiStore';
-	import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
+	import { resolveComputedParameter } from '$lib/domain/computedParameters';
     
 	let currentStep = 1;
 

@@ -1,11 +1,23 @@
 import { makeCylinder, drawEllipse } from "replicad";
 import type { Solid } from "replicad";
-import type { FluteParameters, ToneHoleParameters } from "../../stores/fluteStore";
-import { resolveComputedParameter } from '$lib/components/generation/generation-steps/designParametersDefault';
+import { resolveComputedParameter } from '$lib/domain/computedParameters';
+import type { FluteParameters, ToneHoleParameters } from '$lib/domain/fluteTypes';
 
 export interface FluteCADResult {
 	full: Solid;
 	parts?: Solid[];
+}
+
+export function validCutDistances(
+	cutDistances: number[],
+	numberOfCuts: number,
+	fluteLength: number
+): number[] {
+	return cutDistances
+		.slice(0, Math.max(0, numberOfCuts))
+		.filter((distance) => Number.isFinite(distance) && distance > 0 && distance < fluteLength)
+		.sort((a, b) => a - b)
+		.filter((distance, index, distances) => index === 0 || distance !== distances[index - 1]);
 }
 
 function createEllipticalHole(lengthX: number, widthY: number, depth: number): Solid {
@@ -170,17 +182,11 @@ class FluteCADBuilder {
 
 		const parts: Solid[] = [];
 		const connectorRadius = wallThickness / 2 + boreDiameter / 2;
-		const sortedCutDistances = [...cutDistances].sort((a, b) => a - b);
+		const sortedCutDistances = validCutDistances(cutDistances, numberOfCuts, this.fluteLength);
 
 		let currentStart = 0;
     
-		for (let i = 0; i < sortedCutDistances.length; i++) {
-			const cutPosition = sortedCutDistances[i];
-
-            let isValidCut = cutPosition > currentStart && cutPosition < this.fluteLength;
-			if (!isValidCut) {
-				continue;
-			}
+		for (const cutPosition of sortedCutDistances) {
 
 			const partLength = cutPosition - currentStart;
 			const includeRegion = makeCylinder(this.outerRadius, partLength).translate([
@@ -195,7 +201,7 @@ class FluteCADBuilder {
                 .cut(makeCylinder(this.innerRadius, connectorLength).translate([0, 0, cutPosition]));
 
             // Cut connector cavity if this is not the first part
-            const needsCavity = i > 0;
+            const needsCavity = parts.length > 0;
             if (needsCavity) {
                 const cutTool = makeCylinder(this.innerRadius + wallThickness / 2, connectorLength).translate([0, 0, currentStart]);
                 part = part.cut(cutTool);
