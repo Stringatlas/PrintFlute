@@ -2,7 +2,7 @@
 
 A web-based tool for designing, generating, and analyzing 3D-printed flutes. This application provides an end-to-end workflow for creating custom wind instruments, from parametric design through acoustic analysis and STL file generation for 3D printing.
 
-[Try it here](https://print-flute.vercel.app/)
+[Try it here](https://www.printflute.com/)
 
 ## Overview
 
