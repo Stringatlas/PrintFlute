@@ -32,7 +32,10 @@ export const PARAMETER_BOUNDS = {
 	connectorLength: { min: 5, max: 30 },
 	numberOfCuts: { min: 0, max: 5 },
 	cutDistance: { min: 0, max: 500 },
-	holeDiameter: { min: 3, max: 15 },
+	// Broad representational limits. Playability guidance is advisory, not a hard bound.
+	holeDiameter: { min: 0.1, max: 100 },
+	holeDistance: { min: 0, max: 10_000 },
+	holeAngle: { min: -180, max: 180 },
 	holeCents: { min: 0, max: 2400 }
 } as const;
 
@@ -55,9 +58,9 @@ export function validateWallThickness(value: number): ValidationResult {
 }
 
 export function validateDiameter(value: number): ValidationResult {
-	if (value < PARAMETER_BOUNDS.holeDiameter.min) return { status: 'error', message: 'Hole diameter too small. Minimum 3mm.' };
-	if (value > PARAMETER_BOUNDS.holeDiameter.max) return { status: 'error', message: 'Hole diameter too large. Maximum 15mm.' };
+	if (value < 3) return { status: 'warning', message: 'Below the usual 3mm range; printing and response may be difficult.' };
 	if (value < 5) return { status: 'warning', message: 'Very small hole. May be difficult to cover.' };
+	if (value > 15) return { status: 'warning', message: 'Above the usual 15mm range; check wall geometry and playability.' };
 	if (value > 12) return { status: 'warning', message: 'Very large hole. May affect tuning significantly.' };
 	return { status: 'success' };
 }

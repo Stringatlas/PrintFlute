@@ -91,14 +91,21 @@ class FluteCADBuilder {
 		for (let i = 0; i < this.fluteParams.numberOfToneHoles; i++) {
 			const holeDiameter = this.toneHoleParams.holeDiameters[i] || 0;
 			const holeDistance = this.toneHoleParams.holeDistances[i] || 0;
+			const holeAngle = this.toneHoleParams.holeAngles[i] || 0;
 
 			if (holeDiameter > 0 && holeDistance > 0 && holeDistance < this.fluteLength) {
 				const holeRadius = holeDiameter / 2;
 				const holeDepth = this.fluteParams.wallThickness * 2 + 1;
+				const angleRad = (holeAngle * Math.PI) / 180;
 
 				const toneHole = makeCylinder(holeRadius, holeDepth)
 					.rotate(90, [0, 0, 0], [1, 0, 0])
-					.translate([0, this.outerRadius, holeDistance]);
+					.rotate(holeAngle, [0, 0, 0], [0, 0, 1])
+					.translate([
+						-Math.sin(angleRad) * this.outerRadius,
+						Math.cos(angleRad) * this.outerRadius,
+						holeDistance
+					]);
 
 				this.flute = this.flute.cut(toneHole);
 				this.holePositions.push(holeDistance);

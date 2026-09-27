@@ -28,6 +28,7 @@ describe('preview body semantics', () => {
 	it('projects resolved embouchure, tone-hole, and cut positions', () => {
 		const snapshot = createResolvedSnapshot();
 		snapshot.design.toneHoles.holeDistances[0] = 240;
+		snapshot.design.toneHoles.holeAngles[0] = 35;
 		snapshot.design.flute.cutDistances = [175];
 		const semantics = getPreviewBodySemantics(snapshot);
 		const halfLength = snapshot.design.flute.fluteLength / 2;
@@ -39,7 +40,8 @@ describe('preview body semantics', () => {
 			index: 0,
 			bodyDistance: 240,
 			previewX: 240 - halfLength,
-			diameter: snapshot.design.toneHoles.holeDiameters[0]
+			diameter: snapshot.design.toneHoles.holeDiameters[0],
+			angle: 35
 		});
 		expect(semantics.cuts[0]).toEqual({
 			bodyDistance: 175,

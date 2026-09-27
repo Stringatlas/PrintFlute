@@ -106,7 +106,13 @@ export function createFullFluteGeometry(snapshot: ResolvedDesignSnapshot): Three
 				fluteParams.wallThickness * 2 + 1,
 				32
 			);
-			holeGeometry.translate(hole.previewX, outerRadius, 0);
+			const angleRad = THREE.MathUtils.degToRad(hole.angle);
+			holeGeometry.rotateX(angleRad);
+			holeGeometry.translate(
+				hole.previewX,
+				Math.cos(angleRad) * outerRadius,
+				Math.sin(angleRad) * outerRadius
+			);
 			const holeBrush = new Brush(holeGeometry);
 			
 			resultBrush = evaluator.evaluate(resultBrush, holeBrush, SUBTRACTION);

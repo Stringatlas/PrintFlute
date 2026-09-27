@@ -1,6 +1,7 @@
 import { get } from 'svelte/store';
 import { localStorageStore } from '$lib/utils/localStorageStore';
 import type { FluteParameters, ToneHoleParameters } from '$lib/domain/fluteTypes';
+import type { FluteLibraryEntry } from '$lib/domain/library';
 import { fluteParams, toneHoleParams } from './fluteStore';
 
 export interface FlutePreset {
@@ -31,6 +32,31 @@ function createLibraryStore() {
 
 	return {
 		subscribe,
+
+		loadDesign: (design: Pick<FluteLibraryEntry, 'fluteParameters' | 'toneHoleParameters'>) => {
+			fluteParams.resetAll();
+			toneHoleParams.resetAll();
+
+			Object.entries(design.fluteParameters).forEach(([key, value]) => {
+				fluteParams.updateParameter(key as keyof FluteParameters, value);
+			});
+			toneHoleParams.updateToneHoleParams(design.toneHoleParameters);
+		},
+
+		saveDesignAsPreset: (design: FluteLibraryEntry, name = design.name) => {
+			const now = new Date().toISOString();
+			const preset: FlutePreset = {
+				id: crypto.randomUUID(),
+				name,
+				description: design.description,
+				createdAt: now,
+				updatedAt: now,
+				fluteParameters: structuredClone(design.fluteParameters),
+				toneHoleParameters: structuredClone(design.toneHoleParameters)
+			};
+			update(state => ({ ...state, presets: [...state.presets, preset], activePresetId: preset.id }));
+			return preset.id;
+		},
 
 		saveCurrentAsPreset: (name: string, description: string = '') => {
 			const preset: FlutePreset = {
@@ -75,11 +101,9 @@ function createLibraryStore() {
 
 			fluteParams.resetAll();
 			toneHoleParams.resetAll();
-
 			Object.entries(preset.fluteParameters).forEach(([key, value]) => {
 				fluteParams.updateParameter(key as keyof FluteParameters, value);
 			});
-
 			toneHoleParams.updateToneHoleParams(preset.toneHoleParameters);
 
 			update(state => ({ ...state, activePresetId: id }));

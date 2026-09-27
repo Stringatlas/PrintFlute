@@ -2,6 +2,10 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 import { calculateFluteData, calculateFluteUpdates } from '$lib/services/fluteCalculation';
 import { resolveComputedParameter } from '$lib/domain/computedParameters';
 import { normalizeFluteParameters } from '$lib/stores/fluteStore';
+import {
+	DEFAULT_FLUTE_PARAMETERS,
+	DEFAULT_TONE_HOLE_PARAMETERS
+} from '$lib/services/designNormalization';
 import { validateDesign } from '$lib/validation/designParameters';
 import {
 	API_ERROR_CODES,
@@ -54,6 +58,16 @@ describe('generation contract', () => {
 		expect(updates.embouchureDistance).toBeGreaterThan(0);
 		expect(updates.fluteLength).toBeGreaterThan(updates.embouchureDistance);
 		expect(updates.holeDistances.slice(0, 6).every(Number.isFinite)).toBe(true);
+	});
+
+	it('starts new designs at the recommended tone-hole positions', () => {
+		const recommendation = calculateFluteData(
+			DEFAULT_FLUTE_PARAMETERS,
+			DEFAULT_TONE_HOLE_PARAMETERS
+		).holes.map((hole) => hole.physicalPosition);
+
+		expect(DEFAULT_TONE_HOLE_PARAMETERS.holeDistances.slice(0, recommendation.length))
+			.toEqual(recommendation);
 	});
 
 	it('carries validation issues separately from calculation output', () => {

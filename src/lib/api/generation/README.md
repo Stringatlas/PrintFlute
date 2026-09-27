@@ -2,16 +2,22 @@
 
 ## Data and ownership
 
-`DesignDraft` wraps the existing `FluteParameters` and `ToneHoleParameters` unchanged so persisted designs and current UI code remain compatible. The evaluator normalizes a draft and is the sole owner of these derived compatibility fields:
+`DesignDraft` wraps `FluteParameters` and `ToneHoleParameters`; normalization fills
+new geometry fields such as per-hole angle so legacy persisted designs remain compatible.
+The evaluator is the sole owner of these derived compatibility fields:
 
 - `flute.embouchureDistance` and `flute.fluteLength`
-- `toneHoles.holeDistances` and `toneHoles.cutoffRatios`
+- `toneHoles.cutoffRatios`
+
+Tone-hole diameters, positions (`holeDistances`), and angles are canonical editable
+geometry. The evaluator returns ideal acoustic positions and tuning guidance as a
+separate advisory layer; it never replaces the supplied geometry.
 
 Incoming values for those fields must not influence evaluation. The normalized values are returned in `snapshot.design`; their explicit projection is also returned as `snapshot.calculation.updates`. `snapshot.resolved` owns final auto/manual cork values, while `snapshot.calculation.data` owns raw acoustic output. Consumers must not recalculate or write back any of them.
 
 All lengths, diameters, radii, positions, and linear tolerances are millimetres. Frequencies are Hz, tuning offsets are cents, percentages are 0–100, cutoff ratios are dimensionless, `thumbHoleAngle` is degrees, and production `angularDeflection` is radians.
 
-The canonical physical axis starts at the open/base end at axial position 0 and increases toward the head end. Tone-hole, embouchure, and cut distances use this axis. Replicad maps it to +Z. Three.js maps it to +X and centres the finished body at the origin; that conversion is presentation-only. Tone holes face the positive radial/front direction. A zero-degree thumb-hole angle is opposite the tone holes and positive angles rotate toward the side.
+The canonical physical axis starts at the open/base end at axial position 0 and increases toward the head end. Tone-hole, embouchure, and cut distances use this axis. Replicad maps it to +Z. Three.js maps it to +X and centres the finished body at the origin; that conversion is presentation-only. A zero-degree tone-hole angle faces the positive radial/front direction. A zero-degree thumb-hole angle is opposite the tone holes and positive angles rotate toward the side.
 
 ## Snapshot identity
 

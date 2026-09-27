@@ -3,258 +3,138 @@
 	import LandingBackdrop from '$lib/components/landing/LandingBackdrop.svelte';
 	import LandingPreview3D from '$lib/components/landing/LandingPreview3D.svelte';
 	import PrintFluteAnimation from '$lib/components/landing/PrintFluteAnimation.svelte';
-	import { PARAMETER_BOUNDS } from '$lib/validation/designParameters';
+	import { OFFICIAL_FLUTES } from '$lib/data/officialFlutes';
 
-	let boreDiameter = $state(14.3);
-	let wallThickness = $state(2.5);
-	let holeCount = $state(6);
-
-	const capabilities = [
-		{
-			icon: 'bi-pencil-fill',
-			title: 'Acoustic designer',
-			body: 'Set bore, wall, embouchure, and tone-hole tuning. Lengths and hole seats update as you edit.'
-		},
-		{
-			icon: 'bi-box',
-			title: '3D model generation',
-			body: 'The designer builds a flute solid you can inspect, section, and export. This page only previews that model.'
-		},
-		{
-			icon: 'bi-file-earmark-arrow-down',
-			title: 'STL and STEP export',
-			body: 'When the geometry is ready, export printable files from the builder. Generation stays on this machine.'
-		},
-		{
-			icon: 'bi-collection-fill',
-			title: 'Local library',
-			body: 'Save, load, and import presets on this device. Nothing is uploaded to store or compare your designs.'
-		},
-		{
-			icon: 'bi-music-note',
-			title: 'Chromatic tuner',
-			body: 'After you print, check the instrument against the predicted scale with cent-accurate pitch detection.'
-		},
-		{
-			icon: 'bi-soundwave',
-			title: 'Timbre analysis',
-			body: 'Inspect brightness, breathiness, harmonics, and a spectrogram from microphone audio in this tab.'
-		}
-	];
-
-	const steps = [
-		{ n: 1, title: 'Main geometry', body: 'Dial in bore, wall thickness, cork, and embouchure.' },
-		{ n: 2, title: 'Place tone holes', body: 'Choose a scale. Distances calculate from those inputs.' },
-		{ n: 3, title: 'Prepare the solid', body: 'Add cuts and connectors, then export the generated model.' }
-	];
+	const featuredFlutes = OFFICIAL_FLUTES.filter((entry) => entry.featured);
+	let selectedSlug = $state(featuredFlutes[0].slug);
+	let selected = $derived(featuredFlutes.find((entry) => entry.slug === selectedSlug) ?? featuredFlutes[0]);
 </script>
 
 <svelte:head>
-	<title>Print Flute — Generate 3D flute models in the browser</title>
-	<meta
-		name="description"
-		content="Generate 3D-printable flute models entirely on your device. No cloud, no account, no uploads."
-	/>
+	<title>Print Flute — Choose, generate, and print a flute locally</title>
+	<meta name="description" content="Choose a ready-made flute design and generate printable files entirely in your browser. No account, uploads, or cloud processing." />
 </svelte:head>
 
-<div class="relative min-h-screen bg-gray-950">
+<div class="min-h-screen overflow-hidden bg-gray-950 text-gray-100">
 	<LandingBackdrop />
+	<header class="relative z-20 border-b border-gray-800/80 bg-gray-950/90 backdrop-blur">
+		<div class="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 sm:px-8">
+			<a href="/" class="flex items-center gap-3" aria-label="Print Flute home">
+				<img src={favicon} alt="" class="h-9 w-auto" />
+				<span class="font-semibold tracking-tight text-gray-100">Print Flute</span>
+			</a>
+			<nav class="hidden items-center gap-7 text-sm text-gray-400 md:flex" aria-label="Main navigation">
+				<a class="transition hover:text-gray-100" href="#library">Flute library</a>
+				<a class="transition hover:text-gray-100" href="#how-it-works">How it works</a>
+				<a class="transition hover:text-gray-100" href="/build?tab=designer">Advanced designer</a>
+			</nav>
+			<a href="/build" class="btn-primary">Browse flutes <i class="bi bi-arrow-right"></i></a>
+		</div>
+	</header>
 
-	<div class="relative">
-		<header class="border-b border-gray-800 bg-gray-900/95">
-			<div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-				<div class="flex items-center gap-3">
-					<img src={favicon} alt="Print Flute logo" class="h-10 w-auto" />
-					<div>
-						<h1 class="text-xl font-bold text-primary-400">Print Flute</h1>
-						<p class="text-xs text-gray-400">Design &amp; Analysis for 3D Printed Flutes</p>
+	<main class="relative z-10">
+		<section class="relative border-b border-gray-800/70">
+			<div class="hero-glow" aria-hidden="true"></div>
+			<div class="relative mx-auto grid min-h-[43rem] max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:py-24">
+				<div class="max-w-xl">
+					<p class="mb-5 text-sm font-medium text-primary-400">Local 3D-printable instruments</p>
+					<h1 class="text-5xl font-semibold leading-[1.02] tracking-[-0.045em] text-white sm:text-6xl lg:text-7xl">A printable flute, without the setup.</h1>
+					<p class="mt-7 max-w-lg text-lg leading-8 text-gray-400">Choose a ready-made instrument, adjust it only if you want, and generate the model entirely on your device.</p>
+					<div class="mt-9 flex flex-wrap gap-3">
+						<a href="/build" class="btn-primary min-h-12 px-5">Browse the flute library <i class="bi bi-arrow-right"></i></a>
+						<a href="/build?tab=designer" class="btn-secondary min-h-12 px-5">Build from scratch</a>
 					</div>
+					<p class="mt-5 flex items-center gap-2 text-sm text-gray-500"><i class="bi bi-shield-check text-primary-500"></i> No account. No uploads. No cloud processing.</p>
 				</div>
-				<div class="flex items-center gap-3">
-					<span class="badge-success hidden sm:inline-flex items-center gap-1">
-						<i class="bi bi-shield-lock"></i>
-						100% local · no cloud
-					</span>
-					<a href="/build" class="btn-primary">
-						Open designer
-						<i class="bi bi-arrow-right"></i>
-					</a>
+
+				<div class="relative lg:translate-x-8">
+					<div class="absolute -inset-8 rounded-full bg-primary-500/5 blur-3xl" aria-hidden="true"></div>
+					<div class="relative overflow-hidden rounded-3xl border border-gray-700/70 bg-gray-900/70 shadow-2xl shadow-black/40">
+						<div class="h-80 sm:h-96"><PrintFluteAnimation /></div>
+					</div>
 				</div>
 			</div>
-		</header>
+		</section>
 
-		<main class="mx-auto max-w-6xl space-y-16 px-4 py-10 sm:px-6 md:py-14">
-			<section class="grid items-center gap-10 lg:grid-cols-2">
-				<div class="space-y-6">
-					<p class="heading-section">Local 3D model generation</p>
-					<h2 class="text-4xl font-semibold tracking-tight text-gray-100 sm:text-5xl">
-						Generate the flute
-						<span class="text-primary-400">before you print</span>
-					</h2>
-					<p class="text-lg text-gray-300">
-						Print Flute calculates acoustics and builds a 3D model in your browser. There is no
-						account, no upload, and no cloud service in the path from parameters to geometry.
-					</p>
-					<div class="flex flex-wrap gap-2">
-						<span class="stat-cell text-xs text-gray-300">
-							<i class="bi bi-wifi-off text-primary-400"></i>
-							No cloud
-						</span>
-						<span class="stat-cell text-xs text-gray-300">
-							<i class="bi bi-cpu text-primary-400"></i>
-							On-device generation
-						</span>
-						<span class="stat-cell text-xs text-gray-300">
-							<i class="bi bi-lock text-primary-400"></i>
-							Designs stay here
-						</span>
-					</div>
-					<div class="flex flex-wrap gap-3">
-						<a href="/build" class="btn-primary">
-							Start designing
-							<i class="bi bi-pencil-fill"></i>
-						</a>
-						<a href="#model" class="btn-secondary">Adjust the model</a>
-					</div>
+		<section id="library" class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
+			<div class="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+				<div class="max-w-2xl">
+					<p class="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-400">Ready-made designs</p>
+					<h2 class="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Start with a flute, not a form.</h2>
+					<p class="mt-3 leading-7 text-gray-400">Each design is a small parameter recipe. The actual model is generated when you open it.</p>
 				</div>
+				<a href="/build" class="text-sm font-medium text-primary-400 transition hover:text-primary-300">See all six designs <i class="bi bi-arrow-right ml-1"></i></a>
+			</div>
 
-				<div class="canvas-panel h-64 overflow-hidden sm:h-72">
-					<PrintFluteAnimation />
-				</div>
-			</section>
-
-			<section id="model" class="space-y-4">
-				<div class="flex-between">
-					<div>
-						<p class="heading-section">Interactive model</p>
-						<h3 class="heading-page mt-1">Parameters drive the generated solid</h3>
-					</div>
-					<p class="text-muted hidden sm:block">Three.js preview · no CAD export on this page</p>
-				</div>
-				<div class="canvas-panel h-[26rem] overflow-hidden">
-					<LandingPreview3D
-						{boreDiameter}
-						{wallThickness}
-						holeCount={Math.round(holeCount)}
-					/>
-				</div>
-				<div class="card grid gap-4 md:grid-cols-3">
-					<label class="space-y-2">
-						<div class="flex-between">
-							<span class="label">Bore diameter</span>
-							<span class="text-muted">{boreDiameter.toFixed(1)} mm</span>
+			<div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+				{#each featuredFlutes as flute}
+					<article class="flex min-h-72 flex-col rounded-2xl border border-gray-800 bg-gray-900/45 p-5 transition hover:-translate-y-1 hover:border-gray-700 hover:bg-gray-900/70">
+						<div class="mb-5 flex items-center justify-between"><span class="text-sm font-medium text-primary-400">{flute.metadata.key}</span><span class="text-xs capitalize text-gray-600">{flute.metadata.size}</span></div>
+						<h3 class="text-xl font-semibold text-gray-100">{flute.name}</h3>
+						<p class="mt-3 text-sm leading-6 text-gray-400">{flute.description}</p>
+						<div class="mt-auto pt-7">
+							<div class="mb-4 flex gap-4 text-xs text-gray-500"><span>{flute.fluteParameters.numberOfToneHoles} holes</span><span>{flute.metadata.printFormat === 'one-piece' ? 'One-piece print' : 'Sectional print'}</span></div>
+							<a href={`/build?design=${flute.slug}`} class="flex items-center justify-between border-t border-gray-800 pt-4 text-sm font-medium text-gray-200 transition hover:text-primary-400"><span>Use this design</span><i class="bi bi-arrow-right"></i></a>
 						</div>
-						<input
-							class="input-slider w-full"
-							type="range"
-							min={PARAMETER_BOUNDS.boreDiameter.min}
-							max={PARAMETER_BOUNDS.boreDiameter.max}
-							step="0.1"
-							bind:value={boreDiameter}
-						/>
-					</label>
-					<label class="space-y-2">
-						<div class="flex-between">
-							<span class="label">Wall thickness</span>
-							<span class="text-muted">{wallThickness.toFixed(1)} mm</span>
-						</div>
-						<input
-							class="input-slider w-full"
-							type="range"
-							min={PARAMETER_BOUNDS.wallThickness.min}
-							max={PARAMETER_BOUNDS.wallThickness.max}
-							step="0.1"
-							bind:value={wallThickness}
-						/>
-					</label>
-					<label class="space-y-2">
-						<div class="flex-between">
-							<span class="label">Tone holes</span>
-							<span class="text-muted">{Math.round(holeCount)}</span>
-						</div>
-						<input
-							class="input-slider w-full"
-							type="range"
-							min={PARAMETER_BOUNDS.numberOfToneHoles.min}
-							max={PARAMETER_BOUNDS.numberOfToneHoles.max}
-							step="1"
-							bind:value={holeCount}
-						/>
-					</label>
-				</div>
-			</section>
+					</article>
+				{/each}
+			</div>
+		</section>
 
-			<section class="space-y-6">
-				<div>
-					<p class="heading-section">What you can do</p>
-					<h3 class="heading-page mt-2">A designer, still on-device</h3>
-				</div>
-				<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-					{#each capabilities as capability}
-						<article class="card space-y-3">
-							<div class="flex-center">
-								<i class="bi {capability.icon} text-primary-400 text-lg"></i>
-								<h4 class="font-semibold text-gray-100">{capability.title}</h4>
-							</div>
-							<p class="text-muted">{capability.body}</p>
-						</article>
-					{/each}
-				</div>
-			</section>
+		<section class="border-y border-gray-800 bg-gray-900/25 py-20 lg:py-28">
+			<div class="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+				<div class="max-w-lg">
+					<p class="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-400">Hear the choice in the shape</p>
+					<h2 class="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Choose an instrument character.</h2>
+					<p class="mt-4 leading-7 text-gray-400">Pick a starting point and the generated geometry updates with it. Exact dimensions remain available in the advanced designer.</p>
 
-			<section class="grid gap-8 lg:grid-cols-2">
-				<div class="space-y-4">
-					<p class="heading-section">How a model is built</p>
-					<h3 class="heading-page">Three steps to a solid</h3>
-					<p class="text-gray-300">
-						The builder walks geometry, tone holes, then print prep. Heavy solid export stays in that
-						flow; this page only generates a live preview.
-					</p>
-					<div class="space-y-2">
-						{#each steps as step}
-							<div class="flex items-start gap-3 rounded bg-gray-800/50 p-3">
-								<span class="badge-auto mt-0.5">{step.n}</span>
-								<div>
-									<div class="text-sm text-gray-200">{step.title}</div>
-									<div class="text-xs text-gray-400">{step.body}</div>
-								</div>
-							</div>
+					<div class="mt-8 space-y-2" role="listbox" aria-label="Choose a flute to preview">
+						{#each featuredFlutes as flute}
+							<button
+								class="group flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition {selectedSlug === flute.slug ? 'border-primary-600 bg-primary-950/40' : 'border-gray-800 bg-gray-950/30 hover:border-gray-700'}"
+								onclick={() => selectedSlug = flute.slug}
+								role="option"
+								aria-selected={selectedSlug === flute.slug}
+							>
+								<span><span class="font-medium text-gray-200">{flute.name}</span><span class="ml-3 text-sm text-gray-500">{flute.metadata.character}</span></span>
+								<span class="text-sm text-primary-400">{flute.metadata.key}</span>
+							</button>
 						{/each}
 					</div>
+					<a href={`/build?design=${selected.slug}`} class="btn-primary mt-6 inline-flex">Open {selected.name} <i class="bi bi-arrow-right"></i></a>
 				</div>
 
-				<div class="card space-y-4">
-					<div class="flex-center">
-						<i class="bi bi-cloud-slash text-secondary-400 text-xl"></i>
-						<h3 class="heading-analysis">100% local. No cloud.</h3>
+				<div class="relative lg:translate-x-10">
+					<div class="h-[30rem] overflow-hidden rounded-3xl border border-gray-700 bg-gray-950 shadow-2xl shadow-black/30">
+						<LandingPreview3D boreDiameter={selected.fluteParameters.boreDiameter} wallThickness={selected.fluteParameters.wallThickness} holeCount={selected.fluteParameters.numberOfToneHoles} />
 					</div>
-					<p class="text-gray-300">
-						Acoustics, library files, tuner audio, and model export execute in this browser. There is
-						no backend that receives your flute and no sign-in required to generate geometry.
-					</p>
-					<ul class="space-y-2 text-sm text-gray-300">
-						<li class="flex-center"><i class="bi bi-check text-primary-400"></i> Parameters persist in local storage</li>
-						<li class="flex-center"><i class="bi bi-check text-primary-400"></i> Presets import and export as JSON on disk</li>
-						<li class="flex-center"><i class="bi bi-check text-primary-400"></i> Models are generated on this machine</li>
-						<li class="flex-center"><i class="bi bi-check text-primary-400"></i> Microphone analysis never leaves the tab</li>
-					</ul>
+					<div class="mt-3 flex justify-end gap-5 text-xs text-gray-600"><span>{selected.fluteParameters.boreDiameter} mm bore</span><span>{selected.metadata.printFormat === 'one-piece' ? 'One-piece' : 'Sectional'}</span></div>
 				</div>
-			</section>
+			</div>
+		</section>
 
-			<section class="card flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-				<div>
-					<h3 class="heading-page">Open the full generator</h3>
-					<p class="text-muted mt-1">Same dark workshop, with every design step and export.</p>
-				</div>
-				<a href="/build" class="btn-primary">
-					Go to builder
-					<i class="bi bi-arrow-right"></i>
-				</a>
-			</section>
-		</main>
+		<section id="how-it-works" class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-28">
+			<div class="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
+				<div><p class="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary-400">From catalog to print bed</p><h2 class="text-3xl font-semibold tracking-tight text-white sm:text-4xl">Three deliberate steps.</h2></div>
+				<ol class="grid gap-8 sm:grid-cols-3">
+					<li class="border-t border-gray-700 pt-5"><span class="text-sm text-primary-400">01</span><h3 class="mt-5 font-semibold text-gray-100">Choose</h3><p class="mt-2 text-sm leading-6 text-gray-500">Start from a provided flute or one saved on this device.</p></li>
+					<li class="border-t border-gray-700 pt-5"><span class="text-sm text-primary-400">02</span><h3 class="mt-5 font-semibold text-gray-100">Generate</h3><p class="mt-2 text-sm leading-6 text-gray-500">Acoustics and solid geometry are calculated in your browser.</p></li>
+					<li class="border-t border-gray-700 pt-5"><span class="text-sm text-primary-400">03</span><h3 class="mt-5 font-semibold text-gray-100">Print</h3><p class="mt-2 text-sm leading-6 text-gray-500">Export STL or STEP files without sending the design anywhere.</p></li>
+				</ol>
+			</div>
+		</section>
 
-		<footer class="border-t border-gray-800 px-4 py-6 text-center text-xs text-gray-500">
-			Print Flute v0.1.0 · runs entirely in your browser
-		</footer>
-	</div>
+		<section class="border-t border-gray-800 bg-primary-950/20">
+			<div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 px-5 py-16 sm:px-8 md:flex-row md:items-center">
+				<div><h2 class="text-3xl font-semibold tracking-tight text-white">Pick a flute and make it yours.</h2><p class="mt-2 text-gray-400">The library is included. The model is generated locally.</p></div>
+				<a href="/build" class="btn-primary min-h-12 shrink-0 px-6">Browse the library <i class="bi bi-arrow-right"></i></a>
+			</div>
+		</section>
+	</main>
+
+	<footer class="relative z-10 border-t border-gray-800 px-5 py-7 text-center text-xs text-gray-600">Print Flute · local by default</footer>
 </div>
+
+<style>
+	.hero-glow { position: absolute; inset: 0; background: radial-gradient(circle at 75% 35%, rgb(16 185 129 / 0.1), transparent 35%), linear-gradient(to bottom, rgb(3 7 18 / 0.16), rgb(3 7 18 / 0.66)); }
+</style>

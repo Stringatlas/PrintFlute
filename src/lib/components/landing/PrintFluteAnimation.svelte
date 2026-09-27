@@ -12,8 +12,9 @@
 	let host: HTMLDivElement | undefined;
 	let svg: d3.Selection<SVGSVGElement, unknown, null, undefined> | undefined;
 	let timer: d3.Timer | undefined;
-	let reducedMotion = false;
+	let reducedMotion = $state(false);
 	let ready = $state(false);
+	let finished = $state(false);
 
 	const COOLED = '#10b981';
 	const HOT = '#fb923c';
@@ -46,7 +47,9 @@
 
 	function startPrint() {
 		if (!svg) return;
+		finished = false;
 		timer?.stop();
+		svg.selectAll('*').interrupt();
 		svg.selectAll('*').remove();
 
 		const layers = buildPrintLayers({ boreDiameter, wallThickness, holeCount });
@@ -72,7 +75,8 @@
 						.attr('stroke-linecap', 'round');
 				}
 			}
-			nozzle.attr('transform', `translate(720, 70)`);
+			nozzle.attr('opacity', 0);
+			finished = true;
 			return;
 		}
 
@@ -88,15 +92,17 @@
 
 		let jobIndex = 0;
 		let elapsed = 0;
-		const travelMs = 70;
-		const drawMs = 220;
-		const coolDelay = 90;
+		const travelMs = 34;
+		const drawMs = 86;
 
-		nozzle.attr('transform', `translate(${jobs[0]?.from ?? 80}, ${jobs[0]?.y ?? 200})`);
+		positionNozzle(nozzle, jobs[0]?.from ?? 400, jobs[0]?.y ?? 280);
 
 		timer = d3.timer((now) => {
 			if (jobIndex >= jobs.length) {
-				if (now > elapsed + 1600) startPrint();
+				layerGroup.select<SVGLineElement>(`#seg-${jobs.length - 1}`).attr('stroke', COOLED);
+				nozzle.attr('opacity', 0);
+				timer?.stop();
+				finished = true;
 				return;
 			}
 
@@ -110,13 +116,19 @@
 				const t = local / travelMs;
 				const x = startX + (job.from - startX) * t;
 				const y = startY + (job.y - startY) * t;
-				nozzle.attr('transform', `translate(${x}, ${y})`);
+				positionNozzle(nozzle, x, y);
 				return;
+			}
+
+			// Cooling is discrete: the previous extrusion stays hot through travel,
+			// then turns green exactly when the next extrusion begins.
+			if (jobIndex > 0) {
+				layerGroup.select<SVGLineElement>(`#seg-${jobIndex - 1}`).attr('stroke', COOLED);
 			}
 
 			const drawT = Math.min(1, (local - travelMs) / drawMs);
 			const x = job.from + (job.to - job.from) * drawT;
-			nozzle.attr('transform', `translate(${x}, ${job.y})`);
+			positionNozzle(nozzle, x, job.y);
 
 			const id = `seg-${jobIndex}`;
 			let line = layerGroup.select<SVGLineElement>(`#${id}`);
@@ -135,8 +147,7 @@
 			line.attr('x2', x);
 
 			if (drawT >= 1) {
-				line.transition().duration(coolDelay * 4).attr('stroke', COOLED);
-				elapsed += travelMs + drawMs + coolDelay;
+				elapsed += travelMs + drawMs;
 				jobIndex += 1;
 			}
 		});
@@ -211,9 +222,10 @@
 		const nozzle = root.append('g').attr('class', 'print-nozzle');
 		nozzle
 			.append('line')
+			.attr('class', 'nozzle-feed')
 			.attr('x1', 0)
 			.attr('x2', 0)
-			.attr('y1', -220)
+			.attr('y1', 0)
 			.attr('y2', -18)
 			.attr('stroke', RAIL)
 			.attr('stroke-width', 2);
@@ -234,6 +246,22 @@
 			.attr('opacity', 0.35);
 		return nozzle;
 	}
+
+	function positionNozzle(
+		nozzle: d3.Selection<SVGGElement, unknown, null, undefined>,
+		x: number,
+		y: number
+	) {
+		nozzle.attr('transform', `translate(${x}, ${y})`);
+		nozzle.select<SVGLineElement>('.nozzle-feed').attr('y1', PRINT_VIEW.bedY > y ? 52 - y : -220);
+	}
 </script>
 
-<div bind:this={host} class="h-full w-full"></div>
+<div class="relative h-full w-full">
+	<div bind:this={host} class="h-full w-full"></div>
+	{#if finished && !reducedMotion}
+		<button class="absolute bottom-4 right-4 rounded-lg border border-gray-700 bg-gray-950/85 px-3 py-2 text-xs text-gray-400 shadow-lg transition hover:border-gray-600 hover:text-gray-100" onclick={startPrint} aria-label="Replay printing animation">
+			<i class="bi bi-arrow-clockwise mr-1.5"></i>Replay print
+		</button>
+	{/if}
+</div>

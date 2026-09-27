@@ -25,6 +25,8 @@ describe('design parameter schema', () => {
 		expect(FLUTE_FIELDS.numberOfCuts.bounds).toBe(PARAMETER_BOUNDS.numberOfCuts);
 		expect(FLUTE_FIELDS.cutDistances.bounds).toBe(PARAMETER_BOUNDS.cutDistance);
 		expect(TONE_HOLE_FIELDS.holeDiameters.bounds).toBe(PARAMETER_BOUNDS.holeDiameter);
+		expect(TONE_HOLE_FIELDS.holeDistances.bounds).toBe(PARAMETER_BOUNDS.holeDistance);
+		expect(TONE_HOLE_FIELDS.holeAngles.bounds).toBe(PARAMETER_BOUNDS.holeAngle);
 		expect(TONE_HOLE_FIELDS.holeCents.bounds).toBe(PARAMETER_BOUNDS.holeCents);
 	});
 
@@ -53,7 +55,6 @@ describe('design parameter schema', () => {
 		const derived = [
 			FLUTE_FIELDS.embouchureDistance,
 			FLUTE_FIELDS.fluteLength,
-			TONE_HOLE_FIELDS.holeDistances,
 			TONE_HOLE_FIELDS.cutoffRatios
 		];
 
@@ -64,5 +65,8 @@ describe('design parameter schema', () => {
 			expect(schema.defaultSource.kind).toBe('acoustic-calculation');
 			expect(schema.dependencies.length).toBeGreaterThan(0);
 		}
+
+		expect(TONE_HOLE_FIELDS.holeDistances.readOnly).toBe(false);
+		expect(TONE_HOLE_FIELDS.holeAngles.readOnly).toBe(false);
 	});
 });

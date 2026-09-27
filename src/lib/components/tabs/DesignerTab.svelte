@@ -32,7 +32,8 @@
 		const holeInfo = Array.from({ length: $fluteParams.numberOfToneHoles }, (_, i) => {
 			const diameter = $toneHoleParams.holeDiameters[i] || 0;
 			const distance = $toneHoleParams.holeDistances[i] || 0;
-			return `  Hole ${i + 1}: ${diameter}mm @ ${distance.toFixed(1)}mm`;
+			const angle = $toneHoleParams.holeAngles[i] || 0;
+			return `  Hole ${i + 1}: ${diameter}mm @ ${distance.toFixed(1)}mm / ${angle}°`;
 		}).join('\n');
 		
 		const corkDistance = resolveComputedParameter('corkDistance', $fluteParams);

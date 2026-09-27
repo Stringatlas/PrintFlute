@@ -26,11 +26,14 @@ export interface FluteParameters {
 	cutDistances: number[];
 }
 
-/** Tuning inputs and calculated output for each tone hole. */
+/** Physical tone-hole geometry plus optional acoustic targets and analysis output. */
 export interface ToneHoleParameters {
 	holeDiameters: number[];
-	holeCents: number[];
 	holeDistances: number[];
+	holeAngles: number[];
+	/** Optional target pitch used by the tuning guidance layer. */
+	holeCents: number[];
+	/** Compatibility output populated by acoustic analysis. */
 	cutoffRatios: number[];
 }
 
@@ -38,9 +41,9 @@ export interface ToneHoleParameters {
  * Editable design payload used at the generation boundary.
  *
  * The nested objects intentionally retain the complete legacy parameter shapes.
- * `embouchureDistance`, `fluteLength`, `holeDistances`, and `cutoffRatios` are
- * compatibility fields: evaluators must ignore their incoming values and replace
- * them with calculated values in a resolved snapshot.
+ * `embouchureDistance`, `fluteLength`, and `cutoffRatios` are compatibility
+ * outputs. Tone-hole diameter, distance, and angle are editable geometry and
+ * must never be overwritten by acoustic evaluation.
  */
 export interface DesignDraft {
 	flute: FluteParameters;

@@ -85,6 +85,7 @@ export function createLegacyPreviewSnapshot(
 			holeDiameters: [...toneHoleParams.holeDiameters],
 			holeCents: [...toneHoleParams.holeCents],
 			holeDistances: [...toneHoleParams.holeDistances],
+			holeAngles: [...toneHoleParams.holeAngles],
 			cutoffRatios: [...toneHoleParams.cutoffRatios]
 		}
 	};
@@ -119,6 +120,7 @@ export function createLegacyPreviewSnapshot(
 				cutoffRatios: [...design.toneHoles.cutoffRatios]
 			}
 		},
+		tuning: { available: false, message: 'Tuning guidance has not been evaluated.', toneHoles: [] },
 		validation: []
 	};
 }

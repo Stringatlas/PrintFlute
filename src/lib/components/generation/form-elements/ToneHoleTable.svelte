@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { toneHoleParams } from '$lib/stores/fluteStore';
+	import { resolvedDesignSnapshot, toneHoleParams } from '$lib/stores/fluteStore';
     import { viewMode } from '$lib/stores/uiStore';
 	import { calculationError } from '$lib/utils/fluteCalculationHelper';
 	import { TONE_HOLE_COLUMNS, TONE_HOLE_FIELDS } from '$lib/domain/designSchema';
@@ -23,6 +23,32 @@
 		}
 	}
 
+	function handleGeometryInput(
+		key: 'distance' | 'angle',
+		index: number,
+		event: Event
+	) {
+		const value = parseFloat((event.target as HTMLInputElement).value);
+		if (Number.isNaN(value)) return;
+		if (key === 'distance') toneHoleParams.updateHoleDistance(index, value);
+		else toneHoleParams.updateHoleAngle(index, value);
+	}
+
+	function useRecommendedPosition(index: number) {
+		const advisory = tuningByIndex.get(index);
+		if (advisory) toneHoleParams.updateHoleDistance(index, advisory.suggestedPosition);
+	}
+
+	function fitDiameterToPosition(index: number) {
+		const diameter = tuningByIndex.get(index)?.suggestedDiameter;
+		if (diameter !== undefined) toneHoleParams.updateHoleDiameter(index, diameter);
+	}
+
+	let showTuningGuidance = true;
+	$: tuningByIndex = new Map(
+		($resolvedDesignSnapshot?.tuning.toneHoles ?? []).map((advisory) => [advisory.index, advisory])
+	);
+
 	$: visibleColumns = TONE_HOLE_COLUMNS.filter(col =>
 		col.visibility === 'always' || $viewMode === 'advanced'
 	);
@@ -38,6 +64,23 @@
 		}
 	}
 </script>
+
+<div class="mb-3 flex items-center justify-between gap-4">
+	<div>
+		<div class="text-sm font-medium text-gray-200">Tuning guidance</div>
+		<div class="text-xs text-gray-400">Optional advice only; your geometry is never changed automatically.</div>
+	</div>
+	<label class="flex items-center gap-2 text-sm text-gray-300">
+		<input type="checkbox" bind:checked={showTuningGuidance} />
+		Show
+	</label>
+</div>
+
+{#if showTuningGuidance && $resolvedDesignSnapshot?.tuning.available === false}
+	<div class="mb-3 rounded border border-yellow-700/60 bg-yellow-950/30 px-3 py-2 text-xs text-yellow-300">
+		{$resolvedDesignSnapshot.tuning.message}
+	</div>
+{/if}
 
 {#if $calculationError}
 	<div class="alert-error mb-4">
@@ -106,15 +149,61 @@
 									class="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-200 focus:outline-none focus:border-primary-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 								/>
 							{:else if column.key === 'distance'}
-								<span>{($toneHoleParams.holeDistances[index] || 0).toFixed(2)}</span>
+								<input
+									type="number"
+									value={$toneHoleParams.holeDistances[index] ?? 0}
+									min={TONE_HOLE_FIELDS.holeDistances.bounds?.min}
+									max={TONE_HOLE_FIELDS.holeDistances.bounds?.max}
+									step={TONE_HOLE_FIELDS.holeDistances.step}
+									on:input={(e) => handleGeometryInput('distance', index, e)}
+									class="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-200 focus:outline-none focus:border-primary-500"
+								/>
+							{:else if column.key === 'angle'}
+								<input
+									type="number"
+									value={$toneHoleParams.holeAngles[index] ?? 0}
+									min={TONE_HOLE_FIELDS.holeAngles.bounds?.min}
+									max={TONE_HOLE_FIELDS.holeAngles.bounds?.max}
+									step={TONE_HOLE_FIELDS.holeAngles.step}
+									on:input={(e) => handleGeometryInput('angle', index, e)}
+									class="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-gray-200 focus:outline-none focus:border-primary-500"
+								/>
 							{:else if column.key === 'cutoff'}
 								<span>{($toneHoleParams.cutoffRatios[index] || 0).toFixed(2)}</span>
 							{/if}
 						</td>
 					{/each}
 				</tr>
+				{#if showTuningGuidance && tuningByIndex.get(index)?.status !== 'in-tune'}
+					<tr class="border-b border-gray-800">
+						<td colspan={visibleColumns.length} class="px-3 pb-2 text-xs text-yellow-300">
+							<div class="flex flex-wrap items-center justify-between gap-2">
+								<span>{tuningByIndex.get(index)?.message}</span>
+								<div class="flex shrink-0 gap-1.5">
+									<button
+										type="button"
+										on:click={() => useRecommendedPosition(index)}
+										class="rounded border border-yellow-600/70 px-2 py-1 text-[11px] font-medium text-yellow-200 hover:bg-yellow-900/50"
+									>
+										Use position
+									</button>
+									<button
+										type="button"
+										on:click={() => fitDiameterToPosition(index)}
+										disabled={tuningByIndex.get(index)?.suggestedDiameter === undefined}
+										title={tuningByIndex.get(index)?.suggestedDiameter === undefined
+											? 'No diameter in the supported acoustic range can match this position'
+											: 'Micro-adjust diameter to preserve the position you set'}
+										class="rounded border border-yellow-600/70 px-2 py-1 text-[11px] font-medium text-yellow-200 hover:bg-yellow-900/50 disabled:cursor-not-allowed disabled:opacity-40"
+									>
+										Fit size
+									</button>
+								</div>
+							</div>
+						</td>
+					</tr>
+				{/if}
 			{/each}
 		</tbody>
 	</table>
 </div>
-

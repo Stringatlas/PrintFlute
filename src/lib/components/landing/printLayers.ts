@@ -46,7 +46,8 @@ export function createFluteProfile(params: PrintDemoParams): FluteProfile {
 	const centerY = PRINT_VIEW.bedY - outerRadius - 8;
 
 	const embouchureX = xHead + 52;
-	const holeStart = embouchureX + 70;
+	// Preserve a recognizable headjoint between the embouchure and fingering holes.
+	const holeStart = embouchureX + 125;
 	const holeEnd = xFoot - 48;
 	const holeSpan = Math.max(holeEnd - holeStart, 1);
 	const holes = Array.from({ length: holeCount }, (_, index) => {
@@ -67,7 +68,9 @@ export function createFluteProfile(params: PrintDemoParams): FluteProfile {
 		innerRadius,
 		embouchure: {
 			x: embouchureX,
-			y: centerY - outerRadius + 7,
+			// Center the ellipse on the tube's top surface so only its lower half
+			// cuts into the printed profile. This reads as an open semicircle.
+			y: centerY - outerRadius,
 			rx: 11,
 			ry: 8
 		},
@@ -79,9 +82,7 @@ function inStadium(x: number, y: number, x0: number, x1: number, cy: number, rad
 	if (radius <= 0) return false;
 	const innerStart = x0 + radius;
 	const innerEnd = x1 - radius;
-	if (x >= innerStart && x <= innerEnd) {
-		return Math.abs(y - cy) <= radius;
-	}
+	if (x >= innerStart && x <= innerEnd) return Math.abs(y - cy) <= radius;
 	const capX = x < innerStart ? innerStart : innerEnd;
 	const dx = x - capX;
 	const dy = y - cy;
@@ -95,12 +96,8 @@ function inEllipse(x: number, y: number, cx: number, cy: number, rx: number, ry:
 }
 
 function isSolid(x: number, y: number, profile: FluteProfile): boolean {
-	if (!inStadium(x, y, profile.xHead, profile.xFoot, profile.centerY, profile.outerRadius)) {
-		return false;
-	}
-	if (inEllipse(x, y, profile.embouchure.x, profile.embouchure.y, profile.embouchure.rx, profile.embouchure.ry)) {
-		return false;
-	}
+	if (!inStadium(x, y, profile.xHead, profile.xFoot, profile.centerY, profile.outerRadius)) return false;
+	if (inEllipse(x, y, profile.embouchure.x, profile.embouchure.y, profile.embouchure.rx, profile.embouchure.ry)) return false;
 	return !profile.holes.some((hole) => {
 		const dx = x - hole.x;
 		const dy = y - hole.y;
@@ -111,7 +108,6 @@ function isSolid(x: number, y: number, profile: FluteProfile): boolean {
 function collapseSamples(xs: number[], solid: boolean[]): Interval[] {
 	const segments: Interval[] = [];
 	let start = -1;
-
 	for (let i = 0; i < solid.length; i++) {
 		if (solid[i] && start === -1) start = i;
 		if (start !== -1 && (!solid[i] || i === solid.length - 1)) {
@@ -122,7 +118,6 @@ function collapseSamples(xs: number[], solid: boolean[]): Interval[] {
 			start = -1;
 		}
 	}
-
 	return segments;
 }
 
@@ -130,17 +125,16 @@ export function buildPrintLayers(params: PrintDemoParams, layerCount = 52): Prin
 	const profile = createFluteProfile(params);
 	const top = profile.centerY - profile.outerRadius;
 	const bottom = profile.centerY + profile.outerRadius;
-	const xs = Array.from({ length: SAMPLE_COUNT }, (_, i) => {
-		const t = i / (SAMPLE_COUNT - 1);
+	const xs = Array.from({ length: SAMPLE_COUNT }, (_, index) => {
+		const t = index / (SAMPLE_COUNT - 1);
 		return profile.xHead - 8 + t * (profile.xFoot - profile.xHead + 16);
 	});
 
 	const layers: PrintLayer[] = [];
-	for (let i = 0; i < layerCount; i++) {
-		const y = bottom - ((i + 0.5) / layerCount) * (bottom - top);
-		const solid = xs.map((x) => isSolid(x, y, profile));
-		const segments = collapseSamples(xs, solid);
-		if (segments.length > 0) layers.push({ y, segments });
+	for (let index = 0; index < layerCount; index++) {
+		const y = bottom - ((index + 0.5) / layerCount) * (bottom - top);
+		const segments = collapseSamples(xs, xs.map((x) => isSolid(x, y, profile)));
+		if (segments.length) layers.push({ y, segments });
 	}
 	return layers;
 }

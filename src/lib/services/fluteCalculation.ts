@@ -9,6 +9,17 @@ export interface CalculatedFluteUpdates {
 	cutoffRatios: number[];
 }
 
+/** Calculates opt-in starting geometry without changing an existing design. */
+export function calculateRecommendedHoleDistances(
+	fluteParams: FluteParameters,
+	toneHoleParams: ToneHoleParameters
+): number[] {
+	const result = calculateFluteData(fluteParams, toneHoleParams);
+	return toneHoleParams.holeDistances.map((existing, index) =>
+		result.holes[index]?.physicalPosition ?? existing
+	);
+}
+
 function centsToFrequency(fundamentalHz: number, cents: number): number {
 	return fundamentalHz * Math.pow(2, cents / 1200);
 }

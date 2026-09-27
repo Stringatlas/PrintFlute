@@ -32,6 +32,7 @@ export function createDesignDraft(): DesignDraft {
 			holeDiameters: [7.5, 8, 5, 6, 6.5, 5.5, 6, 6],
 			holeCents: [200, 400, 500, 700, 900, 1100, 1200, 1400],
 			holeDistances: Array(8).fill(0),
+			holeAngles: Array(8).fill(0),
 			cutoffRatios: Array(8).fill(0)
 		}
 	};
@@ -72,6 +73,7 @@ export function createResolvedSnapshot(revision = 1): ResolvedDesignSnapshot {
 			},
 			updates: { embouchureDistance, fluteLength, holeDistances, cutoffRatios }
 		},
+		tuning: { available: true, toneHoles: [] },
 		validation: []
 	};
 }

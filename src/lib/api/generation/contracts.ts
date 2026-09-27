@@ -6,7 +6,7 @@ import type {
 	ToneHoleParameters
 } from '$lib/domain/fluteTypes';
 
-export const DESIGN_SCHEMA_VERSION = 1 as const;
+export const DESIGN_SCHEMA_VERSION = 2 as const;
 
 export type DesignSchemaVersion = typeof DESIGN_SCHEMA_VERSION;
 export type DesignRevision = number;
@@ -54,6 +54,25 @@ export interface ResolvedComputedParameters {
 	corkThickness: number;
 }
 
+export interface ToneHoleTuningAdvisory {
+	index: number;
+	status: 'in-tune' | 'warning';
+	targetFrequency: number;
+	estimatedCentsOffset: number;
+	currentPosition: number;
+	suggestedPosition: number;
+	positionDelta: number;
+	suggestedDiameter?: number;
+	message: string;
+}
+
+/** Acoustic advice layered over the physical design; it never mutates geometry. */
+export interface TuningAnalysis {
+	available: boolean;
+	message?: string;
+	toneHoles: ToneHoleTuningAdvisory[];
+}
+
 export interface ResolvedDesignSnapshot {
 	schemaVersion: DesignSchemaVersion;
 	revision: DesignRevision;
@@ -66,6 +85,7 @@ export interface ResolvedDesignSnapshot {
 		data: AcousticCalculation;
 		updates: CalculatedDesignUpdates;
 	};
+	tuning: TuningAnalysis;
 	validation: DesignValidationIssue[];
 }
 

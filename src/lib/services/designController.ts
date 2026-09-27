@@ -30,8 +30,9 @@ function cloneDesign(design: DesignDraft): DesignDraft {
 		},
 		toneHoles: {
 			holeDiameters: [...design.toneHoles.holeDiameters],
-			holeCents: [...design.toneHoles.holeCents],
 			holeDistances: [...design.toneHoles.holeDistances],
+			holeAngles: [...design.toneHoles.holeAngles],
+			holeCents: [...design.toneHoles.holeCents],
 			cutoffRatios: [...design.toneHoles.cutoffRatios]
 		}
 	};

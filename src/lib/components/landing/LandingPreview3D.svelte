@@ -34,6 +34,7 @@
 	let revision = 0;
 	let lengthMm = $state<number | null>(null);
 	let pending = $state(false);
+	let interactive = $state(false);
 
 	$effect(() => {
 		boreDiameter;
@@ -51,6 +52,9 @@
 		controls = setup.controls;
 		controls.autoRotate = true;
 		controls.autoRotateSpeed = 0.6;
+		controls.enableZoom = false;
+		controls.enablePan = false;
+		controls.enabled = false;
 		disposeScene = setup.dispose;
 		mounted = true;
 		schedule();
@@ -92,6 +96,7 @@
 				holeDiameters: [...DEFAULT_TONE_HOLE_PARAMETERS.holeDiameters],
 				holeCents: [...DEFAULT_TONE_HOLE_PARAMETERS.holeCents],
 				holeDistances: [...DEFAULT_TONE_HOLE_PARAMETERS.holeDistances],
+				holeAngles: [...DEFAULT_TONE_HOLE_PARAMETERS.holeAngles],
 				cutoffRatios: [...DEFAULT_TONE_HOLE_PARAMETERS.cutoffRatios]
 			}
 		};
@@ -170,16 +175,24 @@
 		controls.update();
 		renderer.render(scene, camera);
 	}
+
+	function toggleInteraction() {
+		interactive = !interactive;
+		controls.enabled = interactive;
+		controls.autoRotate = !interactive;
+	}
 </script>
 
 <div class="relative h-full w-full">
-	<canvas bind:this={canvas} class="block h-full w-full"></canvas>
-	<div class="absolute left-3 top-3 flex gap-2">
-		<span class="stat-cell text-xs text-gray-300">
-			{pending ? 'Updating model' : 'Generated model'}
-		</span>
+	<canvas bind:this={canvas} class="block h-full w-full {interactive ? 'pointer-events-auto cursor-grab active:cursor-grabbing' : 'pointer-events-none'}" style="touch-action: pan-y;"></canvas>
+	<div class="pointer-events-none absolute left-4 top-4 flex gap-3 text-xs text-gray-500">
+		<span>{pending ? 'Updating geometry…' : 'Generated on this device'}</span>
 		{#if lengthMm}
-			<span class="stat-cell text-xs text-gray-300">{lengthMm.toFixed(1)} mm</span>
+			<span>·</span><span>{lengthMm.toFixed(1)} mm</span>
 		{/if}
 	</div>
+	<button class="absolute bottom-4 right-4 rounded-lg border border-gray-700 bg-gray-950/90 px-3 py-2 text-xs text-gray-300 shadow-lg transition hover:border-gray-600 hover:text-white" onclick={toggleInteraction} aria-pressed={interactive}>
+		<i class="bi {interactive ? 'bi-check-lg' : 'bi-box'} mr-1.5"></i>
+		{interactive ? 'Finish inspecting' : 'Inspect in 3D'}
+	</button>
 </div>

@@ -5,6 +5,7 @@ import type {
 	ToneHoleParameters
 } from '$lib/domain/fluteTypes';
 import { MAX_TONE_HOLES, PARAMETER_BOUNDS } from '$lib/validation/designParameters';
+import { calculateRecommendedHoleDistances } from '$lib/services/fluteCalculation';
 
 export const DEFAULT_FLUTE_PARAMETERS: FluteParameters = {
 	boreDiameter: 14.3,
@@ -28,11 +29,29 @@ export const DEFAULT_FLUTE_PARAMETERS: FluteParameters = {
 	cutDistances: [180]
 };
 
-export const DEFAULT_TONE_HOLE_PARAMETERS: ToneHoleParameters = {
+const DEFAULT_TONE_HOLE_SEED: ToneHoleParameters = {
 	holeDiameters: [7.5, 8, 5, 6, 6.5, 5.5, 6, 6],
-	holeCents: [200, 400, 500, 700, 900, 1100, 1200, 1400],
 	holeDistances: Array(MAX_TONE_HOLES).fill(0),
+	holeAngles: Array(MAX_TONE_HOLES).fill(0),
+	holeCents: [200, 400, 500, 700, 900, 1100, 1200, 1400],
 	cutoffRatios: Array(MAX_TONE_HOLES).fill(0)
+};
+
+function defaultRecommendedHoleDistances(): number[] {
+	try {
+		return calculateRecommendedHoleDistances(
+			DEFAULT_FLUTE_PARAMETERS,
+			DEFAULT_TONE_HOLE_SEED
+		);
+	} catch {
+		// Keep startup resilient if future default acoustic inputs are temporarily invalid.
+		return [256, 221, 201, 166, 129, 93, 70, 50];
+	}
+}
+
+export const DEFAULT_TONE_HOLE_PARAMETERS: ToneHoleParameters = {
+	...DEFAULT_TONE_HOLE_SEED,
+	holeDistances: defaultRecommendedHoleDistances()
 };
 
 function clamp(
@@ -184,8 +203,17 @@ export function normalizeToneHoleParameters(value: unknown): ToneHoleParameters 
 			DEFAULT_TONE_HOLE_PARAMETERS.holeCents,
 			PARAMETER_BOUNDS.holeCents
 		),
-		// Compatibility outputs never enter calculation.
-		holeDistances: [...DEFAULT_TONE_HOLE_PARAMETERS.holeDistances],
+		holeDistances: normalizeArray(
+			source.holeDistances,
+			DEFAULT_TONE_HOLE_PARAMETERS.holeDistances,
+			PARAMETER_BOUNDS.holeDistance
+		),
+		holeAngles: normalizeArray(
+			source.holeAngles,
+			DEFAULT_TONE_HOLE_PARAMETERS.holeAngles,
+			PARAMETER_BOUNDS.holeAngle
+		),
+		// Compatibility output never enters calculation.
 		cutoffRatios: [...DEFAULT_TONE_HOLE_PARAMETERS.cutoffRatios]
 	};
 }

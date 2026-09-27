@@ -14,6 +14,7 @@ export interface PreviewSegmentBounds {
 export interface PreviewHolePosition extends PreviewAxisPosition {
 	index: number;
 	diameter: number;
+	angle: number;
 }
 
 export interface PreviewBodySemantics {
@@ -68,7 +69,8 @@ export function getPreviewBodySemantics(snapshot: ResolvedDesignSnapshot): Previ
 			.map((distance, index) => ({
 				...position(distance, fluteLength),
 				index,
-				diameter: toneHoles.holeDiameters[index] ?? 0
+				diameter: toneHoles.holeDiameters[index] ?? 0,
+				angle: toneHoles.holeAngles[index] ?? 0
 			})),
 		cuts: flute.cutDistances
 			.slice(0, flute.numberOfCuts)

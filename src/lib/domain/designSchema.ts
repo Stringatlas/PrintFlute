@@ -274,18 +274,24 @@ export const TONE_HOLE_FIELDS = {
 		validate: validateDiameter
 	}),
 	holeCents: bounded('toneHoles.holeCents.${number}', 'holeCents', {
-		label: 'Pitch',
-		tooltip: 'Pitch in cents above the fundamental when this hole is open.',
+		label: 'Target Pitch',
+		tooltip: 'Optional tuning target in cents above the fundamental. It is used for guidance and does not move the hole.',
 		unit: 'cents', input: 'number', step: 1, visibility: 'advanced',
 		defaultSource: { kind: 'diatonic-scale' },
 		dependencies: ['flute.fundamentalFrequency']
 	}),
 	holeDistances: field('toneHoles.holeDistances.${number}', {
-		label: 'Distance',
-		tooltip: 'Calculated distance from the flute base to the center of this tone hole.',
-		unit: 'mm', input: 'display',
-		defaultSource: { kind: 'acoustic-calculation' },
-		readOnly: true, derived: true, dependencies: acousticDependencies
+		label: 'Position',
+		tooltip: 'Physical distance from the flute base to the center of this tone hole.',
+		unit: 'mm', input: 'number', step: 0.5,
+		bounds: PARAMETER_BOUNDS.holeDistance,
+		defaultSource: { kind: 'legacy-default', key: 'holeDistances' }
+	}),
+	holeAngles: bounded('toneHoles.holeAngles.${number}', 'holeAngle', {
+		label: 'Angle',
+		tooltip: 'Rotation around the flute body. 0° faces forward; positive and negative values move the hole around either side.',
+		unit: 'deg', input: 'number', step: 5,
+		defaultSource: { kind: 'legacy-default', key: 'holeAngles' }
 	}),
 	cutoffRatios: field('toneHoles.cutoffRatios.${number}', {
 		label: 'Cutoff Ratio',
@@ -312,8 +318,9 @@ export const TONE_HOLE_NUMBER_COLUMN = {
 export const TONE_HOLE_COLUMNS = [
 	{ key: 'number', ...TONE_HOLE_NUMBER_COLUMN },
 	{ key: 'diameter', ...TONE_HOLE_FIELDS.holeDiameters },
-	{ key: 'pitch', ...TONE_HOLE_FIELDS.holeCents },
 	{ key: 'distance', ...TONE_HOLE_FIELDS.holeDistances },
+	{ key: 'angle', ...TONE_HOLE_FIELDS.holeAngles },
+	{ key: 'pitch', ...TONE_HOLE_FIELDS.holeCents },
 	{ key: 'cutoff', ...TONE_HOLE_FIELDS.cutoffRatios }
 ] as const;
 

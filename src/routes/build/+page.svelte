@@ -5,24 +5,15 @@
 	import AudioAnalysis from '$lib/components/tabs/TunerTab.svelte';
 	import TimbreAnalysis from '$lib/components/tabs/TimbreAnalysisTab.svelte';
 	import LibraryTab from '$lib/components/tabs/LibraryTab.svelte';
-	import WelcomeDialog from '$lib/components/welcome/WelcomeDialog.svelte';
-	import type { WelcomePage } from '$lib/components/welcome/WelcomeDialog.svelte';
-	import WelcomeIntro from '$lib/components/welcome/pages/WelcomeIntro.svelte';
-	import WelcomeDesigner from '$lib/components/welcome/pages/WelcomeDesigner.svelte';
-	import WelcomeAnalysis from '$lib/components/welcome/pages/WelcomeAnalysis.svelte';
-	import { shouldShowWelcome, completeOnboarding } from '$lib/stores/onboardingStore';
 	import type { Tab } from '$lib/components/SideNav.svelte';
+	import { onMount } from 'svelte';
+	import { findOfficialFlute } from '$lib/data/officialFlutes';
+	import { libraryStore } from '$lib/stores/libraryStore';
 
-	const welcomePages: WelcomePage[] = [
-		{ id: 'intro', title: 'Welcome to Flute Generator', component: WelcomeIntro },
-		{ id: 'designer', title: 'The Designer', component: WelcomeDesigner },
-		{ id: 'analysis', title: 'Audio Analysis', component: WelcomeAnalysis }
-	];
-
-	let currentTab: Tab = $state('designer');
+	let currentTab: Tab = $state('library');
 	let visited: Record<Tab, boolean> = $state({
-		designer: true,
-		library: false,
+		designer: false,
+		library: true,
 		tuner: false,
 		timbre: false
 	});
@@ -30,44 +21,55 @@
 	$effect.pre(() => {
 		visited[currentTab] = true;
 	});
+
+	onMount(() => {
+		const params = new URLSearchParams(window.location.search);
+		const design = params.get('design');
+		const requestedTab = params.get('tab');
+		if (design) {
+			const entry = findOfficialFlute(design);
+			if (entry) {
+				libraryStore.loadDesign(entry);
+				currentTab = 'designer';
+				return;
+			}
+		}
+		if (requestedTab === 'designer' || requestedTab === 'library' || requestedTab === 'tuner' || requestedTab === 'timbre') {
+			currentTab = requestedTab;
+		}
+	});
 </script>
 
-<div class="flex h-screen bg-gray-950">
+<div class="flex h-screen bg-gray-950 pb-16 md:pb-0">
 	<SideNav bind:currentTab />
 
-	<WelcomeDialog
-		pages={welcomePages}
-		open={$shouldShowWelcome}
-		onComplete={completeOnboarding}
-	/>
-
 	<main class="flex-1 flex overflow-hidden">
-		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'designer'}>
+		<div class="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6" class:hidden={currentTab !== 'designer'}>
 			{#if visited.designer}
 				<Designer />
 			{/if}
 		</div>
 
-		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'library'}>
+		<div class="flex-1 overflow-y-auto" class:hidden={currentTab !== 'library'}>
 			{#if visited.library}
-				<LibraryTab />
+				<LibraryTab onOpenDesigner={() => currentTab = 'designer'} />
 			{/if}
 		</div>
 
-		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'tuner'}>
+		<div class="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6" class:hidden={currentTab !== 'tuner'}>
 			{#if visited.tuner}
 				<AudioAnalysis />
 			{/if}
 		</div>
 
-		<div class="flex-1 overflow-y-auto p-6" class:hidden={currentTab !== 'timbre'}>
+		<div class="flex-1 overflow-y-auto p-2 sm:p-4 md:p-6" class:hidden={currentTab !== 'timbre'}>
 			{#if visited.timbre}
 				<TimbreAnalysis />
 			{/if}
 		</div>
 
 		{#if currentTab === 'designer'}
-			<div class="w-1/3 bg-gray-900 border-l border-gray-800">
+			<div class="hidden w-1/3 bg-gray-900 border-l border-gray-800 lg:block">
 				<Preview3D />
 			</div>
 		{/if}

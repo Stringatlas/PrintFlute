@@ -68,6 +68,7 @@ function createToneHoleStore() {
 		updateHoleDiameter: (index: number, value: number) => updateArray('holeDiameters', index, value),
 		updateHoleCents: (index: number, value: number) => updateArray('holeCents', index, value),
 		updateHoleDistance: (index: number, value: number) => updateArray('holeDistances', index, value),
+		updateHoleAngle: (index: number, value: number) => updateArray('holeAngles', index, value),
 		updateCutoffRatio: (index: number, value: number) => updateArray('cutoffRatios', index, value),
 		updateToneHoleParams: (params: Partial<ToneHoleParameters>) => {
 			const design = get(designController.design);

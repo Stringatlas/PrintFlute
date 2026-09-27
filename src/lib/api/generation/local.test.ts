@@ -3,7 +3,7 @@ import { createDesignDraft } from './__fixtures__/design';
 import { LocalGenerationApi } from './local';
 
 describe('LocalGenerationApi', () => {
-	it('evaluates defaults and ignores incoming derived compatibility values', async () => {
+	it('preserves tone-hole geometry while replacing derived compatibility values', async () => {
 		const api = new LocalGenerationApi();
 		const firstDraft = createDesignDraft();
 		const secondDraft = createDesignDraft();
@@ -18,27 +18,46 @@ describe('LocalGenerationApi', () => {
 		expect(first.ok).toBe(true);
 		expect(second.ok).toBe(true);
 		if (!first.ok || !second.ok) return;
-		expect(second.value.fingerprint).toBe(first.value.fingerprint);
-		expect(second.value.calculation).toEqual(first.value.calculation);
+		expect(second.value.fingerprint).not.toBe(first.value.fingerprint);
+		expect(second.value.design.toneHoles.holeDistances).toEqual(Array(8).fill(10_000));
+		expect(second.value.calculation.data).toEqual(first.value.calculation.data);
 		expect(second.value.design.flute.fluteLength).not.toBe(888_888);
 		expect(second.value.revision).toBe(2);
 	});
 
-	it('returns acoustic calculation failures as structured results', async () => {
+	it('returns non-blocking tuning guidance without changing geometry', async () => {
+		const api = new LocalGenerationApi();
+		const draft = createDesignDraft();
+		draft.toneHoles.holeDistances[0] = 120;
+
+		const result = await api.evaluate({ revision: 1, design: draft });
+
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(result.value.design.toneHoles.holeDistances[0]).toBe(120);
+		expect(result.value.tuning.toneHoles[0]).toMatchObject({
+			index: 0,
+			currentPosition: 120,
+			status: 'warning'
+		});
+		expect(result.value.tuning.toneHoles[0].suggestedPosition).not.toBe(120);
+	});
+
+	it('keeps acoustic calculation failures in the optional tuning layer', async () => {
 		const api = new LocalGenerationApi(() => {
 			throw new Error('test acoustic failure');
 		});
 
 		const result = await api.evaluate({ revision: 1, design: createDesignDraft() });
 
-		expect(result).toEqual({
-			ok: false,
-			error: {
-				code: 'CALCULATION_FAILED',
-				message: 'test acoustic failure',
-				retryable: false
-			}
+		expect(result.ok).toBe(true);
+		if (!result.ok) return;
+		expect(result.value.tuning).toEqual({
+			available: false,
+			message: 'Tuning guidance unavailable: test acoustic failure',
+			toneHoles: []
 		});
+		expect(result.value.design.flute.fluteLength).toBeGreaterThan(0);
 	});
 
 	it('maps resolved validation errors to contract issues', async () => {
